@@ -44,6 +44,8 @@ uint16_t adcRead(uint8_t channel)
 
 uint16_t adcGet(uint8_t channel)
 {
+	uint16_t _t;
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
-		return _adc[channel];
+		_t = _adc[channel];
+	return _t;
 }

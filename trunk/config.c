@@ -14,10 +14,12 @@
 
 noinit Config_t Config;
 EEMEM Config_t EEConfig;
+#define SIGNATURE	0x55
 
 static Config_t defaultConfig PROGMEM = 
 {
-	.signature = 0x56,
+	.signature = SIGNATURE,
+	.RX_mode = RX_MODE_CPPM,
 	.RX_zero[AIL] = PWM_MID,
 	.RX_zero[ELE] = PWM_MID,
 	.RX_zero[THR] = PWM_LOW,
@@ -40,7 +42,7 @@ static void _initConfig()
 static void _loadConfig()
 {
 	eeprom_read_block(&Config, &EEConfig, sizeof(Config));
-	if (Config.signature != 0x56)
+	if (Config.signature != SIGNATURE)
 		_initConfig();
 }
 

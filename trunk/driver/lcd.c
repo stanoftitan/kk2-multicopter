@@ -11,10 +11,9 @@
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <string.h>
+#include "lcd.h"
 
 #define BUFFERED
-
-extern prog_uchar lcdFont[][6];
 
 static uint8_t _reversed = 0;
 
@@ -55,6 +54,7 @@ static void sendData(uint8_t data)
 
 static void writeData(uint8_t data)
 {
+	if (_reversed) data ^= 0xFF;
 #ifdef BUFFERED
 	*(_write_ptr++) = data;
 	if (_write_ptr >= _screen + sizeof(_screen))
@@ -92,6 +92,7 @@ void lcdClear()
 			sendData(0);
 	}			
 #endif
+	lcdSetPos(0, 0);
 }
 
 void lcdWriteChar(char c)
@@ -100,7 +101,6 @@ void lcdWriteChar(char c)
 	for (uint8_t i = 0; i < 6; i++)
 	{
 		b = pgm_read_byte(&lcdFont[c-32][i]);
-		if (_reversed) b ^= 0xFF;
 		writeData(b);
 	}
 }
@@ -124,10 +124,22 @@ void lcdReverse(uint8_t reversed)
 	_reversed = reversed;
 }
 
+void lcdWriteImage_P(PGM_P image, uint8_t width)
+{
+	for (uint8_t i = 0; i < width; i++)	
+		writeData(pgm_read_byte(image + i));
+}
+
 void lcdSetContrast(uint8_t contrast)
 {
 	sendCommand(0x81);
 	sendCommand(contrast & 0x3F); 
+}
+
+void lcdFill(uint8_t c, uint8_t width)
+{
+	for (uint8_t i = 0; i < width; i++)
+		writeData(c);
 }
 
 void lcdInit()
@@ -164,7 +176,7 @@ void lcdInit()
 void lcdOutput()
 {
 #ifdef BUFFERED 
-	#define NUMCHAR	64
+	#define NUMCHAR	32
 	static uint8_t pos;
 	uint8_t* ptr = _screen + pos * NUMCHAR;
 	_lcdSetPos((pos * NUMCHAR) / 128 , (pos * NUMCHAR) % 128);
