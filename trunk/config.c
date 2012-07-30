@@ -23,6 +23,12 @@ static Config_t defaultConfig PROGMEM =
 	.RX_zero[THR] = PWM_LOW,
 	.RX_zero[RUD] = PWM_MID,
 	.RX_zero[AUX] = PWM_MID,
+	.GYRO_zero[0] = 536,
+	.GYRO_zero[1] = 548,
+	.GYRO_zero[2] = 565,
+	.ACC_zero[0]  = 621,
+	.ACC_zero[1]  = 611,
+	.ACC_zero[2]  = 766,
 };
 
 static void _initConfig()
