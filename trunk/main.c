@@ -43,7 +43,11 @@ int main(void)
 	// init hardware
 	init();
 	
-	//_delay_ms(1000);
+	_delay_ms(1000);  // wait for receiver start
+	rxCalibrate();
+	sensorsCalibateAcc();
+	sensorsCalibateGyro();
+	
 	uint8_t r = 0;
 	lcdClear();	
 

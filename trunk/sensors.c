@@ -33,3 +33,16 @@ void sensorsReadAcc()
 	ACC[2] = ACC_raw[2] - Config.ACC_zero[2];
 }
 
+void sensorsCalibateGyro()
+{
+	sensorsReadGyro();
+	memcpy(&Config.GYRO_zero, &GYRO_raw, sizeof(Config.GYRO_zero));
+	configSave();
+}
+
+void sensorsCalibateAcc()
+{
+	sensorsReadAcc();
+	memcpy(&Config.ACC_zero, &ACC_raw, sizeof(Config.ACC_zero));
+	configSave();
+}
