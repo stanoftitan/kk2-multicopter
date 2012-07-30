@@ -161,6 +161,13 @@ void rxRead()
 		ATOMIC_BLOCK(ATOMIC_FORCEON)
 			b = RX_isr[i];
 		if (b >= PWM_MIN && b <= PWM_MAX)
+		{
 			RX_raw[i] = b; 
+			RX[i] = b - Config.RX_zero[i];
+		}
+		else
+		{
+			RX[i] = 0;
+		}			
 	}			
 }

@@ -10,20 +10,26 @@
 #include "global.h"
 #include "adc.h"
 
-uint16_t GYRO[3];
-uint16_t ACC[3];
+uint16_t GYRO[3], GYRO_raw[3];
+uint16_t ACC[3], ACC_raw[3];
 
 void sensorsReadGyro()
 {
-	GYRO[0] = adcGet(ADC_GYR_X);
-	GYRO[1] = adcGet(ADC_GYR_Y);
-	GYRO[2] = adcGet(ADC_GYR_Z);
+	GYRO_raw[0] = adcGet(ADC_GYR_X);
+	GYRO[0] = GYRO_raw[0] - Config.GYRO_zero[0];
+	GYRO_raw[1] = adcGet(ADC_GYR_Y);
+	GYRO[1] = GYRO_raw[1] - Config.GYRO_zero[1];
+	GYRO_raw[2] = adcGet(ADC_GYR_Z);
+	GYRO[2] = GYRO_raw[2] - Config.GYRO_zero[2];
 }
 
 void sensorsReadAcc()
 {
-	ACC[0] = adcGet(ADC_ACC_X);
-	ACC[1] = adcGet(ADC_ACC_Y);
-	ACC[2] = adcGet(ADC_ACC_Z);
+	ACC_raw[0] = adcGet(ADC_ACC_X);
+	ACC[0] = ACC_raw[0] - Config.ACC_zero[0];
+	ACC_raw[1] = adcGet(ADC_ACC_Y);
+	ACC[1] = ACC_raw[1] - Config.ACC_zero[1];
+	ACC_raw[2] = adcGet(ADC_ACC_Z);
+	ACC[2] = ACC_raw[2] - Config.ACC_zero[2];
 }
 
