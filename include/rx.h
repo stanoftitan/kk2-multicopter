@@ -11,7 +11,7 @@
 #ifndef RX_H_
 #define RX_H_
 
-extern uint16_t RX[RX_CHANNELS];
+extern int16_t RX[RX_CHANNELS];
 
 #define RX_MODE_CPPM	0
 #define RX_MODE_PWM		1

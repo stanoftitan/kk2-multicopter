@@ -19,7 +19,7 @@
 #include "rx.h"
 #include <string.h>
 
-uint16_t RX[RX_CHANNELS];
+int16_t RX[RX_CHANNELS];
 uint16_t RX_raw[RX_CHANNELS];
 static int16_t RX_isr[RX_CHANNELS];
 static uint8_t _mode;
@@ -163,7 +163,7 @@ void rxRead()
 		if (b >= PWM_MIN && b <= PWM_MAX)
 		{
 			RX_raw[i] = b; 
-			RX[i] = b - Config.RX_zero[i];
+			RX[i] = (int16_t)(b - Config.RX_zero[i]) >> 2;
 		}
 		else
 		{
