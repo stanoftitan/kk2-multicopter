@@ -3,7 +3,9 @@
  *
  * Created: 27.07.2012 10:19:24
  *  Author: OliverS
- */ 
+ *
+ * $Id$
+*/ 
 
 #include <avr/pgmspace.h>
 prog_uchar lcdFont[][6]={

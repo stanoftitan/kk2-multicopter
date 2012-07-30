@@ -3,6 +3,8 @@
  *
  * Created: 30.07.2012 12:46:10
  *  Author: OliverS
+ *
+ * $Id$
  */ 
 
 #include "global.h"
