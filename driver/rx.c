@@ -171,3 +171,10 @@ void rxRead()
 		}			
 	}			
 }
+
+void rxCalibrate()
+{
+	rxRead();
+	memcpy(&Config.RX_zero, &RX_raw, sizeof(Config.RX_zero));
+	configSave();
+}

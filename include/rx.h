@@ -24,7 +24,7 @@ extern uint16_t RX[RX_CHANNELS];
 
 void rxInit(uint8_t mode);
 void rxRead();
-
+void rxCalibrate();
 
 
 

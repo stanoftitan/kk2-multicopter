@@ -16,6 +16,7 @@ extern uint16_t ACC[3];
 
 void sensorsReadGyro();
 void sensorsReadAcc();
-
+void sensorsCalibateGyro();
+void sensorsCalibateAcc();
 
 #endif /* SENSORS_H_ */
