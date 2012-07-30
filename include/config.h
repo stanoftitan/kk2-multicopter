@@ -17,6 +17,7 @@
 typedef struct  
 {
 	uint8_t signature;
+	uint8_t RX_mode;
 	uint16_t RX_zero[RX_CHANNELS];
 	uint16_t GYRO_zero[3];
 	uint16_t ACC_zero[3];

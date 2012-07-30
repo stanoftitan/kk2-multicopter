@@ -130,4 +130,19 @@ typedef struct
 #define OUT8		_REG_BIT(OUT_PORT, OUT8_BIT)
 
 
+/// Keyboard
+#define KEYBOARD_PORT	PORTB
+#define KEYBOARD_DDR	DDRB
+#define KEYBOARD_PIN	PINB
+#define KEY_S1_BIT		7
+#define KEY_S2_BIT		6
+#define KEY_S3_BIT		5
+#define KEY_S4_BIT		4
+/*
+#define KEY_S1			_REG_BIT(KEYBOARD_PIN, KEY_S1_BIT)
+#define KEY_S2			_REG_BIT(KEYBOARD_PIN, KEY_S2_BIT)
+#define KEY_S3			_REG_BIT(KEYBOARD_PIN, KEY_S3_BIT)
+#define KEY_S4			_REG_BIT(KEYBOARD_PIN, KEY_S4_BIT)
+*/
+
 #endif /* HARDWARE_H_ */

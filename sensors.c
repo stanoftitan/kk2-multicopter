@@ -9,6 +9,7 @@
 
 #include "global.h"
 #include "adc.h"
+#include <string.h>
 
 uint16_t GYRO_raw[3], ACC_raw[3];
 int16_t GYRO[3], ACC[3];
