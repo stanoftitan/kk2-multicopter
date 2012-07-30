@@ -15,6 +15,9 @@ static const prog_char strBACK[] = "BACK";
 static const prog_char strUP[] = "UP";
 static const prog_char strDOWN[] = "DOWN";
 static const prog_char strENTER[] = "ENTER";
+static const prog_char strSAFE[] = "SAFE";
+static const prog_char strOFF[] = "OFF";
+static const prog_char strON[] = "ON";
 
 static const prog_char strPIEditor[] = "PI Editor";
 static const prog_char strReceiverTest[] = "Receiver Test";
@@ -29,6 +32,10 @@ static const prog_char strMixerEditor[] = "Mixer Editor";
 static const prog_char strShowMotorLayout[] = "Show Motor Layout";
 static const prog_char strLoadMotorLayout[] = "Load Motor Layout";
 static const prog_char strDebug[] = "Debug";
+
+static const prog_char strSelflevel[] = "Self-level";
+static const prog_char strIofPI[] = "I of PI";
+static const prog_char strSpIsSp[] = " is ";
 
 static PGM_P theMenu[] PROGMEM = {
 	strPIEditor,
@@ -46,10 +53,15 @@ static PGM_P theMenu[] PROGMEM = {
 	strDebug
 };
 
+#define PAGE_START	-1
+#define PAGE_MENU	-2
+
 static uint8_t itemTop, itemMarked, refresh;
+static int8_t page;
 
 void menuInit()
 {
+	page = PAGE_START;
 	refresh = 1;
 	lcdClear();
 }
@@ -91,30 +103,70 @@ void displayMenu()
 	lcdWriteString_P(strENTER);
 }
 
+void displayStart()
+{
+	lcdSetPos(0, 36);
+	lcdWriteString_P(strSAFE);
+	lcdSetPos(3, 0);
+	lcdWriteString_P(strSelflevel);
+	lcdWriteString_P(strSpIsSp);
+	lcdWriteString_P(strOFF);
+	lcdSetPos(4, 0);
+	lcdWriteString_P(strIofPI);
+	lcdWriteString_P(strSpIsSp);
+	lcdWriteString_P(strON);
+	lcdSetPos(7, 102);
+	lcdWriteString_P(strMENU);
+}
+
 void menuShow()
 {
+	uint8_t oldPage = page;
 	uint8_t key = keyboardRead();
-	if (key == KEY_2)		// UP
-		if (itemMarked > 0) 
+	if (page == PAGE_MENU)
+	{
+		if (key == KEY_2)		// UP
+			if (itemMarked > 0) 
+			{
+				itemMarked--;
+				if (itemMarked < itemTop)
+					itemTop = itemMarked;
+				refresh = 1;
+			}
+					
+		if (key == KEY_3)		// DOWN
+			if (itemMarked < length(theMenu)-1) 
+			{
+				itemMarked++;
+				if (itemMarked - itemTop >= 5)
+					itemTop = itemMarked - 4;
+				refresh = 1;
+			}
+		if (key == KEY_1)		// BACK
 		{
-			itemMarked--;
-			if (itemMarked < itemTop)
-				itemTop = itemMarked;
+			page = PAGE_START;
 			refresh = 1;
 		}
-					
-	if (key == KEY_3)		// DOWN
-		if (itemMarked < length(theMenu)-1) 
+	}
+	else if (page == PAGE_START)
+	{
+		if (key == KEY_4)
 		{
-			itemMarked++;
-			if (itemMarked - itemTop >= 5)
-				itemTop = itemMarked - 4;
+			page = PAGE_MENU;
 			refresh = 1;
-		}			
+		}
+	}		
 		
 	if (refresh)
 	{
-		displayMenu();
+		if (oldPage != page)
+			lcdClear();
+			
+		switch (page)
+		{
+			case PAGE_MENU: displayMenu(); break;
+			case PAGE_START: displayStart(); break;
+		}			
 		refresh = 0;
 	}		
 }
