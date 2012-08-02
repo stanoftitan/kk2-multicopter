@@ -12,7 +12,7 @@
 #include <string.h>
 #include <avr/pgmspace.h>
 
-extern MixerModel mixerTable[] PROGMEM;
+extern mixer_model_t mixerTable[] PROGMEM;
 
 uint16_t MIXER[8];
 

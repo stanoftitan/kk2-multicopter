@@ -23,17 +23,19 @@ typedef struct
 	int8_t Elevator;
 	int8_t Rudder;
 	int8_t Offset;		
-} MixerOutput;
+} mixer_output_t;
 
 typedef struct  
 {
-	MixerOutput Channel[8];
-	char Name[20];
-} MixerModel;
+	char Name[22];
+	mixer_output_t Channel[8];
+} mixer_model_t;
+
+#define MIXER_TABLE_LEN		2
+extern mixer_model_t mixerTable[MIXER_TABLE_LEN];
 
 
 void mixerInit();
 void mixerLoadTable(uint8_t index);
-
 
 #endif /* MIXER_H_ */

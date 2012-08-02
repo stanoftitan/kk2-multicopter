@@ -26,4 +26,6 @@
 #include "hardware.h"
 #include "config.h"
 
+extern uint8_t Armed;
+
 #endif /* GLOBAL_H_ */

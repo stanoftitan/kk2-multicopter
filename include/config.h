@@ -21,10 +21,10 @@ typedef struct
 	uint16_t RX_zero[RX_CHANNELS];
 	uint16_t GYRO_zero[3];
 	uint16_t ACC_zero[3];
-	MixerModel Mixer;
-} Config_t;
+	mixer_model_t Mixer;
+} config_t;
 
-extern Config_t Config;
+extern config_t Config;
 
 void configSave();
 void configInit();

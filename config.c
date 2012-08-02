@@ -12,11 +12,11 @@
 #include <avr/eeprom.h>
 #include <avr/pgmspace.h>
 
-noinit Config_t Config;
-EEMEM Config_t EEConfig;
+noinit config_t Config;
+EEMEM config_t EEConfig;
 #define SIGNATURE	0x55
 
-static Config_t defaultConfig PROGMEM = 
+static config_t defaultConfig PROGMEM = 
 {
 	.signature = SIGNATURE,
 	.RX_mode = RX_MODE_CPPM,
