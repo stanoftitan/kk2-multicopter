@@ -11,7 +11,9 @@
 #ifndef MENU_TEXT_H_
 #define MENU_TEXT_H_
 
+#ifndef P_STR
 #define P_STR static const prog_char
+#endif
 
 P_STR strMENU[] = "MENU";
 P_STR strBACK[] = "BACK";

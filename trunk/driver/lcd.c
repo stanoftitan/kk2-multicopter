@@ -54,13 +54,29 @@ static void sendData(uint8_t data)
 	LCD_CS = 1;
 }
 
+static void incWritePtr(uint8_t val)
+{
+	_write_ptr += val;
+	if (_write_ptr >= _screen + sizeof(_screen))
+		_write_ptr -= _screen;
+}
+
+static uint8_t curLine()
+{
+	return (_write_ptr - _screen) / 128;
+}
+
+static uint8_t curColumn()
+{
+	return (_write_ptr - _screen) % 128;
+}
+
 static void writeData(uint8_t data)
 {
 	if (_flags & REVERSED) data ^= 0xFF;
 #ifdef BUFFERED
-	*(_write_ptr++) = data;
-	if (_write_ptr >= _screen + sizeof(_screen))
-		_write_ptr = _screen;
+	*_write_ptr = data;
+	incWritePtr(1);
 #else
 	sendData(data);
 #endif
@@ -76,6 +92,8 @@ void _lcdSetPos(uint8_t line, uint8_t column)
 void lcdSetPos(uint8_t line, uint8_t column)
 {
 #ifdef BUFFERED
+	line = line % 8;
+	column = column % 128;
 	_write_ptr = _screen + (line * 128 + column);
 #else
 	_lcdSetPos(line, column);
@@ -121,11 +139,16 @@ void lcdWriteChar(char c)
 	else
 	{
 #endif
-		for (uint8_t i = 0; i < 6; i++)
+		if (c == '\n')
 		{
-			b = pgm_read_byte(&lcdFontSmall[c-32][i]);
-			writeData(b);
-		}
+			lcdSetPos(curLine() + 1, 0);
+		}			
+		else
+			for (uint8_t i = 0; i < 6; i++)
+			{
+				b = pgm_read_byte(&lcdFontSmall[c-32][i]);
+				writeData(b);
+			}
 #ifdef BUFFERED
 	}		
 #endif

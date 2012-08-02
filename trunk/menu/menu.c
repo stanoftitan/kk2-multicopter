@@ -13,6 +13,7 @@
 #include "sensors.h"
 #include "rx.h"
 #include "mixer.h"
+#include "buzzer.h"
 #include <avr/pgmspace.h>
 #include <stdlib.h>
 
@@ -39,7 +40,7 @@ typedef struct
 	element_t *softkeys;
 	uint8_t numSoftkeys;	
 	pageHandler *handler;
-	void *staticElements;
+	const void *staticElements;
 	uint8_t numStaticElements;
 } page_t;
 typedef struct  
@@ -52,6 +53,7 @@ typedef struct
 
 
 //////////////////////////////////////////////////////////////////////////
+#define P_STR static const prog_char
 #include "menu_text.h"
 #include "menu_screen.h"
 
@@ -107,7 +109,7 @@ static element_t _skMENU[] = {
 	{ 7, 96, strENTER },
 };
 static element_t _skBACK[] = { { 7, 0, strBACK} };
-static element_t _skCONTINUE[] = { { 7, 78, strCONTINUE} };
+static element_t _skCONTINUE[] = { { 7, 0, strBACK}, { 7, 78, strCONTINUE} };
 static element_t _skPAGE[] = {
 	{ 7, 0, strBACK },
 	{ 7, 30, strPREV },
@@ -120,15 +122,15 @@ static const page_t pages[] PROGMEM = {
 /*  0 */	{ _skSTART, length(_skSTART), _hStart },
 /*  1 */	{ _skMENU, length(_skMENU), _hMenu },
 /*  2 */	{ _skPAGE, length(_skPAGE), NULL, _sePIEditor, length(_sePIEditor)},
-/*  3 */	{ _skBACK, 1, _hReceiverTest, _seReceiverTest, length(_seReceiverTest)},
+/*  3 */	{ _skBACK, length(_skBACK), _hReceiverTest, _seReceiverTest, length(_seReceiverTest)},
 /*  4 */	{  },
 /*  5 */	{  },
 /*  6 */	{  },
 /*  7 */	{  },
-/*  8 */	{ _skBACK, 1, _hSensorTest, _seSensorTest, length(_seSensorTest)},
-/*  9 */	{ _skCONTINUE, 1, _hSensorCalibration, scrSensorCal[0]},
-/* 10 */	{ _skCONTINUE, 1, _hESCCalibration},
-/* 11 */	{ _skCONTINUE, 1, _hRadioCalibration, scrRadioCal[0]},
+/*  8 */	{ _skBACK, length(_skBACK), _hSensorTest, _seSensorTest, length(_seSensorTest)},
+/*  9 */	{ _skCONTINUE, length(_skCONTINUE), _hSensorCalibration, scrSensorCal0},
+/* 10 */	{ _skCONTINUE, length(_skCONTINUE), _hESCCalibration},
+/* 11 */	{ _skCONTINUE, length(_skCONTINUE), _hRadioCalibration, scrRadioCal0},
 /* 12 */	{  },
 /* 13 */	{  },
 /* 14 */	{ _skMENU, length(_skMENU), _hLoadMotorLayout },
@@ -164,16 +166,7 @@ static page_t currentPage;
 static menu_t mnuMain = {length(lstMenu), tsmMain};
 static menu_t mnuMLayout = {MIXER_TABLE_LEN, tsmLoadMotorLayout};
 
-void writeScreen(screen_t theScreen)
-{
-	for (uint8_t i = 0; i < 7; i++)
-	{
-		lcdSetPos(i, 0);
-		lcdWriteString_P(theScreen[i]);
-	}
-}
-
-static void writeList(element_t list[], uint8_t len)
+static void writeList(const element_t list[], uint8_t len)
 {
 	for (uint8_t i = 0; i < len; i++)
 	{
@@ -216,7 +209,7 @@ void defaultHandler()
 		if (currentPage.numStaticElements)
 			writeList(currentPage.staticElements, currentPage.numStaticElements);
 		else if (currentPage.staticElements)
-			writeScreen(currentPage.staticElements);
+			lcdWriteString_P(currentPage.staticElements);
 		writeSoftkeys();
 	}
 		
@@ -407,7 +400,8 @@ void _hESCCalibration()
 		else
 		{
 			lcdClear();
-			writeScreen(scrESCCal[subpage]);
+			PGM_P s = (PGM_P)pgm_read_word(&scrESCCal[subpage]);
+			lcdWriteString_P(s);
 			writeSoftkeys();
 			subpage++;
 		}		
@@ -436,6 +430,9 @@ void menuShow()
 {
 	static uint8_t oldPage = 0xFF;
 	_mykey = keyboardRead();
+	if (ANYKEY)
+		buzzerBuzz(10);
+		
 	if (KEY1)	// BACK
 	{
 		if (page > PAGE_MENU)
