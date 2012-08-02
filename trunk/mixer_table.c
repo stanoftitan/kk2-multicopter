@@ -11,9 +11,25 @@
 #include "mixer.h"
 #include <avr/pgmspace.h>
 
-PROGMEM MixerModel mixerTable[] = {
+PROGMEM mixer_model_t mixerTable[MIXER_TABLE_LEN] = {
+	// QuadroCopter +
+	{
+		"QuadroCopter +",
+		{
+			{FLAG_ESC, 100, 0, 100, 100, 0},
+			{FLAG_ESC, 100, 100, 0, -100, 0},			
+			{FLAG_ESC, 100, 0, -100, 100, 0},			
+			{FLAG_ESC, 100, -100, 0, -100, 0},			
+			{FLAG_NONE},			
+			{FLAG_NONE},			
+			{FLAG_NONE},			
+			{FLAG_NONE},			
+		},
+	},	
+	
 	// QuadroCopter x
 	{
+		"QuadroCopter x",
 		{
 			{FLAG_ESC, 100, -71, 71, 100, 0},
 			{FLAG_ESC, 100, 71, 71, -100, 0},			
@@ -24,6 +40,5 @@ PROGMEM MixerModel mixerTable[] = {
 			{FLAG_NONE},			
 			{FLAG_NONE},			
 		},
-		"QuadroCopter x"
-	}	
+	},	
 };

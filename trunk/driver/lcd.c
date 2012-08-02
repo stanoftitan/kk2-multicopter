@@ -15,7 +15,9 @@
 
 #define BUFFERED
 
-static uint8_t _reversed = 0;
+#define REVERSED	1
+#define BIGFONT		2
+static uint8_t _flags = 0;
 
 #ifdef BUFFERED
 static uint8_t _screen[128 * 8];
@@ -54,7 +56,7 @@ static void sendData(uint8_t data)
 
 static void writeData(uint8_t data)
 {
-	if (_reversed) data ^= 0xFF;
+	if (_flags & REVERSED) data ^= 0xFF;
 #ifdef BUFFERED
 	*(_write_ptr++) = data;
 	if (_write_ptr >= _screen + sizeof(_screen))
@@ -93,16 +95,40 @@ void lcdClear()
 	}			
 #endif
 	lcdSetPos(0, 0);
+	_flags = 0;
 }
 
 void lcdWriteChar(char c)
 {
 	uint8_t b;
-	for (uint8_t i = 0; i < 6; i++)
+#ifdef BUFFERED
+	if (_flags & BIGFONT)
 	{
-		b = pgm_read_byte(&lcdFont[c-32][i]);
-		writeData(b);
-	}
+		uint8_t* w = _write_ptr;
+		for (uint8_t i = 0; i < 12; i++)
+		{
+			b = pgm_read_byte(&lcdFontBig[c-32][i*2]);
+			writeData(b);
+		}
+		_write_ptr = w + 128;
+		for (uint8_t i = 0; i < 12; i++)
+		{
+			b = pgm_read_byte(&lcdFontBig[c-32][i*2+1]);
+			writeData(b);
+		}
+		_write_ptr = w + 12;
+	}		
+	else
+	{
+#endif
+		for (uint8_t i = 0; i < 6; i++)
+		{
+			b = pgm_read_byte(&lcdFontSmall[c-32][i]);
+			writeData(b);
+		}
+#ifdef BUFFERED
+	}		
+#endif
 }
 
 void lcdWriteString(char *s)
@@ -121,7 +147,18 @@ void lcdWriteString_P(PGM_P s)
 
 void lcdReverse(uint8_t reversed)
 {
-	_reversed = reversed;
+	if (reversed)
+		_flags |= REVERSED;
+	else
+		_flags &= ~REVERSED;
+}
+
+void lcdBigFont(uint8_t bigfont)
+{
+	if (bigfont)
+		_flags |= BIGFONT;
+	else
+		_flags &= ~BIGFONT;
 }
 
 void lcdWriteImage_P(PGM_P image, uint8_t width)

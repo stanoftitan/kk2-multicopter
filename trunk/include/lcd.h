@@ -15,7 +15,8 @@
 
 extern prog_char lcdArrowUp[9];
 extern prog_char lcdArrowDown[9];
-extern prog_uchar lcdFont[][6];
+extern prog_uchar lcdFontSmall[][6];
+extern prog_uchar lcdFontBig[][24];
 
 void lcdInit();
 void lcdClear();
@@ -28,5 +29,6 @@ void lcdSetContrast(uint8_t contrast);
 void lcdOutput();
 void lcdWriteImage_P(PGM_P image, uint8_t width);
 void lcdFill(uint8_t c, uint8_t width);
+void lcdBigFont(uint8_t bigfont);
 
 #endif /* LCD_H_ */

@@ -169,7 +169,8 @@ void rxRead()
 		{
 			RX[i] = 0;
 		}			
-	}			
+	}
+	RX[THR]	>>= 1;
 }
 
 void rxCalibrate()

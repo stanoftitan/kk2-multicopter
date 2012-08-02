@@ -15,12 +15,14 @@
 #include "pwm.h"
 #include "mixer.h"
 #include "keyboard.h"
+#include "menu.h"
 #include <util/delay.h>
 
 // for debugging
 #include <stdlib.h>
 #include <string.h>
 
+uint8_t Armed;
 
 void init()
 {
@@ -48,10 +50,11 @@ int main(void)
 
 	lcdClear();	
 		
-	_delay_ms(1000);  // wait for receiver start
-	rxCalibrate();
+	//_delay_ms(1000);  // wait for receiver start
+	/*rxCalibrate();
 	sensorsCalibateAcc();
 	sensorsCalibateGyro();
+	*/
 	
 	uint8_t r = 0;
 	lcdClear();	
