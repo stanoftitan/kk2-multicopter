@@ -3,11 +3,15 @@
  *
  * Created: 02.08.2012 08:10:28
  *  Author: OliverS
- */ 
+ *
+ * $Id$
+*/ 
 
 
 #ifndef MENU_TEXT_H_
 #define MENU_TEXT_H_
+
+#define P_STR static const prog_char
 
 P_STR strMENU[] = "MENU";
 P_STR strBACK[] = "BACK";
@@ -24,6 +28,8 @@ P_STR strSAFE[] = "SAFE";
 P_STR strARMED[] = "ARMED";
 P_STR strOFF[] = "OFF";
 P_STR strON[] = "ON";
+P_STR strCANCEL[] = "CANCEL";
+P_STR strYES[] = "YES";
 
 P_STR strPIEditor[] = "PI Editor";
 P_STR strReceiverTest[] = "Receiver Test";
@@ -79,6 +85,7 @@ P_STR strZ[] = "Z:";
 P_STR strWait[] = "Waiting";
 P_STR strSec[] = "sec";
 P_STR strCalSucc[] = "Calibration succeeded";
+P_STR strAreYouSure[] = "Are you sure?";
 
 
 #endif /* MENU_TEXT_H_ */

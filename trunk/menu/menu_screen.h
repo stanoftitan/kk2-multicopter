@@ -1,15 +1,17 @@
 /*
- * menu_screen.h
+ * menu_screen_t.h
  *
  * Created: 02.08.2012 08:12:11
  *  Author: OliverS
+ *
+ * $Id$
  */ 
 
 
 #ifndef MENU_SCREEN_H_
 #define MENU_SCREEN_H_
 
-screen scrSensorCal[] = {
+screen_t scrSensorCal[] = {
 	{
 	"Place the aircraft on",
 	"a level surface and",
@@ -28,7 +30,7 @@ screen scrSensorCal[] = {
 	}	
 };
 
-screen scrESCCal[] = {
+screen_t scrESCCal[] = {
 	{
 	"1 TAKE OFF THE",
 	"  PROPELLERS!!",
@@ -82,7 +84,7 @@ screen scrESCCal[] = {
 	},
 };
 
-screen scrRadioCal[] = {
+screen_t scrRadioCal[] = {
 	{
 	"Release sticks on the",
 	"radio and set ",
