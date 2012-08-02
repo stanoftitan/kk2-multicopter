@@ -3,6 +3,8 @@
  *
  * Created: 30.07.2012 18:52:51
  *  Author: OliverS
+ *
+ * $Id$
  */ 
 
 #include "global.h"
@@ -24,33 +26,37 @@ uint8_t _mykey;
 #define ANYKEY		(_mykey)
 #define NOKEYRETURN {if (!_mykey) return;}
 
-#define P_STR static const prog_char
-
-typedef const prog_char screen[7][22];
+typedef const prog_char screen_t[7][22];
 typedef struct  
 {
 	uint8_t posX, posY;
 	const prog_char *text;
-} PROGMEM element;
-
-#include "menu_text.h"
-#include "menu_screen.h"
+} PROGMEM element_t;
 
 typedef void (pageHandler)(void);
 typedef struct  
 {
-	element *softkeys;
+	element_t *softkeys;
 	uint8_t numSoftkeys;	
 	pageHandler *handler;
 	void *staticElements;
 	uint8_t numStaticElements;
 } page_t;
+typedef struct  
+{
+	uint8_t len;
+	PGM_P (*textSelector)(uint8_t);
+	uint8_t top;
+	uint8_t marked;
+} menu_t;
 
 
 //////////////////////////////////////////////////////////////////////////
-void _hStart();
-void _hMenu();
-static element _sePIEditor[] = {
+#include "menu_text.h"
+#include "menu_screen.h"
+
+//////////////////////////////////////////////////////////////////////////
+static element_t _sePIEditor[] = {
 	{ 0,  0, strAxis},
 	{ 1,  0, strPGain},
 	{ 2,  0, strPLimit},
@@ -58,8 +64,7 @@ static element _sePIEditor[] = {
 	{ 4,  0, strILimit},
 };
 
-void _hReceiverTest();
-static element _seReceiverTest[] = {
+static element_t _seReceiverTest[] = {
 	{ 0,  0, strAileron },
 	{ 1,  0, strElevator },
 	{ 2,  0, strThrottle },
@@ -67,8 +72,7 @@ static element _seReceiverTest[] = {
 	{ 4,  0, strAuxiliary },
 };
 
-void _hSensorTest();
-static element _seSensorTest[] = {
+static element_t _seSensorTest[] = {
 	{ 0,  0, strGyro },
 	{ 0, 30, strX },
 	{ 1,  0, strGyro },
@@ -83,23 +87,28 @@ static element _seSensorTest[] = {
 	{ 5, 30, strZ }
 };
 
+//////////////////////////////////////////////////////////////////////////
+void _hStart();
+void _hMenu();
+void _hReceiverTest();
+void _hSensorTest();
 void _hSensorCalibration();
 void _hESCCalibration();
 void _hRadioCalibration();
 void _hLoadMotorLayout();
 
 //////////////////////////////////////////////////////////////////////////
-// softkey lines
-static element _skSTART[] = { { 7, 102, strMENU } };
-static element _skMENU[] = { 
+// softkeys
+static element_t _skSTART[] = { { 7, 102, strMENU } };
+static element_t _skMENU[] = { 
 	{ 7, 0, strBACK },
 	{ 7, 36, strUP },
 	{ 7, 66, strDOWN },
 	{ 7, 96, strENTER },
 };
-static element _skBACK[] = { { 7, 0, strBACK} };
-static element _skCONTINUE[] = { { 7, 78, strCONTINUE} };
-static element _skPAGE[] = {
+static element_t _skBACK[] = { { 7, 0, strBACK} };
+static element_t _skCONTINUE[] = { { 7, 78, strCONTINUE} };
+static element_t _skPAGE[] = {
 	{ 7, 0, strBACK },
 	{ 7, 30, strPREV },
 	{ 7, 60, strNEXT },
@@ -107,7 +116,7 @@ static element _skPAGE[] = {
 };
 
 //////////////////////////////////////////////////////////////////////////
-page_t pages[] PROGMEM = {
+static const page_t pages[] PROGMEM = {
 /*  0 */	{ _skSTART, length(_skSTART), _hStart },
 /*  1 */	{ _skMENU, length(_skMENU), _hMenu },
 /*  2 */	{ _skPAGE, length(_skPAGE), NULL, _sePIEditor, length(_sePIEditor)},
@@ -126,17 +135,7 @@ page_t pages[] PROGMEM = {
 /* 15 */	{  },
 };
 
-#define NO_PAGE 0xFF
-
-typedef struct  
-{
-	uint8_t len;
-	PGM_P (*textSelector)(uint8_t);
-	uint8_t top;
-	uint8_t marked;
-} menu_t;
-
-const prog_char *lstMenu[] PROGMEM = {
+static const prog_char *lstMenu[] PROGMEM = {
 	strPIEditor,
 	strReceiverTest,
 	strModeSettings,
@@ -165,7 +164,7 @@ static page_t currentPage;
 static menu_t mnuMain = {length(lstMenu), tsmMain};
 static menu_t mnuMLayout = {MIXER_TABLE_LEN, tsmLoadMotorLayout};
 
-void writeScreen(screen theScreen)
+void writeScreen(screen_t theScreen)
 {
 	for (uint8_t i = 0; i < 7; i++)
 	{
@@ -174,11 +173,11 @@ void writeScreen(screen theScreen)
 	}
 }
 
-static void writeList(element list[], uint8_t len)
+static void writeList(element_t list[], uint8_t len)
 {
 	for (uint8_t i = 0; i < len; i++)
 	{
-		element e;
+		element_t e;
 		memcpy_P(&e, &list[i], sizeof(e));
 		lcdSetPos(e.posX, e.posY);
 		lcdWriteString_P(e.text);
@@ -435,7 +434,7 @@ void _hRadioCalibration()
 
 void menuShow()
 {
-	static uint8_t oldPage = NO_PAGE;
+	static uint8_t oldPage = 0xFF;
 	_mykey = keyboardRead();
 	if (KEY1)	// BACK
 	{
@@ -468,5 +467,5 @@ PGM_P tsmMain(uint8_t index)
 
 PGM_P tsmLoadMotorLayout(uint8_t index)
 {
-	return mixerTable[index].Name;
+	return (PGM_P)pgm_read_word(&mixerTable[index].Name);
 }

@@ -27,11 +27,11 @@ typedef struct
 
 typedef struct  
 {
-	char Name[22];
+	const char *Name;
 	mixer_output_t Channel[8];
 } mixer_model_t;
 
-#define MIXER_TABLE_LEN		2
+#define MIXER_TABLE_LEN		20
 extern mixer_model_t mixerTable[MIXER_TABLE_LEN];
 
 
