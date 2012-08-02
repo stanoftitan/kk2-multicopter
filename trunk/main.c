@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint8_t Armed;
+state_t State;
 
 void init()
 {
@@ -39,7 +39,6 @@ void init()
 
 int main(void)
 {
-	char s[10];
 	// setup hardware w/o interrupts
 	setup();
 	
@@ -49,8 +48,8 @@ int main(void)
 	// init hardware
 	init();
 
+	buzzerBuzz(77);
 	lcdClear();
-	buzzerBuzzWait(77);
 		
     while(1)
     {

@@ -12,7 +12,7 @@
 #include <string.h>
 #include <avr/pgmspace.h>
 
-extern mixer_model_t mixerTable[] PROGMEM;
+extern model_t mixerTable[] PROGMEM;
 
 uint16_t MIXER[8];
 
@@ -24,6 +24,7 @@ void mixerInit()
 void mixerLoadTable(uint8_t index)
 {
 	memcpy_P(&Config.Mixer, &mixerTable[index], sizeof(Config.Mixer));
+	Config.MixerIndex = index;
 }
 
 void mixerDoMixing()

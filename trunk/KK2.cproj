@@ -137,6 +137,9 @@
     <Compile Include="include\mixer.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\pid.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\pwm.h">
       <SubType>compile</SubType>
     </Compile>

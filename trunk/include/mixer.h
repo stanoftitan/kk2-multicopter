@@ -23,16 +23,16 @@ typedef struct
 	int8_t Elevator;
 	int8_t Rudder;
 	int8_t Offset;		
-} mixer_output_t;
+} mixer_channel_t;
 
 typedef struct  
 {
 	const char *Name;
-	mixer_output_t Channel[8];
-} mixer_model_t;
+	mixer_channel_t Channel[8];
+} model_t;
 
 #define MIXER_TABLE_LEN		20
-extern mixer_model_t mixerTable[MIXER_TABLE_LEN];
+extern model_t mixerTable[MIXER_TABLE_LEN];
 
 
 void mixerInit();

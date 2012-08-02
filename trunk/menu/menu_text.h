@@ -83,6 +83,7 @@ P_STR strNot[] = "Not";
 P_STR strX[] = "X:";
 P_STR strY[] = "Y:";
 P_STR strZ[] = "Z:";
+P_STR strBattery[] = "Battery:";
 
 P_STR strWait[] = "Waiting";
 P_STR strSec[] = "sec";

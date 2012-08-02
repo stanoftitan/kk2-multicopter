@@ -67,7 +67,7 @@ typedef struct
 #define ADC_ACC_X	5
 #define ADC_ACC_Y	6
 #define ADC_ACC_Z	7
-#define ADV_VBAT	3
+#define ADC_VBAT	3
 
 /// RX
 // 1. AIL

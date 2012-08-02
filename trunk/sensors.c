@@ -34,6 +34,11 @@ void sensorsReadAcc()
 	ACC[2] = (int16_t)(ACC_raw[2] - Config.ACC_zero[2]) >> 1;
 }
 
+uint16_t sensorsReadBattery()
+{
+	return adcGet(ADC_VBAT) * 100 / 376;	
+}
+
 void sensorsCalibateGyro()
 {
 	sensorsReadGyro();
