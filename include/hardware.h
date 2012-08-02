@@ -138,11 +138,13 @@ typedef struct
 #define KEY_S2_BIT		6
 #define KEY_S3_BIT		5
 #define KEY_S4_BIT		4
-/*
-#define KEY_S1			_REG_BIT(KEYBOARD_PIN, KEY_S1_BIT)
-#define KEY_S2			_REG_BIT(KEYBOARD_PIN, KEY_S2_BIT)
-#define KEY_S3			_REG_BIT(KEYBOARD_PIN, KEY_S3_BIT)
-#define KEY_S4			_REG_BIT(KEYBOARD_PIN, KEY_S4_BIT)
-*/
+
+/// Buzzer
+#define BUZZER_PORT		PORTB
+#define BUZZER_DDR		DDRB
+#define BUZZER_BIT		1
+#define BUZZER_DIR		_REG_BIT(BUZZER_DDR, BUZZER_BIT)
+#define BUZZER			_REG_BIT(BUZZER_PORT, BUZZER_BIT)
+#define BUZZER_TOGGLE	(_REG_BIT(PINB, BUZZER_BIT) = 1)
 
 #endif /* HARDWARE_H_ */

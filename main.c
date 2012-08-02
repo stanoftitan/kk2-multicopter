@@ -16,6 +16,7 @@
 #include "mixer.h"
 #include "keyboard.h"
 #include "menu.h"
+#include "buzzer.h"
 #include <util/delay.h>
 
 // for debugging
@@ -48,17 +49,9 @@ int main(void)
 	// init hardware
 	init();
 
-	lcdClear();	
+	lcdClear();
+	buzzerBuzzWait(77);
 		
-	//_delay_ms(1000);  // wait for receiver start
-	/*rxCalibrate();
-	sensorsCalibateAcc();
-	sensorsCalibateGyro();
-	*/
-	
-	uint8_t r = 0;
-	lcdClear();	
-
     while(1)
     {
 		LED_TOGGLE;
@@ -69,6 +62,6 @@ int main(void)
 		//pwmWrite();
 		lcdOutput();
 		menuShow();
-		
+		buzzerLoop();
     }
 }

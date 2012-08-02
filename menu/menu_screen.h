@@ -11,89 +11,94 @@
 #ifndef MENU_SCREEN_H_
 #define MENU_SCREEN_H_
 
-screen_t scrSensorCal[] = {
-	{
-	"Place the aircraft on",
-	"a level surface and",
-	"press CONTINUE.",
-	"The FC will then wait",
-	"5 sec to let the",
-	"aircraft settle down."
-	},
-	{
-	"Calibration failed.",
-	"",
-	"Make sure the air-",
-	"craft is level and",
-	"stationary, and try",
-	"again."
-	}	
-};
+#ifndef P_STR
+#define P_STR static const prog_char
+#endif
 
-screen_t scrESCCal[] = {
-	{
-	"1 TAKE OFF THE",
-	"  PROPELLERS!!",
-	"2 Check the throttle",
-	"  direction in the",
-	"  receiver test menu.",
-	"  Reverse if",
-	"  necessary."
-	},
-	{
-	"3 Memorize the rest",
-	"  of the instructions",
-	"  because the next",
-	"  step is to turn off",
-	"  the power.",
-	"4 Turn off the power.",
-	"5 Turn on the radio."
-	},
-	{
-	"6 Set the throttle to",
-	"  full.",
-	"7 Press down button",
-	"  1 and 4 and keep",
-	"  them down until the",
-	"  last step.",
-	"8 Turn on power."		
-	},
-	{
-	"9 Wait for the ESCs",
-	"  full-throttle cali-",
-	"  bration sound.",
-	"10 Set the throttle",
-	"  to idle.",
-	"11 Wait for the idle"		
-	},
-	{
-	"  calibration sound.",
-	"12 Release the",
-	"  buttons.",
-	"13 Check if the mot-",
-	"  ors start at the",
-	"  same time. If not,",
-	"  adjust the"		
-	},
-	{
-	"  'Minimum throttle'",
-	"  in the 'Misc. Set-",
-	"  tings menu.",
-	"",
-	"  You are now done!",
-	},
-};
+P_STR scrSensorCal0[] = 
+	"Place the aircraft on\n"
+	"a level surface and\n"
+	"press CONTINUE.\n"
+	"The FC will then wait\n"
+	"5 sec to let the\n"
+	"aircraft settle down.";
+P_STR scrSensorCal1[] = 
+	"Calibration failed.\n"
+	"\n"
+	"Make sure the air-\n"
+	"craft is level and\n"
+	"stationary, and try\n"
+	"again.";
 
-screen_t scrRadioCal[] = {
+PROGMEM const prog_char* scrSensorCal[] = 
 	{
-	"Release sticks on the",
-	"radio and set ",
-	"throttle to idle.",
-	"",
-	"Press CONTINUE to",
-	"calibrate."
-	}	
-};
+		scrSensorCal0, 
+		scrSensorCal1
+	};
+
+P_STR scrESCCal0[] = 
+	"1 TAKE OFF THE\n"
+	"  PROPELLERS!!\n"
+	"2 Check the throttle\n"
+	"  direction in the\n"
+	"  receiver test menu.\n"
+	"  Reverse if\n"
+	"  necessary.";
+P_STR scrESCCal1[] = 
+	"3 Memorize the rest\n"
+	"  of the instructions\n"
+	"  because the next\n"
+	"  step is to turn off\n"
+	"  the power.\n"
+	"4 Turn off the power.\n"
+	"5 Turn on the radio.";
+P_STR scrESCCal2[] = 
+	"6 Set the throttle to\n"
+	"  full.\n"
+	"7 Press down button\n"
+	"  1 and 4 and keep\n"
+	"  them down until the\n"
+	"  last step.\n"
+	"8 Turn on power.";	
+P_STR scrESCCal3[] = 
+	"9 Wait for the ESCs\n"
+	"  full-throttle cali-\n"
+	"  bration sound.\n"
+	"10 Set the throttle\n"
+	"  to idle.\n"
+	"11 Wait for the idle";		
+P_STR scrESCCal4[] = 
+	"  calibration sound.\n"
+	"12 Release the\n"
+	"  buttons.\n"
+	"13 Check if the mot-\n"
+	"  ors start at the\n"
+	"  same time. If not,\n"
+	"  adjust the";	
+P_STR scrESCCal5[] = 
+	"  'Minimum throttle'\n"
+	"  in the 'Misc. Set-\n"
+	"  tings menu.\n"
+	"\n"
+	"  You are now done!";
+
+PROGMEM const prog_char* scrESCCal[] = 
+	{
+		scrESCCal0,
+		scrESCCal1,
+		scrESCCal2,
+		scrESCCal3,
+		scrESCCal4,
+		scrESCCal5,
+	};
+
+P_STR scrRadioCal0[] = 
+	"Release sticks on the\n"
+	"radio and set \n"
+	"throttle to idle.\n"
+	"\n"
+	"Press CONTINUE to\n"
+	"calibrate.";
 
 
 #endif /* MENU_SCREEN_H_ */
