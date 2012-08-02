@@ -37,6 +37,20 @@ void init()
 	menuInit();
 }
 
+void CheckState()
+{
+	State.ThrottleOff = RX[THR] <= 5;
+	State.Aux = RX[AUX] > 10;
+	
+	if (Config.IPartMode)	// AUX
+		State.IofPI = State.Aux;
+	else
+		State.IofPI = ON;
+
+	if (Config.SelfLevelMode)	// AUX
+		State.SelfLevel = State.Aux;
+}
+
 int main(void)
 {
 	// setup hardware w/o interrupts
@@ -58,6 +72,8 @@ int main(void)
 		rxRead();
 		sensorsReadGyro();
 		sensorsReadAcc();
+		CheckState();
+		
 		//pwmWrite();
 		lcdOutput();
 		menuShow();

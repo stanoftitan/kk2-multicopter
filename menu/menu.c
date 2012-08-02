@@ -320,20 +320,25 @@ void _hStart()
 		lcdSetPos(3, 0);
 		lcdWriteString_P(strSelflevel);
 		lcdWriteString_P(strSpIsSp);
-		lcdWriteString_P(strOFF);
 		lcdSetPos(4, 0);
 		lcdWriteString_P(strIofPI);
 		lcdWriteString_P(strSpIsSp);
-		if (Config.SelfLevelMode) // = AUX
-		{
-			if (RX[AUX] > 15)
-				lcdWriteString_P(strON);
-			else		
-				lcdWriteString_P(strOFF);
-		}
-		else
-			lcdWriteString_P(strON);
-	}	
+	}
+	
+	lcdSetPos(3, 84);
+	if (State.SelfLevel)
+		lcdWriteString_P(strON);
+	else		
+		lcdWriteString_P(strOFF);
+	lcdFill(0, 6);
+	
+	lcdSetPos(4, 66);
+	if (State.IofPI)
+		lcdWriteString_P(strON);
+	else		
+		lcdWriteString_P(strOFF);
+	lcdFill(0, 6);
+	
 }
 
 void _hSensorTest()

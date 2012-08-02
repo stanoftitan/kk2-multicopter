@@ -36,7 +36,7 @@ uint16_t micros()
 	uint16_t t;
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 		t = TCNT1;
-	return (t1_micros + TCNT1 / 20);
+	return (t1_micros + TNCT1TOMICRO(t));
 }
 
 uint16_t millis()
@@ -44,7 +44,7 @@ uint16_t millis()
 	uint16_t t;
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 		t = TCNT1;
-	return (t1_millis + TCNT1 / 20000);
+	return (t1_millis + TNCT1TOMICRO(t) / 1000);
 }
 
 void setup()
