@@ -20,5 +20,6 @@ void sensorsReadGyro();
 void sensorsReadAcc();
 void sensorsCalibateGyro();
 void sensorsCalibateAcc();
+uint16_t sensorsReadBattery();
 
 #endif /* SENSORS_H_ */

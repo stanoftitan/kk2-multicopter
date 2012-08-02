@@ -14,11 +14,12 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x55
+#define SIGNATURE	0x56
 
 static config_t defaultConfig PROGMEM = 
 {
 	.signature = SIGNATURE,
+	.MixerIndex = 0,
 	.RX_mode = RX_MODE_CPPM,
 	.RX_zero[AIL] = PWM_MID,
 	.RX_zero[ELE] = PWM_MID,
@@ -31,12 +32,22 @@ static config_t defaultConfig PROGMEM =
 	.ACC_zero[0]  = 621,
 	.ACC_zero[1]  = 611,
 	.ACC_zero[2]  = 766,
+	.PID[0] = { 150, 100, 50, 20},
+	.PID[1] = { 150, 100, 50, 20},
+	.PID[2] = { 150,  20, 50, 10},
+	.StickScaling = { 30, 30, 50, 90},
+	.MinThrottle = 10,
+	.LCDContrast = 32,
+	.HeightDampening = 0,
+	.HeightDampeningLimit = 30,
+	.LVA = 0,
+	.PID_SelfLevel = { 40, 20, 0, 0},
 };
 
 static void _initConfig()
 {
 	memcpy_P(&Config, &defaultConfig, sizeof(Config));
-	mixerLoadTable(0);
+	mixerLoadTable(Config.MixerIndex);
 }
 
 static void _loadConfig()

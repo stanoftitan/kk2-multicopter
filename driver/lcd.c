@@ -58,7 +58,7 @@ static void incWritePtr(uint8_t val)
 {
 	_write_ptr += val;
 	if (_write_ptr >= _screen + sizeof(_screen))
-		_write_ptr -= _screen;
+		_write_ptr -= sizeof(_screen);
 }
 
 static uint8_t curLine()

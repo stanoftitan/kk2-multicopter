@@ -86,7 +86,8 @@ static element_t _seSensorTest[] = {
 	{ 4,  0, strAcc },
 	{ 4, 30, strY },
 	{ 5,  0, strAcc },
-	{ 5, 30, strZ }
+	{ 5, 30, strZ },
+	{ 6,  0, strBattery },
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -98,6 +99,7 @@ void _hSensorCalibration();
 void _hESCCalibration();
 void _hRadioCalibration();
 void _hLoadMotorLayout();
+void _hDebug();
 
 //////////////////////////////////////////////////////////////////////////
 // softkeys
@@ -110,6 +112,7 @@ static element_t _skMENU[] = {
 };
 static element_t _skBACK[] = { { 7, 0, strBACK} };
 static element_t _skCONTINUE[] = { { 7, 0, strBACK}, { 7, 78, strCONTINUE} };
+static element_t _skCANCELYES[] = { { 7, 0, strCANCEL}, { 7, 108, strYES} };
 static element_t _skPAGE[] = {
 	{ 7, 0, strBACK },
 	{ 7, 30, strPREV },
@@ -134,7 +137,7 @@ static const page_t pages[] PROGMEM = {
 /* 12 */	{  },
 /* 13 */	{  },
 /* 14 */	{ _skMENU, length(_skMENU), _hLoadMotorLayout },
-/* 15 */	{  },
+/* 15 */	{ _skBACK, length(_skBACK), _hDebug },
 };
 
 static const prog_char *lstMenu[] PROGMEM = {
@@ -225,23 +228,20 @@ uint8_t doMenu(menu_t *menu)
 	if (KEY2)		// UP
 	{
 		if (menu->marked > 0) 
-		{
 			menu->marked--;
-			if (menu->marked < menu->top)
-				menu->top = menu->marked;
-		}
 	}					
 	else if (KEY3)		// DOWN
 	{
 		if (menu->marked < menu->len - 1) 
-		{
 			menu->marked++;
-			if (menu->marked - menu->top >= 5)
-				menu->top = menu->marked - 4;
-		}
 	}
 	else if (KEY4)		// ENTER
 		return 1;
+
+	if (menu->marked < menu->top)
+		menu->top = menu->marked;
+	else if (menu->marked - menu->top >= 5)
+		menu->top = menu->marked - 4;
 	
 	// text output
 	lcdSetPos(0, 58);
@@ -261,7 +261,7 @@ uint8_t doMenu(menu_t *menu)
 		lcdWriteString_P(item);
 		lcdFill(0, (21 - strlen_P(item)) * 6);
 	}
-	
+
 	lcdReverse(0);
 	lcdSetPos(6, 58);
 	if (menu->top < menu->len - 5)
@@ -280,7 +280,26 @@ void _hMenu()
 
 void _hLoadMotorLayout()
 {
-	doMenu(&mnuMLayout);
+	if (ISINIT)
+		mnuMLayout.marked = Config.MixerIndex;
+
+	if (subpage == 0)
+	{
+		if (doMenu(&mnuMLayout))
+		{
+			lcdClear();
+			lcdSetPos(3, 18);
+			lcdWriteString_P(strAreYouSure);
+			writeList(_skCANCELYES, length(_skCANCELYES));
+			subpage = 1;
+		}
+	}		
+	else if (KEY4)		// YES
+	{
+		mixerLoadTable(mnuMLayout.marked);
+		configSave();
+		loadPage(PAGE_MENU);
+	}
 }
 
 void _hStart()
@@ -305,9 +324,15 @@ void _hStart()
 		lcdSetPos(4, 0);
 		lcdWriteString_P(strIofPI);
 		lcdWriteString_P(strSpIsSp);
-		lcdWriteString_P(strON);
-		lcdSetPos(7, 102);
-		lcdWriteString_P(strMENU);
+		if (Config.SelfLevelMode) // = AUX
+		{
+			if (RX[AUX] > 15)
+				lcdWriteString_P(strON);
+			else		
+				lcdWriteString_P(strOFF);
+		}
+		else
+			lcdWriteString_P(strON);
 	}	
 }
 
@@ -337,6 +362,11 @@ void _hSensorTest()
 	lcdFill(0, 6);
 	utoa(ACC_raw[2], s, 10);
 	lcdSetPos(5, 48);
+	lcdWriteString(s);
+	lcdFill(0, 6);
+	
+	utoa(sensorsReadBattery(), s, 10);
+	lcdSetPos(6, 48);
 	lcdWriteString(s);
 	lcdFill(0, 6);
 }
@@ -424,6 +454,16 @@ void _hRadioCalibration()
 	}
 	else if (KEY4)
 		loadPage(PAGE_MENU);
+}
+
+void _hDebug()
+{
+	lcdSetPos(0, 0);
+	lcdWriteString_P(PSTR("MixerIndex: "));
+	char s[7];
+	utoa(Config.MixerIndex, s, 10);
+	lcdWriteString(s);
+	lcdFill(0, 12);
 }
 
 void menuShow()
