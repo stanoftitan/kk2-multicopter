@@ -69,8 +69,8 @@ static element_t _sePIEditor[] = {
 static element_t _seReceiverTest[] = {
 	{ 0,  0, strAileron },
 	{ 1,  0, strElevator },
-	{ 2,  0, strThrottle },
-	{ 3,  0, strRudder },
+	{ 2,  0, strRudder },
+	{ 3,  0, strThrottle },
 	{ 4,  0, strAuxiliary },
 };
 
@@ -90,6 +90,16 @@ static element_t _seSensorTest[] = {
 	{ 6,  0, strBattery },
 };
 
+static element_t _seMixerEditor[] = {
+	{ 0,  0, strThrottle },
+	{ 1,  0, strAileron },
+	{ 2,  0, strElevator },
+	{ 3,  0, strRudder },
+	{ 4,  0, strOffset },
+	{ 5,  0, strType },
+	{ 0,  102, strCH },
+	{ 5,  66, strRate },
+};	
 //////////////////////////////////////////////////////////////////////////
 void _hStart();
 void _hMenu();
@@ -134,7 +144,7 @@ static const page_t pages[] PROGMEM = {
 /*  9 */	{ _skCONTINUE, length(_skCONTINUE), _hSensorCalibration, scrSensorCal0},
 /* 10 */	{ _skCONTINUE, length(_skCONTINUE), _hESCCalibration},
 /* 11 */	{ _skCONTINUE, length(_skCONTINUE), _hRadioCalibration, scrRadioCal0},
-/* 12 */	{  },
+/* 12 */	{ _skPAGE, length(_skPAGE), NULL, _seMixerEditor, length(_seMixerEditor)},
 /* 13 */	{  },
 /* 14 */	{ _skMENU, length(_skMENU), _hLoadMotorLayout },
 /* 15 */	{ _skBACK, length(_skBACK), _hDebug },
@@ -304,7 +314,6 @@ void _hLoadMotorLayout()
 
 void _hStart()
 {
-	NOKEYRETURN;
 	if (KEY4)	// MENU
 	{
 		loadPage(PAGE_MENU);
@@ -416,6 +425,7 @@ void _hSensorCalibration()
 		{
 			sensorsCalibateGyro();
 			sensorsCalibateAcc();
+			configSave();
 			lcdSetPos(3, 0);
 			lcdWriteString_P(strCalSucc);
 			writeSoftkeys();
@@ -450,6 +460,7 @@ void _hRadioCalibration()
 		if (KEY4)
 		{
 			rxCalibrate();
+			configSave();
 			lcdClear();
 			lcdSetPos(3, 0);
 			lcdWriteString_P(strCalSucc);
@@ -474,6 +485,7 @@ void _hDebug()
 void menuShow()
 {
 	static uint8_t oldPage = 0xFF;
+	
 	_mykey = keyboardRead();
 	if (ANYKEY)
 		buzzerBuzz(10);
@@ -499,7 +511,6 @@ void menuShow()
 void menuInit()
 {
 	loadPage(PAGE_START);
-	//loadPage(14);
 }
 
 PGM_P tsmMain(uint8_t index)

@@ -14,27 +14,27 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x56
+#define SIGNATURE	0x58
 
 static config_t defaultConfig PROGMEM = 
 {
 	.signature = SIGNATURE,
 	.MixerIndex = 0,
-	.RX_mode = RX_MODE_CPPM,
+	.RX_mode = RX_MODE_CPPM_FUTABA,
 	.RX_zero[AIL] = PWM_MID,
 	.RX_zero[ELE] = PWM_MID,
-	.RX_zero[THR] = PWM_LOW,
 	.RX_zero[RUD] = PWM_MID,
+	.RX_zero[THR] = PWM_LOW,
 	.RX_zero[AUX] = PWM_MID,
-	.GYRO_zero[0] = 536,
-	.GYRO_zero[1] = 548,
-	.GYRO_zero[2] = 565,
-	.ACC_zero[0]  = 621,
-	.ACC_zero[1]  = 611,
-	.ACC_zero[2]  = 766,
-	.PID[0] = { 150, 100, 50, 20},
-	.PID[1] = { 150, 100, 50, 20},
-	.PID[2] = { 150,  20, 50, 10},
+	.GYRO_zero[AIL] = 536,
+	.GYRO_zero[ELE] = 548,
+	.GYRO_zero[RUD] = 565,
+	.ACC_zero[AIL]  = 621,
+	.ACC_zero[ELE]  = 611,
+	.ACC_zero[RUD]  = 766,
+	.PID[AIL] = { 150, 100, 50, 20},
+	.PID[ELE] = { 150, 100, 50, 20},
+	.PID[RUD] = { 150,  20, 50, 10},
 	.StickScaling = { 30, 30, 50, 90},
 	.MinThrottle = 10,
 	.LCDContrast = 32,
