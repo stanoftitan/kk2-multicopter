@@ -14,6 +14,7 @@
 #include "lcd.h"
 
 #define BUFFERED
+#define INTERRUPT
 
 #define REVERSED	1
 #define BIGFONT		2
@@ -40,10 +41,18 @@ static void sendByte(uint8_t byte)
 
 static void sendCommand(uint8_t command)
 {
+	#ifdef INTERRUPT
+	TIMSK0 = 0;
+	#endif
+	
 	LCD_CS = 0;
 	LCD_A0 = 0;
 	sendByte(command);
 	LCD_CS = 1;
+	
+	#ifdef INTERRUPT
+	TIMSK0 = _BV(TOIE0);
+	#endif
 }
 
 static void sendData(uint8_t data)
@@ -88,6 +97,19 @@ void _lcdSetPos(uint8_t line, uint8_t column)
 	sendCommand(0x10 | (column >> 4));
 	sendCommand(column & 0x0f);
 }
+
+#if defined(BUFFERED) && defined(INTERRUPT)
+__attribute__ ((section(".lowtext")))
+ISR(TIMER0_OVF_vect, ISR_NOBLOCK)
+{
+	static uint16_t offset;
+	if (offset % 128 == 0)
+		_lcdSetPos(offset / 128, 0);
+		
+	sendData(*(_screen + offset++));
+	offset %= sizeof(_screen);
+}
+#endif
 
 void lcdSetPos(uint8_t line, uint8_t column)
 {
@@ -206,6 +228,15 @@ void lcdInit()
 {
 #ifdef BUFFERED
 	_write_ptr = _screen;
+	
+#ifdef INTERRUPT
+	// if INTERRUPT mode enabled, use timer0 with clk/8 and overflow
+	// at 256 as interrupt based output of data bytes
+	// ie every 1024us one byte is send to display. whole screen takes about 105ms
+	
+	TCCR0B = _BV(CS01);		// clk/8
+	TIMSK0 = _BV(TOIE0);	// enable interrupt on overflow
+#endif
 #endif
 
 	// pins
@@ -235,7 +266,7 @@ void lcdInit()
 
 void lcdOutput()
 {
-#ifdef BUFFERED 
+#if defined(BUFFERED) && !defined(INTERRUPT)
 	#define NUMCHAR	32
 	static uint8_t pos;
 	uint8_t* ptr = _screen + pos * NUMCHAR;

@@ -18,39 +18,34 @@
 #include "global.h"
 #include "rx.h"
 #include <string.h>
+#include <avr/pgmspace.h>
 
 int16_t RX[RX_CHANNELS];
 uint16_t RX_raw[RX_CHANNELS];
 static int16_t RX_isr[RX_CHANNELS];
 static uint8_t _mode;
 
+prog_char channelMapGraupner[RX_CHANNELS] = {ELE, RUD, THR, AIL, AUX};
+prog_char channelMapFutaba[RX_CHANNELS] = {AIL, ELE, THR, RUD, AUX};
+
 // ISR for vector INT1. Handles CPPM signal in CPPM mode, or PWM signal for AIL in PWM mode
 __attribute__ ((section(".lowtext")))
 ISR(INT1_vect)
 {
-	static uint16_t _start;
+	static uint32_t _start;
 	static int8_t _index;
-	static uint8_t _sync;
 
-	uint16_t t = micros();
+	uint32_t t = ticks();
 	sei();
 	
-	if (_mode == RX_MODE_CPPM)
+	if (_mode != RX_MODE_PWM)
 	{
-		if ((t - _start) > PPM_SYNC_LENGTH)
-		{
+		if ((t - _start) > MICROTOTICKS(PPM_SYNC_LENGTH))
 			_index = 0;
-			_sync = 1;
-		}			
-		else if (_sync != 0 && _index >= 0 && _index < RX_CHANNELS)
+		else if (_index >= 0 && _index < RX_CHANNELS)
 		{
-			if ((t - _start) < PWM_MIN)
-				_sync = 0;
-			else
-			{
-				RX_isr[_index] = t - _start;
-				_index++;
-			}				
+			RX_isr[_index] = t - _start;
+			_index++;
 		}			
 		_start = t;
 	}
@@ -68,7 +63,7 @@ __attribute__ ((section(".lowtext")))
 ISR(INT0_vect)
 {
 	static uint16_t _start;
-	uint16_t t = micros();
+	uint16_t t = ticks();
 	sei();
 	
 	if (RX_ELE)
@@ -82,7 +77,7 @@ __attribute__ ((section(".lowtext")))
 ISR(INT2_vect)
 {
 	static uint16_t _start;
-	uint16_t t = micros();
+	uint16_t t = ticks();
 	sei();
 	
 	if (RX_RUD)
@@ -96,7 +91,7 @@ __attribute__ ((section(".lowtext")))
 ISR(PCINT3_vect)
 {
 	static uint16_t _start;
-	uint16_t t = micros();
+	uint16_t t = ticks();
 	sei();
 	
 	if (RX_THR)
@@ -110,7 +105,7 @@ __attribute__ ((section(".lowtext")))
 ISR(PCINT1_vect)
 {
 	static uint16_t _start;
-	uint16_t t = micros();
+	uint16_t t = ticks();
 	sei();
 	
 	if (RX_AUX)
@@ -121,7 +116,7 @@ ISR(PCINT1_vect)
 
 void rxInit(uint8_t mode)
 {
-	if (mode == RX_MODE_CPPM)
+	if (mode != RX_MODE_PWM)
 	{
 		// set pin direction
 		RX_AIL_DIR = INPUT;
@@ -156,19 +151,25 @@ void rxInit(uint8_t mode)
 void rxRead()
 {
 	uint16_t b;
+	uint8_t index;
 	for (uint8_t i = 0; i < RX_CHANNELS; i++)
 	{
 		ATOMIC_BLOCK(ATOMIC_FORCEON)
 			b = RX_isr[i];
+		b = TICKSTOMICRO(b);
+		
+		if (_mode == RX_MODE_PWM)
+			index = i;
+		else
+			index = pgm_read_byte(&channelMapFutaba[i]);
+		
 		if (b >= PWM_MIN && b <= PWM_MAX)
 		{
-			RX_raw[i] = b; 
-			RX[i] = (int16_t)(b - Config.RX_zero[i]) >> 2;
+			RX_raw[index] = b; 
+			RX[index] = (int16_t)(RX_raw[index] - Config.RX_zero[index]) >> 2;
 		}
 		else
-		{
-			RX[i] = 0;
-		}			
+			RX[index] = 0;
 	}
 	RX[THR]	>>= 1;
 }
@@ -177,5 +178,4 @@ void rxCalibrate()
 {
 	rxRead();
 	memcpy(&Config.RX_zero, &RX_raw, sizeof(Config.RX_zero));
-	configSave();
 }

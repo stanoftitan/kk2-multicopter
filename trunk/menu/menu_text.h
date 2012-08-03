@@ -61,10 +61,26 @@ P_STR strRollAil[] = "Roll (Aileron)";
 P_STR strPitchEle[] = "Pitch (Elevator)";
 P_STR strYawRud[] = "Yaw (Rudder)";
 
+P_STR strIPartOfPI[] = "I part of PI:";
+P_STR strArming[] = "Arming:";
+P_STR strLinkRollPitch[] = "Link Roll Pitch:";
+P_STR strStick[] = "Stick";
+P_STR strAUX[] = "AUX";
+P_STR strYes[] = "Yes";
+P_STR strNo[] = "No";
+
 P_STR strAileron[] = "Aileron:";
 P_STR strElevator[] = "Elevator:";
 P_STR strThrottle[] = "Throttle:";
 P_STR strRudder[] = "Rudder:";
+P_STR strOffset[] = "Offset:";
+P_STR strType[] = "Type:";
+P_STR strRate[] = "Rate:";
+P_STR strCH[] = "CH:";
+P_STR strESC[] = "ESC";
+P_STR strServo[] = "Servo";
+P_STR strHigh[] = "Hi";
+P_STR strLow[] = "Lo";
 P_STR strAuxiliary[] = "Auxiliary:";
 P_STR strNoSignal[] = "No signal";
 P_STR strLeft[] = "Left";

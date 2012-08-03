@@ -62,21 +62,27 @@ int main(void)
 	// init hardware
 	init();
 
-	buzzerBuzz(77);
 	lcdClear();
-		
+
+	/*
+	buzzerBuzzWait(50);
+	WAITMS(1000);
+	rxCalibrate();
+	*/
+
+	buzzerBuzz(77);
     while(1)
     {
 		LED_TOGGLE;
-		
-		rxRead();
-		sensorsReadGyro();
-		sensorsReadAcc();
-		CheckState();
+		rxRead();				//  21.50us
+		sensorsReadGyro();		//   5.90us
+		sensorsReadAcc();		//   5.90us
+		CheckState();			//   2.10us
 		
 		//pwmWrite();
-		lcdOutput();
-		menuShow();
+		EVERYMS(20)
+			menuShow();			// 128.85us
+					
 		buzzerLoop();
     }
 }
