@@ -22,18 +22,19 @@
 
 int16_t RX[RX_CHANNELS];
 uint16_t RX_raw[RX_CHANNELS];
+uint8_t RX_good;
 static int16_t RX_isr[RX_CHANNELS];
 static uint8_t _mode;
+static uint8_t _RX_good;
 
-prog_char channelMapGraupner[RX_CHANNELS] = {ELE, RUD, THR, AIL, AUX};
-prog_char channelMapFutaba[RX_CHANNELS] = {AIL, ELE, THR, RUD, AUX};
 
 // ISR for vector INT1. Handles CPPM signal in CPPM mode, or PWM signal for AIL in PWM mode
 __attribute__ ((section(".lowtext")))
 ISR(INT1_vect)
 {
 	static uint32_t _start;
-	static int8_t _index;
+	static uint8_t _index;
+	static uint8_t _mask;
 
 	uint32_t t = ticks();
 	sei();
@@ -41,11 +42,16 @@ ISR(INT1_vect)
 	if (_mode != RX_MODE_PWM)
 	{
 		if ((t - _start) > MICROTOTICKS(PPM_SYNC_LENGTH))
+		{
 			_index = 0;
+			_mask = 1;
+		}			
 		else if (_index >= 0 && _index < RX_CHANNELS)
 		{
 			RX_isr[_index] = t - _start;
 			_index++;
+			_RX_good |= _mask;
+			_mask <<= 1;
 		}			
 		_start = t;
 	}
@@ -54,7 +60,10 @@ ISR(INT1_vect)
 		if (RX_AIL)
 			_start = t;
 		else
+		{
 			RX_isr[AIL] = t - _start;
+			_RX_good |= _BV(AIL);
+		}			
 	}
 }
 
@@ -69,7 +78,10 @@ ISR(INT0_vect)
 	if (RX_ELE)
 		_start = t;
 	else
+	{
 		RX_isr[ELE] = t - _start;
+		_RX_good |= _BV(ELE);
+	}		
 }
 
 // ISR for vector INT2. Handles PWM signal for RUD in PWM mode
@@ -83,7 +95,10 @@ ISR(INT2_vect)
 	if (RX_RUD)
 		_start = t;
 	else
+	{
 		RX_isr[RUD] = t - _start;
+		_RX_good |= _BV(RUD);
+	}		
 }
 
 // ISR for vector PCI3. Handles PWM signal for THR in PWM mode
@@ -97,7 +112,10 @@ ISR(PCINT3_vect)
 	if (RX_THR)
 		_start = t;
 	else
+	{
 		RX_isr[THR] = t - _start;	
+		_RX_good |= _BV(THR);
+	}		
 }
 
 // ISR for vector PCI1. Handles PWM signal for AUX in PWM mode
@@ -111,7 +129,10 @@ ISR(PCINT1_vect)
 	if (RX_AUX)
 		_start = t;
 	else
+	{
 		RX_isr[AUX] = t - _start;	
+		_RX_good |= _BV(AUX);
+	}		
 }
 
 void rxInit(uint8_t mode)
@@ -146,30 +167,41 @@ void rxInit(uint8_t mode)
 		PCICR |= _BV(PCIE1) | _BV(PCIE3);				// enable PCI1 and PCI3
 	}	
 	_mode = mode;	
+	RX_good = 0;
 }
 
 void rxRead()
 {
 	uint16_t b;
 	uint8_t index;
+	
+	EVERYMS(50)
+	{
+		RX_good = _RX_good;
+		_RX_good = 0;
+	}	
+	
 	for (uint8_t i = 0; i < RX_CHANNELS; i++)
 	{
 		ATOMIC_BLOCK(ATOMIC_FORCEON)
 			b = RX_isr[i];
+
 		b = TICKSTOMICRO(b);
 		
 		if (_mode == RX_MODE_PWM)
 			index = i;
 		else
-			index = pgm_read_byte(&channelMapFutaba[i]);
+			index = Config.RX_chmap[i];
 		
 		if (b >= PWM_MIN && b <= PWM_MAX)
 		{
 			RX_raw[index] = b; 
 			RX[index] = (int16_t)(RX_raw[index] - Config.RX_zero[index]) >> 2;
 		}
+		/*
 		else
-			RX[index] = 0;
+			RX_raw[index] = 0;
+			*/
 	}
 	RX[THR]	>>= 1;
 }

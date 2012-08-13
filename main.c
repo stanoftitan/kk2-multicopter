@@ -24,6 +24,8 @@
 #include <string.h>
 
 state_t State;
+static const prog_char versionNum[] = "Version 0.1a";
+static const prog_char versionAuthor[] = "By Oliver Schulz";
 
 void init()
 {
@@ -42,11 +44,6 @@ void CheckState()
 	State.ThrottleOff = RX[THR] <= 5;
 	State.Aux = RX[AUX] > 10;
 	
-	if (Config.IPartMode)	// AUX
-		State.IofPI = State.Aux;
-	else
-		State.IofPI = ON;
-
 	if (Config.SelfLevelMode)	// AUX
 		State.SelfLevel = State.Aux;
 }
@@ -63,26 +60,27 @@ int main(void)
 	init();
 
 	lcdClear();
+	lcdSetPos(1, 0);
+	lcdWriteString_P(versionNum);
+	lcdSetPos(2, 0);
+	lcdWriteString_P(versionAuthor);
+	buzzerBuzzWait(500);
+	WAITMS(700);
 
-	/*
-	buzzerBuzzWait(50);
-	WAITMS(1000);
-	rxCalibrate();
-	*/
-
-	buzzerBuzz(77);
-    while(1)
-    {
+	while(1)
+	{
 		LED_TOGGLE;
 		rxRead();				//  21.50us
 		sensorsReadGyro();		//   5.90us
 		sensorsReadAcc();		//   5.90us
 		CheckState();			//   2.10us
-		
-		//pwmWrite();
+
+		for (uint8_t i = 0; i < 5; i++)		
+			pwmWrite(i+1, RX_raw[i]);
+
 		EVERYMS(20)
 			menuShow();			// 128.85us
 					
 		buzzerLoop();
-    }
+	}
 }

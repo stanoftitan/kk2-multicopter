@@ -17,12 +17,12 @@
 
 typedef struct 
 {
-	uint8_t flags;
 	int8_t Throttle;
 	int8_t Aileron;
 	int8_t Elevator;
 	int8_t Rudder;
-	int8_t Offset;		
+	int8_t Offset;
+	uint8_t flags;
 } mixer_channel_t;
 
 typedef struct  
@@ -31,7 +31,7 @@ typedef struct
 	mixer_channel_t Channel[8];
 } model_t;
 
-#define MIXER_TABLE_LEN		20
+#define MIXER_TABLE_LEN		22
 extern model_t mixerTable[MIXER_TABLE_LEN];
 
 

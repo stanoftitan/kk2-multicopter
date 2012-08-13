@@ -30,5 +30,7 @@ void lcdOutput();
 void lcdWriteImage_P(PGM_P image, uint8_t width);
 void lcdFill(uint8_t c, uint8_t width);
 void lcdBigFont(uint8_t bigfont);
+void lcdBeginUpdate();
+void lcdEndUpdate();
 
 #endif /* LCD_H_ */

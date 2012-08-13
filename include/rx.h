@@ -13,10 +13,10 @@
 
 extern int16_t RX[RX_CHANNELS];
 extern uint16_t RX_raw[RX_CHANNELS];
+extern uint8_t RX_good;
 
-#define RX_MODE_PWM				0
-#define RX_MODE_CPPM_FUTABA		1
-#define RX_MODE_CPPM_GRAUPNER	2
+#define RX_MODE_PWM		0
+#define RX_MODE_CPPM	1
 
 #define AIL			0
 #define ELE			1

@@ -14,34 +14,44 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x58
+#define SIGNATURE	0x59
 
 static config_t defaultConfig PROGMEM = 
 {
 	.signature = SIGNATURE,
 	.MixerIndex = 0,
-	.RX_mode = RX_MODE_CPPM_FUTABA,
+	.RX_mode = RX_MODE_CPPM,
 	.RX_zero[AIL] = PWM_MID,
 	.RX_zero[ELE] = PWM_MID,
 	.RX_zero[RUD] = PWM_MID,
 	.RX_zero[THR] = PWM_LOW,
 	.RX_zero[AUX] = PWM_MID,
+	.RX_chmap[AIL] = 0,
+	.RX_chmap[ELE] = 1,
+	.RX_chmap[RUD] = 3,
+	.RX_chmap[THR] = 2,
+	.RX_chmap[AUX] = 4,
 	.GYRO_zero[AIL] = 536,
 	.GYRO_zero[ELE] = 548,
 	.GYRO_zero[RUD] = 565,
 	.ACC_zero[AIL]  = 621,
 	.ACC_zero[ELE]  = 611,
 	.ACC_zero[RUD]  = 766,
-	.PID[AIL] = { 150, 100, 50, 20},
-	.PID[ELE] = { 150, 100, 50, 20},
-	.PID[RUD] = { 150,  20, 50, 10},
+	.PID[AIL] = { 50, 100, 25, 20},
+	.PID[ELE] = { 50, 100, 25, 20},
+	.PID[RUD] = { 50,  20, 50, 10},
+	.LinkRollPitch = ON,
+	.AutoDisarm = ON,
 	.StickScaling = { 30, 30, 50, 90},
 	.MinThrottle = 10,
 	.LCDContrast = 32,
 	.HeightDampening = 0,
 	.HeightDampeningLimit = 30,
 	.LVA = 0,
+	.ServoFilter = 0,
 	.PID_SelfLevel = { 40, 20, 0, 0},
+	.AccTrimPitch = 0,
+	.AccTrimRoll = 0,
 };
 
 static void _initConfig()
@@ -57,13 +67,23 @@ static void _loadConfig()
 		_initConfig();
 }
 
-void configInit()
+void configLoad()
 {
 	_loadConfig();
+}
+
+void configInit()
+{
+	configLoad();
 }
 
 void configSave()
 {
 	eeprom_update_block(&Config, &EEConfig, sizeof(Config));
+}
+
+void configReset()
+{
+	_initConfig();
 }
 
