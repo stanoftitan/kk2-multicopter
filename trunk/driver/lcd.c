@@ -281,6 +281,7 @@ void lcdInit()
 	LCD_SCL_DIR = OUTPUT;
 	LCD_SDA_DIR = OUTPUT;
 
+	// init display
 	LCD_RST = 0;
 	_delay_ms(1);
 	LCD_RST = 1;
