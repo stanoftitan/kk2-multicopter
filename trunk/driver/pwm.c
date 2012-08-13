@@ -12,6 +12,7 @@
 #include <avr/pgmspace.h>
 
 uint16_t PWM[8];
+static uint16_t _lastStart;
 
 prog_uchar masktable[] = {_BV(OUT1_BIT), _BV(OUT2_BIT), _BV(OUT3_BIT), _BV(OUT4_BIT), _BV(OUT5_BIT), _BV(OUT6_BIT), _BV(OUT7_BIT), _BV(OUT8_BIT)};
 
@@ -23,6 +24,8 @@ ISR(TIMER1_COMPA_vect)
 	OUT_PORT = pgm_read_byte(&masktable[_index]);
 	OCR1A = (uint16_t)(t + (PWM[_index]));
 	_index = (_index + 1) & 0x07;
+	if (!_index)
+		_lastStart = t;
 }
 
 void pwmInit()
@@ -38,5 +41,5 @@ void pwmInit()
 void pwmWrite(uint8_t channel, uint16_t value)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
-		PWM[channel] = value * 20UL;
+		PWM[channel] = value * TICKSPERMICRO;
 };

@@ -37,11 +37,9 @@ typedef struct
 typedef void (pageHandler)(void);
 typedef struct  
 {
-	element_t *softkeys;
-	uint8_t numSoftkeys;	
+	const char *softkeys;
 	pageHandler *handler;
-	const void *staticElements;
-	uint8_t numStaticElements;
+	const char *screen;
 } page_t;
 typedef struct  
 {
@@ -58,49 +56,6 @@ typedef struct
 #include "menu_screen.h"
 
 //////////////////////////////////////////////////////////////////////////
-static element_t _sePIEditor[] = {
-	{ 0,  0, strAxis},
-	{ 1,  0, strPGain},
-	{ 2,  0, strPLimit},
-	{ 3,  0, strIGain},
-	{ 4,  0, strILimit},
-};
-
-static element_t _seReceiverTest[] = {
-	{ 0,  0, strAileron },
-	{ 1,  0, strElevator },
-	{ 2,  0, strRudder },
-	{ 3,  0, strThrottle },
-	{ 4,  0, strAuxiliary },
-};
-
-static element_t _seSensorTest[] = {
-	{ 0,  0, strGyro },
-	{ 0, 30, strX },
-	{ 1,  0, strGyro },
-	{ 1, 30, strY },
-	{ 2,  0, strGyro },
-	{ 2, 30, strZ },
-	{ 3,  0, strAcc },
-	{ 3, 30, strX },
-	{ 4,  0, strAcc },
-	{ 4, 30, strY },
-	{ 5,  0, strAcc },
-	{ 5, 30, strZ },
-	{ 6,  0, strBattery },
-};
-
-static element_t _seMixerEditor[] = {
-	{ 0,  0, strThrottle },
-	{ 1,  0, strAileron },
-	{ 2,  0, strElevator },
-	{ 3,  0, strRudder },
-	{ 4,  0, strOffset },
-	{ 5,  0, strType },
-	{ 0,  102, strCH },
-	{ 5,  66, strRate },
-};	
-//////////////////////////////////////////////////////////////////////////
 void _hStart();
 void _hMenu();
 void _hReceiverTest();
@@ -110,44 +65,38 @@ void _hESCCalibration();
 void _hRadioCalibration();
 void _hLoadMotorLayout();
 void _hDebug();
+void _hFactoryReset();
 
 //////////////////////////////////////////////////////////////////////////
 // softkeys
-static element_t _skSTART[] = { { 7, 102, strMENU } };
-static element_t _skMENU[] = { 
-	{ 7, 0, strBACK },
-	{ 7, 36, strUP },
-	{ 7, 66, strDOWN },
-	{ 7, 96, strENTER },
-};
-static element_t _skBACK[] = { { 7, 0, strBACK} };
-static element_t _skCONTINUE[] = { { 7, 0, strBACK}, { 7, 78, strCONTINUE} };
-static element_t _skCANCELYES[] = { { 7, 0, strCANCEL}, { 7, 108, strYES} };
-static element_t _skPAGE[] = {
-	{ 7, 0, strBACK },
-	{ 7, 30, strPREV },
-	{ 7, 60, strNEXT },
-	{ 7, 90, strCHANGE },
-};
+static const prog_char _skSTART[]     = "                 MENU";
+static const prog_char _skMENU[]      = "BACK  UP   DOWN ENTER";
+static const prog_char _skBACK[]      = "BACK";
+static const prog_char _skCONTINUE[]  = "BACK         CONTINUE";
+static const prog_char _skCANCELYES[] = "CANCEL            YES";
+static const prog_char _skPAGE[]      = "BACK PREV NEXT CHANGE";
+static const prog_char _skBACKNEXT[]  = "BACK  NEXT";
 
 //////////////////////////////////////////////////////////////////////////
 static const page_t pages[] PROGMEM = {
-/*  0 */	{ _skSTART, length(_skSTART), _hStart },
-/*  1 */	{ _skMENU, length(_skMENU), _hMenu },
-/*  2 */	{ _skPAGE, length(_skPAGE), NULL, _sePIEditor, length(_sePIEditor)},
-/*  3 */	{ _skBACK, length(_skBACK), _hReceiverTest, _seReceiverTest, length(_seReceiverTest)},
-/*  4 */	{  },
-/*  5 */	{  },
-/*  6 */	{  },
-/*  7 */	{  },
-/*  8 */	{ _skBACK, length(_skBACK), _hSensorTest, _seSensorTest, length(_seSensorTest)},
-/*  9 */	{ _skCONTINUE, length(_skCONTINUE), _hSensorCalibration, scrSensorCal0},
-/* 10 */	{ _skCONTINUE, length(_skCONTINUE), _hESCCalibration},
-/* 11 */	{ _skCONTINUE, length(_skCONTINUE), _hRadioCalibration, scrRadioCal0},
-/* 12 */	{ _skPAGE, length(_skPAGE), NULL, _seMixerEditor, length(_seMixerEditor)},
-/* 13 */	{  },
-/* 14 */	{ _skMENU, length(_skMENU), _hLoadMotorLayout },
-/* 15 */	{ _skBACK, length(_skBACK), _hDebug },
+/*  0 */	{ _skSTART, _hStart },
+/*  1 */	{ _skMENU, _hMenu },
+/*  2 */	{ _skPAGE, NULL, scrPIEditor},
+/*  3 */	{ _skBACK, _hReceiverTest, scrReceiverTest},
+/*  4 */	{ _skPAGE, NULL, scrModeSettings},
+/*  5 */	{ _skPAGE, NULL, scrStickScaling},
+/*  6 */	{ _skPAGE, NULL, scrMiscSettings},
+/*  7 */	{ _skPAGE, NULL, scrSelflevelSettings},
+/*  8 */	{ _skBACK, _hSensorTest, scrSensorTest},
+/*  9 */	{ _skCONTINUE, _hSensorCalibration, scrSensorCal0},
+/* 10 */	{ _skCONTINUE, _hESCCalibration, scrESCCal0},
+/* 11 */	{ _skPAGE, NULL, scrCPPMSettings},
+/* 12 */	{ _skCONTINUE, _hRadioCalibration, scrRadioCal0},
+/* 13 */	{ _skPAGE, NULL, scrMixerEditor},
+/* 14 */	{ _skBACKNEXT},
+/* 15 */	{ _skMENU, _hLoadMotorLayout },
+/* 16 */	{ _skBACK, _hDebug },
+/* 16 */	{ _skCANCELYES, _hFactoryReset },
 };
 
 static const prog_char *lstMenu[] PROGMEM = {
@@ -160,11 +109,13 @@ static const prog_char *lstMenu[] PROGMEM = {
 	strSensorTest,
 	strSensorCalibration,
 	strESCCalibration,
+	strCPPMSettings,
 	strRadioCalibration,
 	strMixerEditor,
 	strShowMotorLayout,
 	strLoadMotorLayout,
 	strDebug,
+	strFactoryReset,
 };
 
 #define PAGE_START	0
@@ -190,10 +141,15 @@ static void writeList(const element_t list[], uint8_t len)
 	}
 }
 
-static void writeSoftkeys()
+static void writeSoftkeys(const char* sk)
 {
-	if (currentPage.numSoftkeys)
-		writeList(currentPage.softkeys, currentPage.numSoftkeys);	
+	if (!sk)
+		sk = currentPage.softkeys;
+	if (sk)
+	{
+		lcdSetPos(7, 0);
+		lcdWriteString_P(sk);
+	}
 }
 
 void loadPage(uint8_t pageIndex)
@@ -204,12 +160,12 @@ void loadPage(uint8_t pageIndex)
 
 void defaultHandler()
 {
-	if (currentPage.softkeys == NULL)
+	if (!currentPage.softkeys)
 	{
 		if (ISINIT)
 		{
 			lcdWriteString_P(PSTR("Under construction."));
-			writeList(_skBACK, 1);
+			writeSoftkeys(_skBACK);
 		}
 		else if (KEY1)
 			loadPage(PAGE_MENU);
@@ -219,11 +175,9 @@ void defaultHandler()
 
 	if (ISINIT)
 	{
-		if (currentPage.numStaticElements)
-			writeList(currentPage.staticElements, currentPage.numStaticElements);
-		else if (currentPage.staticElements)
-			lcdWriteString_P(currentPage.staticElements);
-		writeSoftkeys();
+		if (currentPage.screen)
+			lcdWriteString_P(currentPage.screen);
+		writeSoftkeys(currentPage.softkeys);
 	}
 		
 	if (currentPage.handler)
@@ -300,7 +254,7 @@ void _hLoadMotorLayout()
 			lcdClear();
 			lcdSetPos(3, 18);
 			lcdWriteString_P(strAreYouSure);
-			writeList(_skCANCELYES, length(_skCANCELYES));
+			writeSoftkeys(_skCANCELYES);
 			subpage = 1;
 		}
 	}		
@@ -329,20 +283,10 @@ void _hStart()
 		lcdSetPos(3, 0);
 		lcdWriteString_P(strSelflevel);
 		lcdWriteString_P(strSpIsSp);
-		lcdSetPos(4, 0);
-		lcdWriteString_P(strIofPI);
-		lcdWriteString_P(strSpIsSp);
 	}
 	
 	lcdSetPos(3, 84);
 	if (State.SelfLevel)
-		lcdWriteString_P(strON);
-	else		
-		lcdWriteString_P(strOFF);
-	lcdFill(0, 6);
-	
-	lcdSetPos(4, 66);
-	if (State.IofPI)
 		lcdWriteString_P(strON);
 	else		
 		lcdWriteString_P(strOFF);
@@ -391,11 +335,11 @@ void _hReceiverTest()
 	for (uint8_t i = 0; i < RX_CHANNELS; i++)
 	{
 		lcdSetPos(i, 66);
-		if (RX_raw[i])
+		if (RX_good & _BV(i))
 		{
 			itoa(RX[i], s, 10);
 			lcdWriteString(s);
-			lcdFill(0, 30);
+			lcdFill(0, 42);
 		}
 		else
 			lcdWriteString_P(strNoSignal);
@@ -428,7 +372,7 @@ void _hSensorCalibration()
 			configSave();
 			lcdSetPos(3, 0);
 			lcdWriteString_P(strCalSucc);
-			writeSoftkeys();
+			writeSoftkeys(NULL);
 			subpage = 2;
 		}
 	}
@@ -447,7 +391,7 @@ void _hESCCalibration()
 			lcdClear();
 			PGM_P s = (PGM_P)pgm_read_word(&scrESCCal[subpage]);
 			lcdWriteString_P(s);
-			writeSoftkeys();
+			writeSoftkeys(NULL);
 			subpage++;
 		}		
 	}
@@ -464,7 +408,7 @@ void _hRadioCalibration()
 			lcdClear();
 			lcdSetPos(3, 0);
 			lcdWriteString_P(strCalSucc);
-			writeSoftkeys();
+			writeSoftkeys(NULL);
 			subpage = 1;
 		}
 	}
@@ -482,13 +426,32 @@ void _hDebug()
 	lcdFill(0, 12);
 }
 
+void _hFactoryReset()
+{
+	if (ISINIT)
+	{
+		lcdSetPos(3, 18);
+		lcdWriteString_P(strAreYouSure);
+	}
+	else if (KEY4)	// Yes
+	{
+		configReset();
+		configSave();
+		asm volatile (
+			"clr	r30\n"
+			"clr	r31\n"
+			"ijmp"
+			);
+	}
+}
+
 void menuShow()
 {
 	static uint8_t oldPage = 0xFF;
 	
 	_mykey = keyboardRead();
 	if (ANYKEY)
-		buzzerBuzz(10);
+		buzzerBuzz(5);
 		
 	if (KEY1)	// BACK
 	{
@@ -497,15 +460,17 @@ void menuShow()
 		else if (page == PAGE_MENU)
 			loadPage(PAGE_START);
 	}
-		
+	
+	lcdBeginUpdate();
 	if (oldPage != page)
 	{
 		_mykey = KEY_INIT;
 		subpage = 0;
 		lcdClear();
 		oldPage = page;
-	}			
+	}
 	defaultHandler();
+	lcdEndUpdate();
 }
 
 void menuInit()

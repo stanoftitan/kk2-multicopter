@@ -15,6 +15,66 @@
 #define P_STR static const prog_char
 #endif
 
+P_STR scrPIEditor[] = 
+	"Axis:\n"
+	"\n"
+	"P Gain:\n"
+	"P Limit:\n"
+	"I Gain:\n"
+	"I Limit:";
+
+P_STR scrReceiverTest[] = 
+	"Aileron:\n"
+	"Elevator:\n"
+	"Rudder:\n"
+	"Throttle:\n"
+	"Auxiliary:";
+
+P_STR scrSensorTest[] = 
+	"Gyro X:\n"
+	"Gyro Y:\n"
+	"Gyro Z:\n"
+	"Acc  X:\n"
+	"Acc  Y:\n"
+	"Acc  Z:\n"
+	"Batt:";
+
+P_STR scrModeSettings[] = 
+	"Self-Level:\n"
+	"Arming:\n"
+	"Link Roll Pitch:\n"
+	"Auto Disarm:\n"
+	"CPPM Enabled:";
+
+P_STR scrStickScaling[] = 
+	"Stick Scaling\n"
+	"\n"
+	"Roll (Ail):\n"
+	"Pitch (Ele):\n"
+	"Yaw (Rud):\n"
+	"Throttle:";
+
+P_STR scrMiscSettings[] = 
+	"Minimum throttle:\n"
+	"Height Dampening:\n"
+	"Height D. Limit:\n"
+	"Alarm 1/10 volts:\n"
+	"Servo filter:";
+
+P_STR scrSelflevelSettings[] =
+	"P Gain:\n"
+	"P Limit:\n"
+	"\n"
+	"Acc Trim Roll:\n"
+	"Acc Trim Pitch:";
+
+P_STR scrCPPMSettings[] = 
+	"Roll (Ail):\n"
+	"Pitch (Ele):\n"
+	"Yaw (Rud):\n"
+	"Throttle:\n"
+	"Aux:";
+	
 P_STR scrSensorCal0[] = 
 	"Place the aircraft on\n"
 	"a level surface and\n"
@@ -100,5 +160,12 @@ P_STR scrRadioCal0[] =
 	"Press CONTINUE to\n"
 	"calibrate.";
 
+P_STR scrMixerEditor[] = 
+	"Throttle:       Ch:\n"
+	"Aileron:\n"
+	"Elevator:\n"
+	"Rudder:\n"
+	"Offset:\n"
+	"Type:       Rate:";
 
 #endif /* MENU_SCREEN_H_ */

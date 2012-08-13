@@ -31,7 +31,6 @@ typedef struct
 	uint8_t Armed;
 	uint8_t ThrottleOff;
 	uint8_t SelfLevel;
-	uint8_t IofPI;
 	uint8_t Aux;
 } state_t;
 

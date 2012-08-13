@@ -33,46 +33,71 @@ P_STR strModel16[] = "V8";
 P_STR strModel17[] = "Airplane 1S Ail";
 P_STR strModel18[] = "Airplane 2S Ail";
 P_STR strModel19[] = "Flying Wing";
+P_STR strModel20[] = "Y4";
+P_STR strModel21[] = "V-Tail";
 
 PROGMEM model_t mixerTable[MIXER_TABLE_LEN] = {
 	// SingleCopter 2M 2S
 	{
 		strModel00,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 0  , 100, 0  , FLAG_ESC},
+			{100, 0  , 0  ,-100, 0  , FLAG_ESC},
+			{0  , 100, 0  , 0  , 50 , FLAG_SERVO},
+			{0  , 0  , 100, 0  , 50 , FLAG_SERVO},
+		},
 	},
 	
 	// SingleCopter 1M 4S
 	{
 		strModel01,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 0  , 0  , 0  , FLAG_ESC},
+			{0  , 100, 0  , 100, 50 , FLAG_SERVO},
+			{0  , 0  , 100, 100, 50 , FLAG_SERVO},
+			{0  ,-100, 0  , 100, 50 , FLAG_SERVO},
+			{0  , 0  ,-100, 100, 50 , FLAG_SERVO},
+		},
 	},
 	
 	// DualCopter
 	{
 		strModel02,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 100, 0  , 0  , 0  , FLAG_ESC},
+			{100,-100, 0  , 0  , 0  , FLAG_ESC},
+			{0  , 0  , 100, 100, 0  , FLAG_SERVO},
+			{0  , 0  ,-100, 100, 0  , FLAG_SERVO},
+		},
 	},
 	
 	// TriCopter
 	{
 		strModel03,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100,-87 , 50 , 0  , 0  , FLAG_ESC},
+			{100, 87 , 50 ,-1  , 0  , FLAG_ESC},
+			{100, 0  ,-100, 0  , 0  , FLAG_ESC},
+			{0  , 0  , 0  , 100, 50 , FLAG_SERVO},
+		},
 	},
 	
 	// Y6
 	{
 		strModel04,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100,-87 , 50 , 100, 0  , FLAG_ESC},
+			{100,-87 , 50 ,-100, 0  , FLAG_ESC},
+			{100, 87 , 50 , 100, 0  , FLAG_ESC},
+			{100, 87 , 50 ,-100, 0  , FLAG_ESC},
+			{100, 0  ,-100, 100, 0  , FLAG_ESC},
+			{100, 0  ,-100,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 
@@ -80,10 +105,11 @@ PROGMEM model_t mixerTable[MIXER_TABLE_LEN] = {
 	{
 		strModel05,
 		{
-			{FLAG_ESC, 100, 0, 100, 100, 0},
-			{FLAG_ESC, 100, 100, 0, -100, 0},			
-			{FLAG_ESC, 100, 0, -100, 100, 0},			
-			{FLAG_ESC, 100, -100, 0, -100, 0},			
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 100, 100, 0  , FLAG_ESC},
+			{100, 100, 0  ,-100, 0  , FLAG_ESC},
+			{100, 0  ,-100, 100, 0  , FLAG_ESC},
+			{100,-100, 0  ,-100, 0  , FLAG_ESC},
 		},
 	},	
 	
@@ -91,10 +117,11 @@ PROGMEM model_t mixerTable[MIXER_TABLE_LEN] = {
 	{
 		strModel06,
 		{
-			{FLAG_ESC, 100, -71, 71, 100, 0},
-			{FLAG_ESC, 100, 71, 71, -100, 0},			
-			{FLAG_ESC, 100, 71, -71, 100, 0},			
-			{FLAG_ESC, 100, -71, -71, -100, 0},			
+		//   thr roll pitch yaw offs  flags
+			{100,-71 , 71 , 100, 0  , FLAG_ESC},
+			{100, 71 , 71 ,-100, 0  , FLAG_ESC},
+			{100, 71 ,-71 , 100, 0  , FLAG_ESC},
+			{100,-71 ,-71 ,-100, 0  , FLAG_ESC},
 		},
 	},	
 
@@ -102,104 +129,211 @@ PROGMEM model_t mixerTable[MIXER_TABLE_LEN] = {
 	{
 		strModel07,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 100, 100, 0  , FLAG_ESC},
+			{100, 0  , 100,-100, 0  , FLAG_ESC},
+			{100, 100, 0  , 100, 0  , FLAG_ESC},
+			{100, 100, 0  ,-100, 0  , FLAG_ESC},
+			{100, 0  ,-100, 100, 0  , FLAG_ESC},
+			{100, 0  ,-100,-100, 0  , FLAG_ESC},
+			{100,-100, 0  , 100, 0  , FLAG_ESC},
+			{100,-100, 0  ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// X8 x
 	{
 		strModel08,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100,-71 , 71 , 100, 0  , FLAG_ESC},
+			{100,-71 , 71 ,-100, 0  , FLAG_ESC},
+			{100, 71 , 71 , 100, 0  , FLAG_ESC},
+			{100, 71 , 71 ,-100, 0  , FLAG_ESC},
+			{100, 71 ,-71 , 100, 0  , FLAG_ESC},
+			{100, 71 ,-71 ,-100, 0  , FLAG_ESC},
+			{100,-71 ,-71 , 100, 0  , FLAG_ESC},
+			{100,-71 ,-71 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// HexaCopter +
 	{
 		strModel09,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 100, 100, 0  , FLAG_ESC},
+			{100, 87 , 50 ,-100, 0  , FLAG_ESC},
+			{100, 87 ,-50 , 100, 0  , FLAG_ESC},
+			{100, 0  ,-100,-100, 0  , FLAG_ESC},
+			{100,-87 ,-50 , 100, 0  , FLAG_ESC},
+			{100,-87 , 50 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// HexaCopter x
 	{
 		strModel10,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 50 , 87 , 100, 0  , FLAG_ESC},
+			{100, 100, 0  ,-100, 0  , FLAG_ESC},
+			{100, 50 ,-87 , 100, 0  , FLAG_ESC},
+			{100,-50 ,-87 ,-100, 0  , FLAG_ESC},
+			{100,-100, 0  , 100, 0  , FLAG_ESC},
+			{100,-50 , 87 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// OctoCopter +
 	{
 		strModel11,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 100, 100, 0  , FLAG_ESC},
+			{100, 71 , 71 ,-100, 0  , FLAG_ESC},
+			{100, 100, 0  , 100, 0  , FLAG_ESC},
+			{100, 71 ,-71 ,-100, 0  , FLAG_ESC},
+			{100, 0  ,-100, 100, 0  , FLAG_ESC},
+			{100,-71 ,-71 ,-100, 0  , FLAG_ESC},
+			{100,-100, 0  , 100, 0  , FLAG_ESC},
+			{100,-71 , 71 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// OctoCopter x
 	{
 		strModel12,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 38 , 92 , 100, 0  , FLAG_ESC},
+			{100, 92 , 38 ,-100, 0  , FLAG_ESC},
+			{100, 92 ,-38 , 100, 0  , FLAG_ESC},
+			{100, 38 ,-92 ,-100, 0  , FLAG_ESC},
+			{100,-38 ,-92 , 100, 0  , FLAG_ESC},
+			{100,-92 ,-38 ,-100, 0  , FLAG_ESC},
+			{100,-92 , 38 , 100, 0  , FLAG_ESC},
+			{100,-38 , 92 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// H6
 	{
 		strModel13,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 71 , 71 , 100, 0  , FLAG_ESC},
+			{100, 71 , 0  ,-100, 0  , FLAG_ESC},
+			{100, 71 ,-71 , 100, 0  , FLAG_ESC},
+			{100,-71 ,-71 ,-100, 0  , FLAG_ESC},
+			{100,-71 , 0  , 100, 0  , FLAG_ESC},
+			{100,-71 , 71 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// H8
 	{
 		strModel14,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 71 , 71 , 100, 0  , FLAG_ESC},
+			{100, 71 , 24 ,-100, 0  , FLAG_ESC},
+			{100, 71 ,-24 , 100, 0  , FLAG_ESC},
+			{100, 71 ,-71 ,-100, 0  , FLAG_ESC},
+			{100,-71 ,-71 , 100, 0  , FLAG_ESC},
+			{100,-71 ,-24 ,-100, 0  , FLAG_ESC},
+			{100,-71 , 24 , 100, 0  , FLAG_ESC},
+			{100,-71 , 71 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// V6
 	{
 		strModel15,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 100, 71 , 100, 0  , FLAG_ESC},
+			{100, 71 , 0  ,-100, 0  , FLAG_ESC},
+			{100, 42 ,-71 , 100, 0  , FLAG_ESC},
+			{100,-42 ,-71 ,-100, 0  , FLAG_ESC},
+			{100,-71 , 0  , 100, 0  , FLAG_ESC},
+			{100,-100, 71 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// V8
 	{
 		strModel16,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 100, 71 , 100, 0  , FLAG_ESC},
+			{100, 81 , 24 ,-100, 0  , FLAG_ESC},
+			{100, 61 ,-24 , 100, 0  , FLAG_ESC},
+			{100, 42 ,-71 ,-100, 0  , FLAG_ESC},
+			{100,-42 ,-71 , 100, 0  , FLAG_ESC},
+			{100,-61 ,-24 ,-100, 0  , FLAG_ESC},
+			{100,-81 , 24 , 100, 0  , FLAG_ESC},
+			{100,-100, 71 ,-100, 0  , FLAG_ESC},
+		},
 	},
 	
 	// Airplane 1S Ail
 	{
 		strModel17,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 0  , 0  , 0  , FLAG_ESC},
+			{0  , 100, 0  , 0  , 50 , FLAG_SERVO},
+			{0  , 0  , 100, 0  , 50 , FLAG_SERVO},
+			{0  , 0  , 0  , 100, 50 , FLAG_SERVO},
+		},
 	},
 	
 	// Airplane 2S Ail
 	{
 		strModel18,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 0  , 0  , 0  , FLAG_ESC},
+			{0  , 100, 0  , 0  , 50 , FLAG_SERVO},
+			{0  , 100, 0  , 0  , 50 , FLAG_SERVO},
+			{0  , 0  , 100, 0  , 50 , FLAG_SERVO},
+			{0  , 0  , 0  , 100, 50 , FLAG_SERVO},
+		},
 	},
 	
 	// Flying Wing
 	{
 		strModel19,
 		{
-			
-		},		
+		//   thr roll pitch yaw offs  flags
+			{100, 0  , 0  , 0  , 0  , FLAG_ESC},
+			{0  , 50 , 50 , 0  , 50 , FLAG_SERVO},
+			{0  , 50 ,-50 , 0  , 50 , FLAG_SERVO},
+		},
 	},
 	
+	// Y4
+	{
+		strModel20,
+		{
+		//   thr roll pitch yaw offs  flags
+			{100,-71 , 71 , 100, 0  , FLAG_ESC},
+			{100, 71 , 71 ,-100, 0  , FLAG_ESC},
+			{100, 0  ,-100, 100, 0  , FLAG_ESC},
+			{100, 0  ,-100,-100, 0  , FLAG_ESC},
+		},
+	},
+
+	// V-Tail
+	{
+		strModel21,
+		{
+		//   thr roll pitch yaw offs  flags
+			{100,-71 , 71 , 0  , 0  , FLAG_ESC},
+			{100, 71 , 71 ,-1  , 0  , FLAG_ESC},
+			{120, 0  ,-90 , 100, 0  , FLAG_ESC},
+			{120, 0  ,-90 ,-100, 0  , FLAG_ESC},
+		},
+	},
 };

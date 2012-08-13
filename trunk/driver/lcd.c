@@ -23,6 +23,9 @@ static uint8_t _flags = 0;
 #ifdef BUFFERED
 static uint8_t _screen[128 * 8];
 static uint8_t* _write_ptr;
+#ifdef INTERRUPT
+static uint8_t _updateLock;
+#endif
 #endif
 
 static void sendByte(uint8_t byte)
@@ -103,6 +106,8 @@ __attribute__ ((section(".lowtext")))
 ISR(TIMER0_OVF_vect, ISR_NOBLOCK)
 {
 	static uint16_t offset;
+	if (_updateLock) return;
+	
 	if (offset % 128 == 0)
 		_lcdSetPos(offset / 128, 0);
 		
@@ -120,6 +125,35 @@ void lcdSetPos(uint8_t line, uint8_t column)
 #else
 	_lcdSetPos(line, column);
 #endif
+}
+
+void lcdSetPixel(uint8_t x, uint8_t y)
+{
+	uint8_t *scr = _screen + x + ((y & 0x07) << 4);
+	uint8_t mask = 1 << (y % 8);
+	if (_flags & REVERSED)
+		*scr = *scr & ~mask;
+	else
+		*scr = *scr | mask;
+}
+
+void lcdLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
+{
+	uint8_t dx =  abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+	uint8_t dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1; 
+	uint8_t err = dx + dy, e2; /* error value e_xy */
+ 
+	for(;;)
+	{
+		lcdSetPixel(x0, y0);
+		
+		if (x0 == x1 && y0 == y1)
+			break;
+			
+		e2 = 2 * err;
+		if (e2 > dy) { err += dy; x0 += sx; } /* e_xy + e_x > 0 */
+		if (e2 < dx) { err += dx; y0 += sy; } /* e_xy + e_y < 0 */
+	}
 }
 
 void lcdClear()
@@ -226,6 +260,7 @@ void lcdFill(uint8_t c, uint8_t width)
 
 void lcdInit()
 {
+	_updateLock = 1;
 #ifdef BUFFERED
 	_write_ptr = _screen;
 	
@@ -262,6 +297,8 @@ void lcdInit()
 	sendCommand(0x24); // set ra/rb
 	lcdSetContrast(0x20);
 	sendCommand(0xAF);	// Display on
+	
+	_updateLock = 0;
 }
 
 void lcdOutput()
@@ -280,3 +317,13 @@ void lcdOutput()
 #endif
 }
 
+void lcdBeginUpdate()
+{
+	_updateLock++;
+}
+
+void lcdEndUpdate()
+{
+	if (_updateLock)
+		_updateLock--;
+}
