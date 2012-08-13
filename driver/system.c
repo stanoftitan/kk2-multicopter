@@ -66,7 +66,7 @@ uint16_t micros()
 		t1 = TCNT1;
 		t2 = t1_ovf;
 	}		
-	return  (t2 * 65536 + t1 * 2) / 40;
+	return  (t2 * 65536 + t1 * 2) / (2 * TICKSPERMICRO);
 }
 
 // accuracy is 3ms

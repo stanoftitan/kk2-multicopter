@@ -12,8 +12,6 @@
 #define GLOBAL_H_
 
 #define F_CPU	20000000
-#define MICROTOTCNT1(x) (((unsigned long)x) * 20)
-#define TNCT1TOMICRO(x) (x / 20)
 
 #define ON		1
 #define OFF		0

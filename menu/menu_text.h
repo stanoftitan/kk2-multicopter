@@ -15,22 +15,6 @@
 #define P_STR static const prog_char
 #endif
 
-/*
-P_STR strMENU[] = "MENU";
-P_STR strBACK[] = "BACK";
-P_STR strUP[] = "UP";
-P_STR strDOWN[] = "DOWN";
-P_STR strENTER[] = "ENTER";
-P_STR strPREV[] = "PREV";
-P_STR strNEXT[] = "NEXT";
-P_STR strCHANGE[] = "CHANGE";
-P_STR strCLR[] = "CLR";
-P_STR strDONE[] = "DONE";
-P_STR strCONTINUE[] = "CONTINUE";
-P_STR strCANCEL[] = "CANCEL";
-P_STR strYES[] = "YES";
-*/
-
 P_STR strSAFE[] = "SAFE";
 P_STR strARMED[] = "ARMED";
 P_STR strOFF[] = "OFF";
@@ -57,39 +41,13 @@ P_STR strSelflevel[] = "Self-level";
 P_STR strIofPI[] = "I of PI";
 P_STR strSpIsSp[] = " is ";
 
-/*
-P_STR strAxis[] = "Axis:";
-P_STR strPGain[] = "P Gain :";
-P_STR strPLimit[] = "P Limit:";
-P_STR strIGain[] = "I Gain :";
-P_STR strILimit[] = "I Limit:";
-*/
 P_STR strRollAil[] = "Roll (Aileron)";
 P_STR strPitchEle[] = "Pitch (Elevator)";
 P_STR strYawRud[] = "Yaw (Rudder)";
-
-/*
-P_STR strIPartOfPI[] = "I part of PI:";
-P_STR strArming[] = "Arming:";
-P_STR strLinkRollPitch[] = "Link Roll Pitch:";
-P_STR strReceiver[] = "Receiver:";
-*/
 P_STR strStick[] = "Stick";
 P_STR strAUX[] = "AUX";
 P_STR strYes[] = "Yes";
 P_STR strNo[] = "No";
-
-/*
-P_STR strAileron[] = "Aileron:";
-P_STR strElevator[] = "Elevator:";
-P_STR strThrottle[] = "Throttle:";
-P_STR strRudder[] = "Rudder:";
-P_STR strAuxiliary[] = "Auxiliary:";
-P_STR strOffset[] = "Offset:";
-P_STR strType[] = "Type:";
-P_STR strRate[] = "Rate:";
-P_STR strCH[] = "CH:";
-*/
 P_STR strESC[] = "ESC";
 P_STR strServo[] = "Servo";
 P_STR strHigh[] = "Hi";
@@ -103,20 +61,12 @@ P_STR strIdle[] = "Idle";
 P_STR strFull[] = "Full";
 P_STR strOn[] = "On";
 P_STR strOff[] = "Off";
-
-/*
-P_STR strGyro[] = "Gyro";
-P_STR strAcc[] = "Acc";
-P_STR strX[] = "X:";
-P_STR strY[] = "Y:";
-P_STR strZ[] = "Z:";
-*/
 P_STR strOK[] = "OK";
 P_STR strNot[] = "Not";
 P_STR strBattery[] = "Battery:";
 
 P_STR strWait[] = "Waiting";
-P_STR strSec[] = "sec";
+P_STR strSec[] = " sec";
 P_STR strCalSucc[] = "Calibration succeeded";
 P_STR strAreYouSure[] = "Are you sure?";
 

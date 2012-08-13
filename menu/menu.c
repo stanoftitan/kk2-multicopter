@@ -160,6 +160,7 @@ void loadPage(uint8_t pageIndex)
 
 void defaultHandler()
 {
+	/*
 	if (!currentPage.softkeys)
 	{
 		if (ISINIT)
@@ -172,6 +173,7 @@ void defaultHandler()
 			
 		return;
 	}
+	*/
 
 	if (ISINIT)
 	{
@@ -193,7 +195,7 @@ uint8_t doMenu(menu_t *menu)
 	{
 		if (menu->marked > 0) 
 			menu->marked--;
-	}					
+	}
 	else if (KEY3)		// DOWN
 	{
 		if (menu->marked < menu->len - 1) 
@@ -231,7 +233,7 @@ uint8_t doMenu(menu_t *menu)
 	if (menu->top < menu->len - 5)
 		lcdWriteImage_P(lcdArrowDown, sizeof(lcdArrowDown));
 	else
-		lcdFill(0, sizeof(lcdArrowDown));	
+		lcdFill(0, sizeof(lcdArrowDown));
 	
 	return 0;
 }
