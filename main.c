@@ -69,18 +69,19 @@ int main(void)
 
 	while(1)
 	{
-		LED_TOGGLE;
+ 		LED_TOGGLE;
 		rxRead();				//  21.50us
 		sensorsReadGyro();		//   5.90us
 		sensorsReadAcc();		//   5.90us
 		CheckState();			//   2.10us
-
+					
 		for (uint8_t i = 0; i < 5; i++)		
 			pwmWrite(i+1, RX_raw[i]);
-
+					
 		EVERYMS(20)
 			menuShow();			// 128.85us
-					
-		buzzerLoop();
+										
+ 		buzzerLoop();
+		 
 	}
 }

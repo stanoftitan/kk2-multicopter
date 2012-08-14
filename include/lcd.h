@@ -11,12 +11,9 @@
 #ifndef LCD_H_
 #define LCD_H_
 
+#include "fonts.h"
+#include "symbols.h"
 #include <avr/pgmspace.h>
-
-extern prog_char lcdArrowUp[9];
-extern prog_char lcdArrowDown[9];
-extern prog_uchar lcdFontSmall[][6];
-extern prog_uchar lcdFontBig[][24];
 
 void lcdInit();
 void lcdClear();
@@ -27,12 +24,12 @@ void lcdWriteString_P(PGM_P s);
 void lcdReverse(uint8_t reversed);
 void lcdSetContrast(uint8_t contrast);
 void lcdOutput();
-void lcdWriteImage_P(PGM_P image, uint8_t width);
-void lcdFill(uint8_t c, uint8_t width);
-void lcdBigFont(uint8_t bigfont);
-void lcdSetPixel(uint8_t x, uint8_t y);
+void lcdSetPixel(uint8_t x, uint8_t y, uint8_t on);
 void lcdLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
-void lcdBeginUpdate();
-void lcdEndUpdate();
+void lcdEnable();
+void lcdDisable();
+void lcdSelectFont(const fontdescriptor_t *font);
+void lcdXY(uint8_t x, uint8_t y);
+void lcdWriteGlyph_P(const glyph_t *glyph);
 
 #endif /* LCD_H_ */
