@@ -60,27 +60,28 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-        <avrgcc.compiler.directories.IncludePaths>
-          <ListValues>
-            <Value>../include</Value>
-          </ListValues>
-        </avrgcc.compiler.directories.IncludePaths>
-        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
-        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-        <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fdiagnostics-show-option </avrgcc.compiler.miscellaneous.OtherFlags>
-        <avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>True</avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>
-        <avrgcc.linker.libraries.Libraries>
-          <ListValues>
-            <Value>m</Value>
-          </ListValues>
-        </avrgcc.linker.libraries.Libraries>
-        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-      </AvrGcc>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../include</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize more (-O2)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fdiagnostics-show-option </avrgcc.compiler.miscellaneous.OtherFlags>
+  <avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>True</avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>m</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+</AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
@@ -99,9 +100,6 @@
     <Compile Include="driver\lcd.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="driver\lcd_font.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="driver\pwm.c">
       <SubType>compile</SubType>
     </Compile>
@@ -111,6 +109,21 @@
     <Compile Include="driver\system.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="fonts\font12x16.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fonts\font4x6.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fonts\font6x8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fonts\fonts.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="fonts\symbols.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\adc.h">
       <SubType>compile</SubType>
     </Compile>
@@ -118,6 +131,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\config.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="include\fonts.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\global.h">
@@ -150,6 +166,9 @@
     <Compile Include="include\sensors.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\symbols.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="include\system.h">
       <SubType>compile</SubType>
     </Compile>
@@ -179,6 +198,7 @@
     <Folder Include="include" />
     <Folder Include="driver" />
     <Folder Include="menu" />
+    <Folder Include="fonts" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

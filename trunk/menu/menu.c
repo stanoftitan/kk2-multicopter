@@ -160,21 +160,6 @@ void loadPage(uint8_t pageIndex)
 
 void defaultHandler()
 {
-	/*
-	if (!currentPage.softkeys)
-	{
-		if (ISINIT)
-		{
-			lcdWriteString_P(PSTR("Under construction."));
-			writeSoftkeys(_skBACK);
-		}
-		else if (KEY1)
-			loadPage(PAGE_MENU);
-			
-		return;
-	}
-	*/
-
 	if (ISINIT)
 	{
 		if (currentPage.screen)
@@ -212,9 +197,9 @@ uint8_t doMenu(menu_t *menu)
 	// text output
 	lcdSetPos(0, 58);
 	if (menu->top > 0)
-		lcdWriteImage_P(lcdArrowUp, sizeof(lcdArrowUp));
-	else
-		lcdFill(0, sizeof(lcdArrowUp));
+		lcdWriteGlyph_P(&glyArrowUp);
+// 	else
+// 		lcdFill(0, sizeof(lcdArrowUp));
 		
 	for (uint8_t i = 0; i < 5 && i < menu->len; i++)
 	{
@@ -225,15 +210,16 @@ uint8_t doMenu(menu_t *menu)
 		else
 			lcdReverse(0);
 		lcdWriteString_P(item);
-		lcdFill(0, (21 - strlen_P(item)) * 6);
+		for (uint8_t j = 0; j < 21 - strlen_P(item); j++)
+			lcdWriteChar(32);
 	}
 
 	lcdReverse(0);
 	lcdSetPos(6, 58);
 	if (menu->top < menu->len - 5)
-		lcdWriteImage_P(lcdArrowDown, sizeof(lcdArrowDown));
-	else
-		lcdFill(0, sizeof(lcdArrowDown));
+		lcdWriteGlyph_P(&glyArrowDown);
+// 	else
+// 		lcdFill(0, sizeof(lcdArrowDown));
 	
 	return 0;
 }
@@ -279,9 +265,9 @@ void _hStart()
 	if (ISINIT)
 	{
 		lcdSetPos(0, 36);
-		lcdBigFont(1);
+		lcdSelectFont(&font12x16);
 		lcdWriteString_P(strSAFE);
-		lcdBigFont(0);
+		lcdSelectFont(NULL);
 		lcdSetPos(3, 0);
 		lcdWriteString_P(strSelflevel);
 		lcdWriteString_P(strSpIsSp);
@@ -292,7 +278,6 @@ void _hStart()
 		lcdWriteString_P(strON);
 	else		
 		lcdWriteString_P(strOFF);
-	lcdFill(0, 6);
 	
 }
 
@@ -302,33 +287,26 @@ void _hSensorTest()
 	utoa(GYRO_raw[0], s, 10);
 	lcdSetPos(0, 48);
 	lcdWriteString(s);
-	lcdFill(0, 6);
 	utoa(GYRO_raw[1], s, 10);
 	lcdSetPos(1, 48);
 	lcdWriteString(s);
-	lcdFill(0, 6);
 	utoa(GYRO_raw[2], s, 10);
 	lcdSetPos(2, 48);
 	lcdWriteString(s);
-	lcdFill(0, 6);
 	
 	utoa(ACC_raw[0], s, 10);
 	lcdSetPos(3, 48);
 	lcdWriteString(s);
-	lcdFill(0, 6);
 	utoa(ACC_raw[1], s, 10);
 	lcdSetPos(4, 48);
 	lcdWriteString(s);
-	lcdFill(0, 6);
 	utoa(ACC_raw[2], s, 10);
 	lcdSetPos(5, 48);
 	lcdWriteString(s);
-	lcdFill(0, 6);
 	
 	utoa(sensorsReadBattery(), s, 10);
 	lcdSetPos(6, 48);
 	lcdWriteString(s);
-	lcdFill(0, 6);
 }
 
 void _hReceiverTest()
@@ -341,7 +319,6 @@ void _hReceiverTest()
 		{
 			itoa(RX[i], s, 10);
 			lcdWriteString(s);
-			lcdFill(0, 42);
 		}
 		else
 			lcdWriteString_P(strNoSignal);
@@ -425,7 +402,6 @@ void _hDebug()
 	char s[7];
 	utoa(Config.MixerIndex, s, 10);
 	lcdWriteString(s);
-	lcdFill(0, 12);
 }
 
 void _hFactoryReset()
@@ -452,8 +428,6 @@ void menuShow()
 	static uint8_t oldPage = 0xFF;
 	
 	_mykey = keyboardRead();
-	if (ANYKEY)
-		buzzerBuzz(5);
 		
 	if (KEY1)	// BACK
 	{
@@ -463,7 +437,7 @@ void menuShow()
 			loadPage(PAGE_START);
 	}
 	
-	lcdBeginUpdate();
+	lcdDisable();
 	if (oldPage != page)
 	{
 		_mykey = KEY_INIT;
@@ -472,7 +446,10 @@ void menuShow()
 		oldPage = page;
 	}
 	defaultHandler();
-	lcdEndUpdate();
+	lcdEnable();
+
+	if (ANYKEY)
+		buzzerBuzz(5);
 }
 
 void menuInit()
