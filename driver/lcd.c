@@ -97,6 +97,15 @@ void lcdSetPixel(uint8_t x, uint8_t y, uint8_t on)
 		*scr = *scr | mask;
 }
 
+static void lcdSetByte(uint8_t x, uint8_t y, uint8_t b)
+{
+	uint8_t *scr = _screen + x + (y / 8 * LCDWIDTH); 
+	if (_flags & REVERSED)
+		*scr = ~b;
+	else
+		*scr = b;
+}
+
 void lcdLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 {
 	// simple optimized bresenham algorithm
@@ -135,8 +144,17 @@ void lcdWriteSprite_P(PGM_P sprite, uint8_t sizeX, uint8_t sizeY, uint8_t mode)
 		{
 			if (j % 8 == 0)
 					b = pgm_read_byte(sprite++);
+					
 			if (mode == ROP_COPY)
-				lcdSetPixel(_curx + i, _cury + j, b & 0x01);
+			{
+				if ((_cury % 8 == 0) && (sizeY - j >= 8))
+				{
+					lcdSetByte(_curx + i, _cury + j, b);
+					j += 7; // just +7 b/c the loop increments anyway
+				}
+				else
+					lcdSetPixel(_curx + i, _cury + j, b & 0x01);
+			}				
 			else if (mode == ROP_PAINT)
 			{
 				if (b & 0x01)

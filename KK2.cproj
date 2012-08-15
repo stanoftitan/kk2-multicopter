@@ -109,19 +109,19 @@
     <Compile Include="driver\system.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="fonts\font12x16.c">
+    <Compile Include="gfx\font12x16.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="fonts\font4x6.c">
+    <Compile Include="gfx\font4x6.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="fonts\font6x8.c">
+    <Compile Include="gfx\font6x8.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="fonts\fonts.c">
+    <Compile Include="gfx\fonts.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="fonts\glyphs.c">
+    <Compile Include="gfx\glyphs.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\adc.h">
@@ -198,7 +198,7 @@
     <Folder Include="include" />
     <Folder Include="driver" />
     <Folder Include="menu" />
-    <Folder Include="fonts" />
+    <Folder Include="gfx" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

@@ -395,26 +395,33 @@ void _hSensorTest()
 	utoa(GYRO_raw[0], s, 10);
 	lcdSetPos(0, 48);
 	lcdWriteString(s);
+	lcdWriteChar(32);
 	utoa(GYRO_raw[1], s, 10);
 	lcdSetPos(1, 48);
 	lcdWriteString(s);
+	lcdWriteChar(32);
 	utoa(GYRO_raw[2], s, 10);
 	lcdSetPos(2, 48);
 	lcdWriteString(s);
+	lcdWriteChar(32);
 	
 	utoa(ACC_raw[0], s, 10);
 	lcdSetPos(3, 48);
 	lcdWriteString(s);
+	lcdWriteChar(32);
 	utoa(ACC_raw[1], s, 10);
 	lcdSetPos(4, 48);
 	lcdWriteString(s);
+	lcdWriteChar(32);
 	utoa(ACC_raw[2], s, 10);
 	lcdSetPos(5, 48);
 	lcdWriteString(s);
+	lcdWriteChar(32);
 	
 	utoa(BATT, s, 10);
 	lcdSetPos(6, 48);
 	lcdWriteString(s);
+	lcdWriteChar(32);
 }
 
 void _hReceiverTest()
@@ -427,6 +434,8 @@ void _hReceiverTest()
 		{
 			itoa(RX[i], s, 10);
 			lcdWriteString(s);
+			for (uint8_t i = 0; i < sizeof(strNoSignal) - strlen(s); i++)
+				lcdWriteChar(32);
 		}
 		else
 			lcdWriteString_P(strNoSignal);
