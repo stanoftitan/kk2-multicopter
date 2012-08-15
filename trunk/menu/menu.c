@@ -64,9 +64,9 @@ void _hReceiverTest();
 void _hSensorTest();
 void _hSensorCalibration();
 void _hESCCalibration();
-void _hRadioCalibration();
-void _hShowMotorLayout();
-void _hLoadMotorLayout();
+void _hStickCentering();
+void _hShowModelLayout();
+void _hLoadModelLayout();
 void _hDebug();
 void _hFactoryReset();
 
@@ -79,6 +79,7 @@ static const prog_char _skCONTINUE[]  = "BACK         CONTINUE";
 static const prog_char _skCANCELYES[] = "CANCEL            YES";
 static const prog_char _skPAGE[]      = "BACK PREV NEXT CHANGE";
 static const prog_char _skBACKNEXT[]  = "BACK  NEXT";
+static const prog_char _skCANCEL[]    = "CANCEL";
 
 //////////////////////////////////////////////////////////////////////////
 static const page_t pages[] PROGMEM = {
@@ -94,10 +95,10 @@ static const page_t pages[] PROGMEM = {
 /*  9 */	{ _skCONTINUE, _hSensorCalibration, scrSensorCal0},
 /* 10 */	{ _skCONTINUE, _hESCCalibration, scrESCCal0},
 /* 11 */	{ _skPAGE, NULL, scrCPPMSettings},
-/* 12 */	{ _skCONTINUE, _hRadioCalibration, scrRadioCal0},
+/* 12 */	{ _skCONTINUE, _hStickCentering, scrRadioCal0},
 /* 13 */	{ _skPAGE, NULL, scrMixerEditor},
-/* 14 */	{ _skBACKNEXT, _hShowMotorLayout},
-/* 15 */	{ _skMENU, _hLoadMotorLayout },
+/* 14 */	{ _skBACKNEXT, _hShowModelLayout},
+/* 15 */	{ _skMENU, _hLoadModelLayout },
 /* 16 */	{ _skBACK, _hDebug },
 /* 16 */	{ _skCANCELYES, _hFactoryReset },
 };
@@ -121,17 +122,18 @@ static const prog_char *lstMenu[] PROGMEM = {
 	strFactoryReset,
 };
 
-#define PAGE_START	0
-#define PAGE_MENU	1
+#define PAGE_START			0
+#define PAGE_MENU			1
+#define PAGE_SHOW_LAYOUT	14
 
 PGM_P tsmMain(uint8_t);
-PGM_P tsmLoadMotorLayout(uint8_t);
+PGM_P tsmLoadModelLayout(uint8_t);
 
 static uint8_t page, subpage;
 static uint16_t _tStart;
 static page_t currentPage;
 static menu_t mnuMain = {length(lstMenu), tsmMain};
-static menu_t mnuMLayout = {MIXER_TABLE_LEN, tsmLoadMotorLayout};
+static menu_t mnuMLayout = {MIXER_TABLE_LEN, tsmLoadModelLayout};
 
 static void writeList(const element_t list[], uint8_t len)
 {
@@ -200,9 +202,7 @@ uint8_t doMenu(menu_t *menu)
 	// text output
 	lcdSetPos(0, 58);
 	if (menu->top > 0)
-		lcdWriteGlyph_P(&glyArrowUp);
-// 	else
-// 		lcdFill(0, sizeof(lcdArrowUp));
+		lcdWriteGlyph_P(&glyArrowUp, 0);
 		
 	for (uint8_t i = 0; i < 5 && i < menu->len; i++)
 	{
@@ -220,9 +220,7 @@ uint8_t doMenu(menu_t *menu)
 	lcdReverse(0);
 	lcdSetPos(6, 58);
 	if (menu->top < menu->len - 5)
-		lcdWriteGlyph_P(&glyArrowDown);
-// 	else
-// 		lcdFill(0, sizeof(lcdArrowDown));
+		lcdWriteGlyph_P(&glyArrowDown, 0);
 	
 	return 0;
 }
@@ -233,12 +231,80 @@ void _hMenu()
 		loadPage(mnuMain.marked + 2);
 }
 
-void _hShowMotorLayout()
+static void showMotor(uint8_t motor, uint8_t withDir)
 {
+	uint8_t x = 96;
+	uint8_t y = 32;
+	mixer_channel_t *channel = &Config.Mixer.Channel[motor];
 	
+	if (channel->flags & FLAG_ESC)
+	{
+		x += (channel->Aileron >> 2);
+		y -= (channel->Elevator >> 2);
+	
+		lcdLine(x, y, 96, 32);
+		lcdXY(x - 4, y - 4);
+		lcdWriteGlyph_P(&glyBall, ROP_PAINT);
+		lcdXY(x - 4, y - 7);
+		if (channel->Rudder >= 0)
+			lcdWriteGlyph_P(&glyDirCW, ROP_PAINT);
+		else
+			lcdWriteGlyph_P(&glyDirCCW, ROP_PAINT);
+		
+		lcdXY(x - 2, y - 2);
+		lcdReverse(1);
+		lcdSelectFont(&font4x6);
+		lcdWriteChar(motor + '1');
+		lcdSelectFont(NULL);
+		lcdReverse(0);
+		
+		if (withDir)
+		{
+			lcdSetPos(2, 0);
+			lcdWriteString_P(strDirSeen);
+			lcdSetPos(5, 0);
+			if (channel->Rudder >= 0)
+				lcdWriteString_P(strCW);
+			else
+				lcdWriteString_P(strCCW);
+		}
+	}
+	else if (withDir)
+	{
+		lcdSetPos(3, 64);
+		if (channel->flags == FLAG_NONE)
+			lcdWriteString_P(strUnused);
+		else
+			lcdWriteString_P(strServo);
+	}
 }
 
-void _hLoadMotorLayout()
+void _hShowModelLayout()
+{
+	if (ANYKEY)
+	{
+		if (KEY2)	// NEXT
+			subpage = (subpage + 1) % 9;
+		
+		lcdClear();
+		lcdWriteString_P(strOutput);
+		lcdWriteChar(32);
+		if (subpage == 0)
+		{
+			lcdWriteString_P(strALL);
+			for (uint8_t i = 0; i < 8; i++)
+				showMotor(i, 0);
+		}			
+		else
+		{
+			lcdWriteChar(subpage + '0');
+			showMotor(subpage - 1, 1);
+		}
+		writeSoftkeys(NULL);
+	}
+}
+
+void _hLoadModelLayout()
 {
 	if (ISINIT)
 		mnuMLayout.marked = Config.MixerIndex;
@@ -258,12 +324,13 @@ void _hLoadMotorLayout()
 	{
 		mixerLoadTable(mnuMLayout.marked);
 		configSave();
-		loadPage(PAGE_MENU);
+		loadPage(PAGE_SHOW_LAYOUT);
 	}
 }
 
 void _hStart()
 {
+	char s[7];
 	if (KEY4)	// MENU
 	{
 		loadPage(PAGE_MENU);
@@ -279,6 +346,8 @@ void _hStart()
 		lcdSetPos(3, 0);
 		lcdWriteString_P(strSelflevel);
 		lcdWriteString_P(strSpIsSp);
+		lcdSetPos(5, 0);
+		lcdWriteString_P(strBattery);
 	}
 	
 	lcdSetPos(3, 84);
@@ -287,6 +356,37 @@ void _hStart()
 	else		
 		lcdWriteString_P(strOFF);
 	
+	lcdSetPos(4, 0);
+	if (State.Error)
+	{
+		lcdWriteString_P(strError);
+		lcdWriteChar(32);
+		if (State.Error & ERR_NOT_CALIBRATED)
+			lcdWriteString_P(strSensorNotCal);
+		else 
+		{
+			lcdWriteString_P(PSTR("no "));
+			if (State.Error & ERR_NO_ROLL)
+				lcdWriteString_P(strRoll);
+			else if (State.Error & ERR_NO_PITCH)
+				lcdWriteString_P(strPitch);
+			else if (State.Error & ERR_NO_YAW)
+				lcdWriteString_P(strYaw);
+			else 
+				lcdWriteString_P(strThro);
+			lcdWriteString_P(PSTR(" input"));
+		}
+	}	
+	else
+		lcdWriteString_P(PSTR("Ready for departure!"));
+	
+	lcdSetPos(5, 9*6);
+	utoa(BATT / 10, s, 10);
+	lcdWriteString(s);
+	lcdWriteChar('.');
+	utoa(BATT % 10, s, 10);
+	lcdWriteString(s);
+	lcdWriteString_P(PSTR(" V "));
 }
 
 void _hSensorTest()
@@ -312,7 +412,7 @@ void _hSensorTest()
 	lcdSetPos(5, 48);
 	lcdWriteString(s);
 	
-	utoa(sensorsReadBattery(), s, 10);
+	utoa(BATT, s, 10);
 	lcdSetPos(6, 48);
 	lcdWriteString(s);
 }
@@ -341,21 +441,22 @@ void _hSensorCalibration()
 		{
 			subpage = 1;
 			lcdClear();
+			lcdSetPos(3, 18);
+			lcdWriteString_P(strWait);
+			lcdSetPos(3, 78);
+			lcdWriteString_P(strSec);
+			writeSoftkeys(_skCANCEL);
 			_tStart = millis();
 		}			
 	}
 	else if (subpage == 1)
 	{
-		lcdSetPos(3, 18);
-		lcdWriteString_P(strWait);
 		lcdSetPos(3, 66);
 		uint8_t sec = (millis() - _tStart) / 1000;
 		lcdWriteChar((5-sec) + 48);
-		lcdWriteString_P(strSec);
 		if (sec >= 5)
 		{
-			sensorsCalibateGyro();
-			sensorsCalibateAcc();
+			sensorsCalibate();
 			configSave();
 			lcdSetPos(3, 0);
 			lcdWriteString_P(strCalSucc);
@@ -384,7 +485,7 @@ void _hESCCalibration()
 	}
 }
 
-void _hRadioCalibration()
+void _hStickCentering()
 {
 	if (subpage == 0)
 	{
@@ -468,7 +569,7 @@ PGM_P tsmMain(uint8_t index)
 	return (PGM_P)pgm_read_word(&lstMenu[index]);
 }
 
-PGM_P tsmLoadMotorLayout(uint8_t index)
+PGM_P tsmLoadModelLayout(uint8_t index)
 {
 	return (PGM_P)pgm_read_word(&mixerTable[index].Name);
 }

@@ -14,7 +14,7 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x59
+#define SIGNATURE	0x5A
 
 static config_t defaultConfig PROGMEM = 
 {

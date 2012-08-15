@@ -12,7 +12,7 @@
 #define LCD_H_
 
 #include "fonts.h"
-#include "symbols.h"
+#include "glyphs.h"
 #include <avr/pgmspace.h>
 
 void lcdInit();
@@ -29,6 +29,10 @@ void lcdEnable();
 void lcdDisable();
 void lcdSelectFont(const fontdescriptor_t *font);
 void lcdXY(uint8_t x, uint8_t y);
-void lcdWriteGlyph_P(const glyph_t *glyph);
+void lcdWriteGlyph_P(const glyph_t *glyph, uint8_t mode);
+
+#define ROP_COPY	0
+#define ROP_PAINT	1
+#define ROP_INVERT	2
 
 #endif /* LCD_H_ */

@@ -15,11 +15,9 @@ extern int16_t GYRO[3];
 extern uint16_t GYRO_raw[3];
 extern int16_t ACC[3];
 extern uint16_t ACC_raw[3];
+extern uint8_t BATT;
 
-void sensorsReadGyro();
-void sensorsReadAcc();
-void sensorsCalibateGyro();
-void sensorsCalibateAcc();
-uint16_t sensorsReadBattery();
+void sensorsRead();
+void sensorsCalibate();
 
 #endif /* SENSORS_H_ */

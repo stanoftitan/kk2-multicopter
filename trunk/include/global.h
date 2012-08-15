@@ -30,6 +30,13 @@ typedef struct
 	uint8_t ThrottleOff;
 	uint8_t SelfLevel;
 	uint8_t Aux;
+	
+	#define ERR_NOT_CALIBRATED	0x80
+	#define ERR_NO_ROLL			0x01
+	#define ERR_NO_PITCH		0x02
+	#define ERR_NO_YAW			0x04
+	#define ERR_NO_THR			0x08
+	uint8_t Error;
 } state_t;
 
 extern state_t State;
