@@ -79,6 +79,7 @@ int main(void)
 	init();
 
 	lcdClear();
+	//lcdWriteGlyph_P(&glyLogo, 0);
 	lcdSetPos(1, 0);
 	lcdWriteString_P(versionNum);
 	lcdSetPos(2, 0);
