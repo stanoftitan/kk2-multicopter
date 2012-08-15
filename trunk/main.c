@@ -18,6 +18,7 @@
 #include "menu.h"
 #include "buzzer.h"
 #include <util/delay.h>
+#include <avr/wdt.h>
 
 // for debugging
 #include <stdlib.h>
@@ -26,6 +27,17 @@
 state_t State;
 static const prog_char versionNum[] = "Version 0.1a";
 static const prog_char versionAuthor[] = "By Oliver Schulz";
+
+
+__attribute__((naked))
+__attribute__((section(".init3")))
+void stop_wdt()
+{
+	// clear watchdog reset flag!!
+	MCUSR = 0;
+	// and stop watchdog
+	wdt_disable();
+}
 
 void init()
 {
@@ -80,7 +92,7 @@ int main(void)
 					
 		EVERYMS(20)
 			menuShow();			// 128.85us
-										
+
  		buzzerLoop();
 		 
 	}

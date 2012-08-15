@@ -16,15 +16,17 @@
 #include "buzzer.h"
 #include <avr/pgmspace.h>
 #include <stdlib.h>
+#include <avr/wdt.h>
 
 uint8_t _mykey;
 #define KEY_INIT	1
-#define ISINIT		(_mykey == KEY_INIT)
-#define KEY1		(_mykey == KEY_1)
-#define KEY2		(_mykey == KEY_2)
-#define KEY3		(_mykey == KEY_3)
-#define KEY4		(_mykey == KEY_4)
+#define ISINIT		(_mykey & KEY_INIT)
+#define KEY1		(_mykey & KEY_1)
+#define KEY2		(_mykey & KEY_2)
+#define KEY3		(_mykey & KEY_3)
+#define KEY4		(_mykey & KEY_4)
 #define ANYKEY		(_mykey)
+#define KEYPRESS	(_mykey & (KEY_1|KEY_2|KEY_3|KEY_4))
 #define NOKEYRETURN {if (!_mykey) return;}
 
 typedef const prog_char screen_t[7][22];
@@ -415,11 +417,9 @@ void _hFactoryReset()
 	{
 		configReset();
 		configSave();
-		asm volatile (
-			"clr	r30\n"
-			"clr	r31\n"
-			"ijmp"
-			);
+		cli();
+		wdt_enable(WDTO_15MS);
+		for(;;);
 	}
 }
 
@@ -440,7 +440,7 @@ void menuShow()
 	lcdDisable();
 	if (oldPage != page)
 	{
-		_mykey = KEY_INIT;
+		_mykey |= KEY_INIT;
 		subpage = 0;
 		lcdClear();
 		oldPage = page;
@@ -448,7 +448,7 @@ void menuShow()
 	defaultHandler();
 	lcdEnable();
 
-	if (ANYKEY)
+	if (KEYPRESS)
 		buzzerBuzz(5);
 }
 
