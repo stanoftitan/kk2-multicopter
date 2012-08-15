@@ -124,6 +124,9 @@
     <Compile Include="gfx\glyphs.c">
       <SubType>compile</SubType>
     </Compile>
+    <None Include="gfx\logo.c">
+      <SubType>compile</SubType>
+    </None>
     <Compile Include="include\adc.h">
       <SubType>compile</SubType>
     </Compile>

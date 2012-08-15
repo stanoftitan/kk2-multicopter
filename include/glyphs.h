@@ -24,5 +24,6 @@ extern const glyph_t glyArrowUp;
 extern const glyph_t glyBall;
 extern const glyph_t glyDirCW;
 extern const glyph_t glyDirCCW;
+extern const glyph_t glyLogo;
 
 #endif /* SYMBOLS_H_ */
