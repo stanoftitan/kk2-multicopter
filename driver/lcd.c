@@ -151,14 +151,14 @@ void lcdClear()
 void lcdWriteSprite_P(PGM_P sprite, uint8_t sizeX, uint8_t sizeY)
 {
 	uint8_t b = 0;
-	for (uint8_t j = 0; j < sizeY; j++)
+	for (uint8_t i = 0; i < sizeX; i++)
 	{
-		for (uint8_t i = 0; i < sizeX; i++)
+		for (uint8_t j = 0; j < sizeY; j++)
 		{
-			if (i % 8 == 0)
+			if (j % 8 == 0)
 					b = pgm_read_byte(sprite++);
-			lcdSetPixel(_curx + i, _cury + j, b & 0x80);
-			b <<= 1;
+			lcdSetPixel(_curx + i, _cury + j, b & 0x01);
+			b >>= 1;
 		}
 	}	
 }
@@ -167,7 +167,7 @@ void lcdWriteGlyph_P(const glyph_t *glyph)
 {
 	uint8_t sizeX = pgm_read_byte(&glyph->sizeX);
 	uint8_t sizeY = pgm_read_byte(&glyph->sizeY);
-	lcdWriteSprite_P(&glyph->glyph, sizeX, sizeY);
+	lcdWriteSprite_P((PGM_P)&glyph->glyph, sizeX, sizeY);
 }
 
 void lcdWriteChar(char c)
@@ -232,6 +232,8 @@ void lcdSetContrast(uint8_t contrast)
 void lcdEnable()
 {
 #ifdef INTERRUPT
+	TCNT0 = 0;
+	TIFR0 = _BV(TOV0);
 	TIMSK0 |= _BV(TOIE0);	// enable interrupt on overflow
 #endif
 }
