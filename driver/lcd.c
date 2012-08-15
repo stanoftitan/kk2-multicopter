@@ -15,8 +15,6 @@
 #include "lcd.h"
 #include "fonts.h"
 
-#define INTERRUPT
-
 #define REVERSED	1
 static uint8_t _flags = 0;
 
@@ -24,7 +22,6 @@ static uint8_t _flags = 0;
 #define LCDHEIGHT	64
 
 static uint8_t _screen[LCDWIDTH * LCDHEIGHT / 8];
-//static uint8_t* _write_ptr;
 static uint8_t _curx, _cury;
 static fontdescriptor_t _font;
 
@@ -58,46 +55,27 @@ static void sendData(uint8_t data)
 	LCD_CS = 1;
 }
 
-// static void incWritePtr(uint8_t val)
-// {
-// _write_ptr += val;
-// if (_write_ptr >= _screen + sizeof(_screen))
-// 	_write_ptr -= sizeof(_screen);
-// }
- 
-// static void writeData(uint8_t data)
-// {
-// if (_flags & REVERSED) data ^= 0xFF;
-// *_write_ptr = data;
-// incWritePtr(1);
-// }
-
-void _lcdSetPos(uint8_t line, uint8_t column)
+static void setPos(uint8_t line, uint8_t column)
 {
 	sendCommand(0xB0 | (line & 0x07));
 	sendCommand(0x10 | (column >> 4));
 	sendCommand(column & 0x0f);
 }
 
-#if defined(INTERRUPT)
 __attribute__ ((section(".lowtext")))
 ISR(TIMER0_OVF_vect, ISR_NOBLOCK)
 {
 	static uint16_t offset;
 	
 	if (offset % LCDWIDTH == 0)
-		_lcdSetPos(offset / LCDWIDTH, 0);
+		setPos(offset / LCDWIDTH, 0);
 		
 	sendData(*(_screen + offset++));
 	offset %= sizeof(_screen);
 }
-#endif
 
 void lcdSetPos(uint8_t line, uint8_t column)
 {
-// 	line = line % 8;
-// 	column = column % LCDWIDTH;
-// 	_write_ptr = _screen + (line * LCDWIDTH + column);
 	_curx = column % LCDWIDTH;
 	_cury = line * 8;
 }
@@ -206,14 +184,6 @@ void lcdReverse(uint8_t reversed)
 		_flags &= ~REVERSED;
 }
 
-/*
-void lcdWriteImage_P(PGM_P image, uint8_t width)
-{
-	for (uint8_t i = 0; i < width; i++)
-		writeData(pgm_read_byte(image + i));
-}
-*/
-
 void lcdSetContrast(uint8_t contrast)
 {
 	uint8_t t = TIMSK0;
@@ -223,26 +193,17 @@ void lcdSetContrast(uint8_t contrast)
 	TIMSK0 = t;
 }
 
-// void lcdFill(uint8_t c, uint8_t width)
-// {
-// 	for (uint8_t i = 0; i < width; i++)
-// 		writeData(c);
-// }
-
 void lcdEnable()
 {
-#ifdef INTERRUPT
+	// reset timer0 to avoid re-entrant call of ISR b/c it is non blocking
 	TCNT0 = 0;
 	TIFR0 = _BV(TOV0);
 	TIMSK0 |= _BV(TOIE0);	// enable interrupt on overflow
-#endif
 }
 
 void lcdDisable()
 {
-#ifdef INTERRUPT
 	TIMSK0 &= ~_BV(TOIE0);	// disable overflow interrupt
-#endif
 }
 
 void lcdSelectFont(const fontdescriptor_t *font)
@@ -269,8 +230,6 @@ static const prog_uchar _initSeq[] = {
 
 void lcdInit()
 {
-	//_write_ptr = _screen;
-	
 	// pins
 	LCD_CS_DIR = OUTPUT;
 	LCD_RST_DIR = OUTPUT;
@@ -291,28 +250,10 @@ void lcdInit()
 	
 	lcdSelectFont(NULL);		// select default font
 	
-#ifdef INTERRUPT
-	// if INTERRUPT mode enabled, use timer0 with clk/8 and overflow
+	// use timer0 with clk/8 and overflow
 	// at 256 as interrupt based output of data bytes
 	// ie every 1024us one byte is send to display. whole screen takes about 105ms
 	TCCR0B = _BV(CS01);		// clk/8
 	lcdEnable();
-#endif
 }
-
-// void lcdOutput()
-// {
-// #ifndef INTERRUPT
-// 	#define NUMCHAR	32
-// 	static uint8_t pos;
-// 	uint8_t* ptr = _screen + pos * NUMCHAR;
-// 	_lcdSetPos((pos * NUMCHAR) / LCDWIDTH , (pos * NUMCHAR) % LCDWIDTH);
-// 	for (uint8_t i = 0; i < NUMCHAR; i++)
-// 	{
-// 		uint8_t b = *(ptr + i);
-// 		sendData(b);
-// 	}
-// 	pos = (pos + 1) % (sizeof(_screen) / NUMCHAR);
-// #endif
-// }
 
