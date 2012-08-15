@@ -126,7 +126,7 @@ void lcdClear()
 	_flags = 0;
 }
 
-void lcdWriteSprite_P(PGM_P sprite, uint8_t sizeX, uint8_t sizeY)
+void lcdWriteSprite_P(PGM_P sprite, uint8_t sizeX, uint8_t sizeY, uint8_t mode)
 {
 	uint8_t b = 0;
 	for (uint8_t i = 0; i < sizeX; i++)
@@ -135,17 +135,23 @@ void lcdWriteSprite_P(PGM_P sprite, uint8_t sizeX, uint8_t sizeY)
 		{
 			if (j % 8 == 0)
 					b = pgm_read_byte(sprite++);
-			lcdSetPixel(_curx + i, _cury + j, b & 0x01);
+			if (mode == ROP_COPY)
+				lcdSetPixel(_curx + i, _cury + j, b & 0x01);
+			else if (mode == ROP_PAINT)
+			{
+				if (b & 0x01)
+					lcdSetPixel(_curx + i, _cury + j, 1);
+			}			
 			b >>= 1;
 		}
 	}	
 }
 
-void lcdWriteGlyph_P(const glyph_t *glyph)
+void lcdWriteGlyph_P(const glyph_t *glyph, uint8_t mode)
 {
 	uint8_t sizeX = pgm_read_byte(&glyph->sizeX);
 	uint8_t sizeY = pgm_read_byte(&glyph->sizeY);
-	lcdWriteSprite_P((PGM_P)&glyph->glyph, sizeX, sizeY);
+	lcdWriteSprite_P((PGM_P)&glyph->glyph, sizeX, sizeY, mode);
 }
 
 void lcdWriteChar(char c)
@@ -157,7 +163,7 @@ void lcdWriteChar(char c)
 	}
 	else
 	{
-		lcdWriteSprite_P(_font.selector(c), _font.sizeX, _font.sizeY);
+		lcdWriteSprite_P(_font.selector(c), _font.sizeX, _font.sizeY, 0);
 		_curx += _font.sizeX;
 	}
 }

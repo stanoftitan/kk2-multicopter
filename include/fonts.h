@@ -20,11 +20,6 @@ typedef struct
 	PGM_P (*selector)(unsigned char);
 } fontdescriptor_t;
 
-typedef struct
-{
-	uint8_t sizeX, sizeY;
-	prog_char glyph[];
-} glyph_t;
 
 extern fontdescriptor_t font4x6;
 extern fontdescriptor_t font6x8;

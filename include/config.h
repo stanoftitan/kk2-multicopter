@@ -23,6 +23,7 @@ typedef struct
 	uint8_t RX_chmap[RX_CHANNELS];
 	uint16_t GYRO_zero[3];
 	uint16_t ACC_zero[3];
+	uint8_t CalibrateFlags;
 	pid_param_t PID[3];
 	uint8_t SelfLevelMode;
 	uint8_t ArmingMode;

@@ -20,6 +20,7 @@ P_STR strARMED[] = "ARMED";
 P_STR strOFF[] = "OFF";
 P_STR strON[] = "ON";
 
+// main menu
 P_STR strPIEditor[] = "PI Editor";
 P_STR strReceiverTest[] = "Receiver Test";
 P_STR strModeSettings[] = "Mode Settings";
@@ -30,10 +31,10 @@ P_STR strSensorTest[] = "Sensor Test";
 P_STR strSensorCalibration[] = "Sensor Calibration";
 P_STR strCPPMSettings[] = "CPPM Settings";
 P_STR strESCCalibration[] = "ESC Calibration";
-P_STR strRadioCalibration[] = "Radio Calibration";
+P_STR strRadioCalibration[] = "Stick Centering";
 P_STR strMixerEditor[] = "Mixer Editor";
-P_STR strShowMotorLayout[] = "Show Motor Layout";
-P_STR strLoadMotorLayout[] = "Load Motor Layout";
+P_STR strShowMotorLayout[] = "Show Model Layout";
+P_STR strLoadMotorLayout[] = "Load Model Layout";
 P_STR strDebug[] = "Debug";
 P_STR strFactoryReset[] = "Factory Reset";
 
@@ -64,11 +65,26 @@ P_STR strOff[] = "Off";
 P_STR strOK[] = "OK";
 P_STR strNot[] = "Not";
 P_STR strBattery[] = "Battery:";
+P_STR strError[] = "Error:";
+
+P_STR strRoll[] = "Roll";
+P_STR strPitch[] = "Pitch";
+P_STR strYaw[] = "Yaw";
+P_STR strThro[] = "Thro";
 
 P_STR strWait[] = "Waiting";
-P_STR strSec[] = " sec";
+P_STR strSec[] = "sec";
 P_STR strCalSucc[] = "Calibration succeeded";
 P_STR strAreYouSure[] = "Are you sure?";
 
+P_STR strMotor[] = "Motor:";
+P_STR strOutput[] = "Output:";
+P_STR strDirSeen[] = "Direction\nseen from\nabove:";
+P_STR strCW[] = "CW";
+P_STR strCCW[] = "CCW";
+P_STR strALL[] = "ALL";
+P_STR strUnused[] = "Unused.";
+
+P_STR strSensorNotCal[] = "No calibration";
 
 #endif /* MENU_TEXT_H_ */

@@ -154,7 +154,7 @@ PROGMEM const prog_char* scrESCCal[] =
 
 P_STR scrRadioCal0[] = 
 	"Release sticks on the\n"
-	"radio and set \n"
+	"transmitter and set \n"
 	"throttle to idle.\n"
 	"\n"
 	"Press CONTINUE to\n"

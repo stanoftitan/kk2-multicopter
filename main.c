@@ -25,7 +25,7 @@
 #include <string.h>
 
 state_t State;
-static const prog_char versionNum[] = "Version 0.1a";
+static const prog_char versionNum[] = "Version 0.2a";
 static const prog_char versionAuthor[] = "By Oliver Schulz";
 
 
@@ -58,6 +58,13 @@ void CheckState()
 	
 	if (Config.SelfLevelMode)	// AUX
 		State.SelfLevel = State.Aux;
+	
+	uint8_t e = 0;
+	if (!Config.CalibrateFlags)
+		e |= ERR_NOT_CALIBRATED;
+	e |= (~RX_good) & (ERR_NO_PITCH|ERR_NO_ROLL|ERR_NO_THR|ERR_NO_YAW);
+	
+	State.Error = e;
 }
 
 int main(void)
@@ -82,16 +89,15 @@ int main(void)
 	while(1)
 	{
  		LED_TOGGLE;
-		rxRead();				//  21.50us
-		sensorsReadGyro();		//   5.90us
-		sensorsReadAcc();		//   5.90us
-		CheckState();			//   2.10us
-					
-		for (uint8_t i = 0; i < 5; i++)		
+		rxRead();
+		sensorsRead();
+		CheckState();
+
+		for (uint8_t i = 0; i < 5; i++)
 			pwmWrite(i+1, RX_raw[i]);
-					
+
 		EVERYMS(20)
-			menuShow();			// 128.85us
+			menuShow();
 
  		buzzerLoop();
 		 
