@@ -65,6 +65,7 @@ void _hSensorTest();
 void _hSensorCalibration();
 void _hESCCalibration();
 void _hRadioCalibration();
+void _hShowMotorLayout();
 void _hLoadMotorLayout();
 void _hDebug();
 void _hFactoryReset();
@@ -95,7 +96,7 @@ static const page_t pages[] PROGMEM = {
 /* 11 */	{ _skPAGE, NULL, scrCPPMSettings},
 /* 12 */	{ _skCONTINUE, _hRadioCalibration, scrRadioCal0},
 /* 13 */	{ _skPAGE, NULL, scrMixerEditor},
-/* 14 */	{ _skBACKNEXT},
+/* 14 */	{ _skBACKNEXT, _hShowMotorLayout},
 /* 15 */	{ _skMENU, _hLoadMotorLayout },
 /* 16 */	{ _skBACK, _hDebug },
 /* 16 */	{ _skCANCELYES, _hFactoryReset },
@@ -230,6 +231,11 @@ void _hMenu()
 {
 	if (doMenu(&mnuMain))
 		loadPage(mnuMain.marked + 2);
+}
+
+void _hShowMotorLayout()
+{
+	
 }
 
 void _hLoadMotorLayout()
