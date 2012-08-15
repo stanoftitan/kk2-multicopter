@@ -90,8 +90,9 @@ int main(void)
 	{
  		LED_TOGGLE;
 		rxRead();
-		sensorsRead();
+		
 		CheckState();
+		sensorsRead();
 
 		for (uint8_t i = 0; i < 5; i++)
 			pwmWrite(i+1, RX_raw[i]);
