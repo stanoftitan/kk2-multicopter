@@ -17,6 +17,7 @@
 #include <avr/pgmspace.h>
 #include <stdlib.h>
 #include <avr/wdt.h>
+#include <string.h>
 
 uint8_t _mykey;
 #define KEY_INIT	1
@@ -29,21 +30,31 @@ uint8_t _mykey;
 #define KEYPRESS	(_mykey & (KEY_1|KEY_2|KEY_3|KEY_4))
 #define NOKEYRETURN {if (!_mykey) return;}
 
-typedef const prog_char screen_t[7][22];
-typedef struct  
+//typedef const prog_char screen_t[7][22];
+// typedef struct  
+// {
+// 	uint8_t posX, posY;
+// 	const prog_char *text;
+// } PROGMEM element_t;
+
+typedef struct
 {
-	uint8_t posX, posY;
-	const prog_char *text;
-} PROGMEM element_t;
+	uint8_t X, Y;
+	void *valuePtr;
+	int16_t loLimit, hiLimit;
+	uint8_t len;
+} edit_element_t;
 
 typedef void (pageHandler)(void);
-typedef struct  
+
+typedef struct
 {
 	const char *softkeys;
 	pageHandler *handler;
 	const char *screen;
 } page_t;
-typedef struct  
+
+typedef struct
 {
 	uint8_t len;
 	PGM_P (*textSelector)(uint8_t);
@@ -65,10 +76,15 @@ void _hSensorTest();
 void _hSensorCalibration();
 void _hESCCalibration();
 void _hStickCentering();
+void _hStickScaling();
 void _hShowModelLayout();
 void _hLoadModelLayout();
 void _hDebug();
 void _hFactoryReset();
+void _hPIEditor();
+void _hMiscSettings();
+void _hSelflevelSettings();
+void _hCPPMSettings();
 
 //////////////////////////////////////////////////////////////////////////
 // softkeys
@@ -78,6 +94,7 @@ static const prog_char _skBACK[]      = "BACK";
 static const prog_char _skCONTINUE[]  = "BACK         CONTINUE";
 static const prog_char _skCANCELYES[] = "CANCEL            YES";
 static const prog_char _skPAGE[]      = "BACK PREV NEXT CHANGE";
+static const prog_char _skEDIT[]      = "CLR  DOWN   UP   DONE";
 static const prog_char _skBACKNEXT[]  = "BACK  NEXT";
 static const prog_char _skCANCEL[]    = "CANCEL";
 
@@ -85,16 +102,16 @@ static const prog_char _skCANCEL[]    = "CANCEL";
 static const page_t pages[] PROGMEM = {
 /*  0 */	{ _skSTART, _hStart },
 /*  1 */	{ _skMENU, _hMenu },
-/*  2 */	{ _skPAGE, NULL, scrPIEditor},
+/*  2 */	{ _skPAGE, _hPIEditor, scrPIEditor},
 /*  3 */	{ _skBACK, _hReceiverTest, scrReceiverTest},
 /*  4 */	{ _skPAGE, NULL, scrModeSettings},
-/*  5 */	{ _skPAGE, NULL, scrStickScaling},
-/*  6 */	{ _skPAGE, NULL, scrMiscSettings},
-/*  7 */	{ _skPAGE, NULL, scrSelflevelSettings},
+/*  5 */	{ _skPAGE, _hStickScaling, scrStickScaling},
+/*  6 */	{ _skPAGE, _hMiscSettings, scrMiscSettings},
+/*  7 */	{ _skPAGE, _hSelflevelSettings, scrSelflevelSettings},
 /*  8 */	{ _skBACK, _hSensorTest, scrSensorTest},
 /*  9 */	{ _skCONTINUE, _hSensorCalibration, scrSensorCal0},
 /* 10 */	{ _skCONTINUE, _hESCCalibration, scrESCCal0},
-/* 11 */	{ _skPAGE, NULL, scrCPPMSettings},
+/* 11 */	{ _skPAGE, _hCPPMSettings, scrCPPMSettings},
 /* 12 */	{ _skCONTINUE, _hStickCentering, scrRadioCal0},
 /* 13 */	{ _skPAGE, NULL, scrMixerEditor},
 /* 14 */	{ _skBACKNEXT, _hShowModelLayout},
@@ -134,17 +151,9 @@ static uint16_t _tStart;
 static page_t currentPage;
 static menu_t mnuMain = {length(lstMenu), tsmMain};
 static menu_t mnuMLayout = {MIXER_TABLE_LEN, tsmLoadModelLayout};
-
-static void writeList(const element_t list[], uint8_t len)
-{
-	for (uint8_t i = 0; i < len; i++)
-	{
-		element_t e;
-		memcpy_P(&e, &list[i], sizeof(e));
-		lcdSetPos(e.posX, e.posY);
-		lcdWriteString_P(e.text);
-	}
-}
+static int16_t editValue, editLoLimit, editHiLimit;
+static uint8_t editMode;
+static void* editValuePtr;
 
 static void writeSoftkeys(const char* sk)
 {
@@ -157,23 +166,102 @@ static void writeSoftkeys(const char* sk)
 	}
 }
 
+void writePadded(char *s, uint8_t len)
+{
+	lcdWriteString(s);
+	for (uint8_t i = 0; i < len - strlen(s); i++)
+		lcdWriteChar(32);
+}
+
+void writePadded_P(const char *s, uint8_t len)
+{
+	lcdWriteString_P(s);
+	for (uint8_t i = 0; i < len - strlen_P(s); i++)
+		lcdWriteChar(32);
+}
+
+void writeValue(uint8_t x, uint8_t y, int16_t value, uint8_t len, uint8_t index)
+{
+	char s[7];
+	itoa(value, s, 10);
+	lcdReverse(index == subpage);
+	lcdSetPos(x, y);
+	writePadded(s, len);
+	lcdReverse(0);
+}
+
 void loadPage(uint8_t pageIndex)
 {
 	memcpy_P(&currentPage, &pages[pageIndex], sizeof(currentPage));
 	page = pageIndex;
 }
 
+void editModeHandler();
 void defaultHandler()
 {
-	if (ISINIT)
+	if (editMode == 1)		// edit mode?
+		editModeHandler();
+	else
 	{
-		if (currentPage.screen)
-			lcdWriteString_P(currentPage.screen);
-		writeSoftkeys(currentPage.softkeys);
-	}
+		if (ISINIT)
+		{
+			lcdClear();
+			if (currentPage.screen)
+				lcdWriteString_P(currentPage.screen);
+			writeSoftkeys(currentPage.softkeys);
+		}
 		
-	if (currentPage.handler)
-		currentPage.handler();
+		if (currentPage.handler)
+			currentPage.handler();
+		
+	}
+}
+
+void editModeHandler()
+{
+	if (KEY4)	// DONE;
+	{
+		editMode = 0;
+		_mykey = KEY_INIT;
+		*(uint8_t*)editValuePtr = editValue;
+		configSave();
+		lcdSelectFont(NULL);
+		defaultHandler();
+		return;
+	}
+	if (ANYKEY)
+	{
+		if (KEY2)	// DOWN?
+		{
+			if (editValue > editLoLimit)
+				editValue--;
+		}
+		else if (KEY3)	// UP?
+		{
+			if (editValue < editHiLimit)
+				editValue++;
+		}
+		else if (KEY1)	// CLR?
+			editValue = 0;
+			
+		writeValue(2, 34, editValue, 5, -1);
+	}
+}
+
+void startEditMode(void* valuePtr, int16_t loLimit, int16_t hiLimit, uint8_t valueType)
+{
+	editMode = 1;
+	_mykey = KEY_INIT;
+	editValuePtr = valuePtr;
+	editValue = *(uint8_t*)valuePtr;
+	editLoLimit = loLimit;
+	editHiLimit = hiLimit;
+	lcdFillRectangle(30, 11, 98, 34, 0);
+	lcdRectangle(30, 11, 98, 34, 1);
+	lcdRectangle(31, 12, 97, 33, 1);
+	writeSoftkeys(_skEDIT);
+	lcdSelectFont(&font12x16);
+	editModeHandler();
 }
 
 uint8_t doMenu(menu_t *menu)
@@ -231,10 +319,13 @@ void _hMenu()
 		loadPage(mnuMain.marked + 2);
 }
 
+#define CENTER_X	96
+#define CENTER_Y	32
+
 static void showMotor(uint8_t motor, uint8_t withDir)
 {
-	uint8_t x = 96;
-	uint8_t y = 32;
+	uint8_t x = CENTER_X;
+	uint8_t y = CENTER_Y;
 	mixer_channel_t *channel = &Config.Mixer.Channel[motor];
 	
 	if (channel->flags & FLAG_ESC)
@@ -242,7 +333,9 @@ static void showMotor(uint8_t motor, uint8_t withDir)
 		x += (channel->Aileron >> 2);
 		y -= (channel->Elevator >> 2);
 	
-		lcdLine(x, y, 96, 32);
+		lcdLine(x, y, CENTER_X, CENTER_Y);
+		lcdXY(CENTER_X - 2, CENTER_Y - 2);
+		lcdWriteGlyph_P(&glyFC, ROP_COPY);
 		lcdXY(x - 4, y - 4);
 		lcdWriteGlyph_P(&glyBall, ROP_PAINT);
 		lcdXY(x - 4, y - 7);
@@ -391,37 +484,13 @@ void _hStart()
 
 void _hSensorTest()
 {
-	char s[7];
-	utoa(GYRO_raw[0], s, 10);
-	lcdSetPos(0, 48);
-	lcdWriteString(s);
-	lcdWriteChar(32);
-	utoa(GYRO_raw[1], s, 10);
-	lcdSetPos(1, 48);
-	lcdWriteString(s);
-	lcdWriteChar(32);
-	utoa(GYRO_raw[2], s, 10);
-	lcdSetPos(2, 48);
-	lcdWriteString(s);
-	lcdWriteChar(32);
-	
-	utoa(ACC_raw[0], s, 10);
-	lcdSetPos(3, 48);
-	lcdWriteString(s);
-	lcdWriteChar(32);
-	utoa(ACC_raw[1], s, 10);
-	lcdSetPos(4, 48);
-	lcdWriteString(s);
-	lcdWriteChar(32);
-	utoa(ACC_raw[2], s, 10);
-	lcdSetPos(5, 48);
-	lcdWriteString(s);
-	lcdWriteChar(32);
-	
-	utoa(BATT, s, 10);
-	lcdSetPos(6, 48);
-	lcdWriteString(s);
-	lcdWriteChar(32);
+	writeValue(0, 48, GYRO_raw[AIL], 5, -1);
+	writeValue(1, 48, GYRO_raw[ELE], 5, -1);
+	writeValue(2, 48, GYRO_raw[RUD], 5, -1);
+	writeValue(3, 48, ACC_raw[AIL], 5, -1);
+	writeValue(4, 48, ACC_raw[ELE], 5, -1);
+	writeValue(5, 48, ACC_raw[RUD], 5, -1);
+	writeValue(6, 48, BATT, 5, -1);
 }
 
 void _hReceiverTest()
@@ -431,12 +500,7 @@ void _hReceiverTest()
 	{
 		lcdSetPos(i, 66);
 		if (RX_good & _BV(i))
-		{
-			itoa(RX[i], s, 10);
-			lcdWriteString(s);
-			for (uint8_t i = 0; i < sizeof(strNoSignal) - strlen(s); i++)
-				lcdWriteChar(32);
-		}
+			writeValue(i, 66, RX[i], sizeof(strNoSignal), -1);
 		else
 			lcdWriteString_P(strNoSignal);
 	}			
@@ -539,13 +603,125 @@ void _hFactoryReset()
 	}
 }
 
+void pageKey(uint8_t num)
+{
+	if (KEY2)	// PREV
+		subpage = subpage == 0 ? num - 1 : subpage - 1;
+	else if (KEY3) // NEXT
+		subpage = (subpage + 1) % num;
+}
+
+void _hPIEditor()
+{
+	NOKEYRETURN;
+	
+	static uint8_t axis;
+	
+	pageKey(5);
+
+	if (KEY4) // CHANGE
+	{
+		if (subpage == 0)
+			axis = (axis + 1) % 3;
+		else
+		{
+			switch (subpage)
+			{
+				case 1: startEditMode(&Config.PID[axis].PGain, 0, 200, 0); break;
+				case 2: startEditMode(&Config.PID[axis].PLimit, 0, 200, 0); break;
+				case 3: startEditMode(&Config.PID[axis].IGain, 0, 200, 0); break;
+				case 4: startEditMode(&Config.PID[axis].ILimit, 0, 200, 0); break;
+			}
+			return;
+		}
+	}
+	
+	lcdSetPos(0, 30);
+	lcdReverse(subpage == 0);
+	switch (axis)
+	{
+		case 0: writePadded_P(strRollAil, 16); break;
+		case 1: writePadded_P(strPitchEle, 16); break;
+		default: writePadded_P(strYawRud, 16); break;
+	}
+	
+	writeValue(2, 60, Config.PID[axis].PGain, 5, 1);
+	writeValue(3, 60, Config.PID[axis].PLimit, 5, 2);
+	writeValue(4, 60, Config.PID[axis].IGain, 5, 3);
+	writeValue(5, 60, Config.PID[axis].ILimit, 5, 4);
+}
+
+void simplePageHandler(edit_element_t *elements, uint8_t len)
+{
+	NOKEYRETURN;
+	edit_element_t element;
+	pageKey(len);
+	if (KEY4)	// CHANGE?
+	{
+		memcpy_P(&element, &elements[subpage], sizeof(element));
+		startEditMode(element.valuePtr, element.loLimit, element.hiLimit, 0);
+		return;
+	}
+	for (uint8_t i = 0; i < len; i++)
+	{
+		memcpy_P(&element, &elements[i], sizeof(element));
+		writeValue(element.X, element.Y, *(uint8_t*)element.valuePtr, element.len, i);
+	}
+}
+
+void _hStickScaling()
+{
+	static edit_element_t elements[] PROGMEM = {
+		{ 2, 78, &Config.StickScaling[AIL], 0, 200, 5 },
+		{ 3, 78, &Config.StickScaling[ELE], 0, 200, 5 },
+		{ 4, 78, &Config.StickScaling[RUD], 0, 200, 5 },
+		{ 5, 78, &Config.StickScaling[THR], 0, 200, 5 },
+	};
+	simplePageHandler(elements, length(elements));
+}
+
+void _hMiscSettings()
+{
+	static edit_element_t elements[] PROGMEM = {
+		{ 0, 102, &Config.MinThrottle, 0, 20, 4 },
+		{ 1, 102, &Config.HeightDampening, 0, 250, 4 },
+		{ 2, 102, &Config.HeightDampeningLimit, 0, 30, 4 },
+		{ 3, 102, &Config.LVA, 0, 250, 4 },
+		{ 4, 102, &Config.ServoFilter, 0, 100, 4 },
+	};
+	simplePageHandler(elements, length(elements));
+}
+
+void _hSelflevelSettings()
+{
+	static edit_element_t elements[] PROGMEM = {
+		{ 0, 54, &Config.PID_SelfLevel.PGain, 0, 250, 5 },
+		{ 1, 54, &Config.PID_SelfLevel.PLimit, 0, 250, 5 },
+		{ 3, 96, &Config.AccTrimRoll, -128, 127, 5 },
+		{ 4, 96, &Config.AccTrimPitch, -128, 127, 5 },
+	};
+	simplePageHandler(elements, length(elements));
+}
+
+void _hCPPMSettings()
+{
+	static edit_element_t elements[] PROGMEM = {
+		{ 0, 78, &Config.RX_chmap[AIL], 1, 8, 1 },
+		{ 1, 78, &Config.RX_chmap[ELE], 1, 8, 1 },
+		{ 2, 78, &Config.RX_chmap[RUD], 1, 8, 1 },
+		{ 3, 78, &Config.RX_chmap[THR], 1, 8, 1 },
+		{ 4, 78, &Config.RX_chmap[AUX], 1, 8, 1 },
+	};
+	simplePageHandler(elements, length(elements));
+}
+
 void menuShow()
 {
 	static uint8_t oldPage = 0xFF;
 	
 	_mykey = keyboardRead();
 		
-	if (KEY1)	// BACK
+	if (KEY1 && (editMode == 0))	// BACK
 	{
 		if (page > PAGE_MENU)
 			loadPage(PAGE_MENU);
@@ -558,7 +734,6 @@ void menuShow()
 	{
 		_mykey |= KEY_INIT;
 		subpage = 0;
-		lcdClear();
 		oldPage = page;
 	}
 	defaultHandler();

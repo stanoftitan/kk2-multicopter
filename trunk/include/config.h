@@ -39,8 +39,8 @@ typedef struct
 	uint8_t LVA;
 	uint8_t ServoFilter;
 	pid_param_t PID_SelfLevel;
-	uint8_t AccTrimPitch;
-	uint8_t AccTrimRoll;
+	int8_t AccTrimPitch;
+	int8_t AccTrimRoll;
 	model_t Mixer;
 } config_t;
 
