@@ -69,8 +69,8 @@ PROGMEM model_t mixerTable[MIXER_TABLE_LEN] = {
 		//   thr roll pitch yaw offs  flags
 			{100, 100, 0  , 0  , 0  , FLAG_ESC},
 			{100,-100, 0  , 0  , 0  , FLAG_ESC},
-			{0  , 0  , 100, 100, 0  , FLAG_SERVO},
-			{0  , 0  ,-100, 100, 0  , FLAG_SERVO},
+			{0  , 0  , 100, 100, 50 , FLAG_SERVO},
+			{0  , 0  ,-100, 100, 50 , FLAG_SERVO},
 		},
 	},
 	

@@ -30,6 +30,8 @@ void lcdDisable();
 void lcdSelectFont(const fontdescriptor_t *font);
 void lcdXY(uint8_t x, uint8_t y);
 void lcdWriteGlyph_P(const glyph_t *glyph, uint8_t mode);
+void lcdFillRectangle(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color);
+void lcdRectangle(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color);
 
 #define ROP_COPY	0
 #define ROP_PAINT	1

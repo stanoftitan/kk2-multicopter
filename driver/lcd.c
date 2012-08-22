@@ -15,6 +15,36 @@
 #include "lcd.h"
 #include "fonts.h"
 
+#define CMD_DISPLAY_OFF				0xAE
+#define CMD_DISPLAY_ON				0xAF
+#define CMD_SET_START_LINE			0x40
+#define CMD_SET_PAGE				0xB0
+#define CMD_SET_COLUMN_UPPER		0x10
+#define CMD_SET_COLUMN_LOWER		0x00
+#define CMD_SET_ADC_NORMAL			0xA0	// RTL or LTR
+#define CMD_SET_ADC_REVERSE			0xA1
+#define CMD_SET_DISP_NORMAL			0xA6
+#define CMD_SET_DISP_REVERSE		0xA7	// negative display
+#define CMD_SET_ALLPTS_OFF			0xA4
+#define CMD_SET_ALLPTS_ON			0xA5
+#define CMD_SET_BIAS_9				0xA2 
+#define CMD_SET_BIAS_7				0xA3
+#define CMD_RMW						0xE0
+#define CMD_RMW_CLEAR				0xEE
+#define CMD_INTERNAL_RESET			0xE2
+#define CMD_SET_COM_NORMAL			0xC0	
+#define CMD_SET_COM_REVERSE			0xC8	// Reverse makes (0,0) from down-left and invert the font [Vertical FLIP]
+#define CMD_SET_POWER_CONTROL		0x28
+#define CMD_SET_RESISTOR_RATIO		0x20
+#define CMD_SET_CONTRAST			0x81
+#define CMD_SET_STATIC_OFF			0xAC
+#define CMD_SET_STATIC_ON			0xAD
+#define CMD_SET_STATIC_REG			0x0
+#define CMD_SET_BOOSTER_FIRST		0xF8
+#define CMD_SET_BOOSTER_234			0
+#define CMD_SET_BOOSTER_5			1
+#define CMD_SET_BOOSTER_6			3
+
 #define REVERSED	1
 static uint8_t _flags = 0;
 
@@ -57,9 +87,9 @@ static void sendData(uint8_t data)
 
 static void setPos(uint8_t line, uint8_t column)
 {
-	sendCommand(0xB0 | (line & 0x07));
-	sendCommand(0x10 | (column >> 4));
-	sendCommand(column & 0x0f);
+	sendCommand(CMD_SET_PAGE | (line & 0x07));
+	sendCommand(CMD_SET_COLUMN_UPPER | (column / 16));
+	sendCommand(CMD_SET_COLUMN_LOWER | (column & 0x0f));
 }
 
 __attribute__ ((section(".lowtext")))
@@ -86,12 +116,12 @@ void lcdXY(uint8_t x, uint8_t y)
 	_cury = y;
 }
 
-void lcdSetPixel(uint8_t x, uint8_t y, uint8_t on)
+void lcdSetPixel(uint8_t x, uint8_t y, uint8_t color)
 {
 	static const prog_char masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
 	uint8_t *scr = _screen + x + (y / 8 * LCDWIDTH); 
 	uint8_t mask = pgm_read_byte(&masks[y % 8]);
-	if ((_flags & REVERSED) ^ !on)
+	if ((_flags & REVERSED) ^ !color)
 		*scr = *scr & ~mask;
 	else
 		*scr = *scr | mask;
@@ -104,6 +134,18 @@ static void lcdSetByte(uint8_t x, uint8_t y, uint8_t b)
 		*scr = ~b;
 	else
 		*scr = b;
+}
+
+static void setBits(uint8_t x, uint8_t y, uint8_t b, uint8_t n, uint8_t mode)
+{
+	uint8_t *scr = _screen + x + (y / 8 * LCDWIDTH); 
+	uint8_t mask;
+	if (y % 8 == 0)		// one byte operation?
+	{
+		
+		
+	}
+	
 }
 
 void lcdLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
@@ -126,6 +168,33 @@ void lcdLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 		if (e2 > dy) { err += dy; x0 += sx; } /* e_xy + e_x > 0 */
 		if (e2 < dx) { err += dx; y0 += sy; } /* e_xy + e_y < 0 */
 	}
+}
+
+void lcdRectangle(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color)
+{
+	uint8_t a;
+	if (x0 > x1) { a = x0; x0 = x1; x1 = a;}
+	if (y0 > y1) { a = y0; y0 = y1; y1 = a;}
+	for (a = x0; a <= x1; a++)
+	{
+		lcdSetPixel(a, y0, color);
+		lcdSetPixel(a, y1, color);
+	}
+	for (a = y0; a <= y1; a++)
+	{
+		lcdSetPixel(x0, a, color);
+		lcdSetPixel(x1, a, color);
+	}
+}
+
+void lcdFillRectangle(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color)
+{
+	uint8_t a;
+	if (x0 > x1) { a = x0; x0 = x1; x1 = a;}
+	if (y0 > y1) { a = y0; y0 = y1; y1 = a;}
+	for (a = y0; a <= y1; a++)
+		for(uint8_t i = x0; i <= x1; i++)
+			lcdSetPixel(i, a, color);
 }
 
 void lcdClear()
@@ -238,18 +307,18 @@ void lcdSelectFont(const fontdescriptor_t *font)
 }
 
 static const prog_uchar _initSeq[] = {
-	0xA2, // set bias to 1/9
-	0xA0, // SEG output direction = normal
-	0xC8, // COM output direction = reversed
-	0x40, // start line = 0
-	0xA6, // Normal Display
-	0xA4, // display all points = OFF
-	0x2F, // Power Control Set
-	0x24, // set ra/rb
-	0x81, // set contrast
-	0x20, // -> to 31
-	0xAF, // Display on
-	0x00, // (terminator)
+	CMD_SET_BIAS_9,				// set bias to 1/9
+	CMD_SET_ADC_NORMAL,			// SEG output direction = normal
+	CMD_SET_COM_REVERSE,		// COM output direction = reversed
+	CMD_SET_START_LINE,			// start line = 0
+	CMD_SET_DISP_NORMAL,		// Normal Display
+	CMD_SET_ALLPTS_OFF,			// display all points = OFF
+	CMD_SET_POWER_CONTROL | 7,	// Power Control Set
+	CMD_SET_RESISTOR_RATIO | 4,	// set ra/rb
+	CMD_SET_CONTRAST,			// set contrast
+	0x20,						// -> to 31
+	CMD_DISPLAY_ON,				// Display on
+	0x00,						// (terminator)
 };
 
 void lcdInit()

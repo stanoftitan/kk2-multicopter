@@ -14,7 +14,7 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x5A
+#define SIGNATURE	0x5C
 
 static config_t defaultConfig PROGMEM = 
 {
@@ -26,11 +26,11 @@ static config_t defaultConfig PROGMEM =
 	.RX_zero[RUD] = PWM_MID,
 	.RX_zero[THR] = PWM_LOW,
 	.RX_zero[AUX] = PWM_MID,
-	.RX_chmap[AIL] = 0,
-	.RX_chmap[ELE] = 1,
-	.RX_chmap[RUD] = 3,
-	.RX_chmap[THR] = 2,
-	.RX_chmap[AUX] = 4,
+	.RX_chmap[AIL] = 1,
+	.RX_chmap[ELE] = 2,
+	.RX_chmap[RUD] = 4,
+	.RX_chmap[THR] = 3,
+	.RX_chmap[AUX] = 5,
 	.GYRO_zero[AIL] = 536,
 	.GYRO_zero[ELE] = 548,
 	.GYRO_zero[RUD] = 565,
