@@ -23,7 +23,7 @@
 int16_t RX[RX_CHANNELS];
 uint16_t RX_raw[RX_CHANNELS];
 uint8_t RX_good;
-static int16_t RX_isr[RX_CHANNELS];
+static int16_t RX_isr[8];
 static uint8_t _mode;
 static uint8_t _RX_good;
 
@@ -46,7 +46,7 @@ ISR(INT1_vect)
 			_index = 0;
 			_mask = 1;
 		}			
-		else if (_index >= 0 && _index < RX_CHANNELS)
+		else if (_index >= 0 && _index < 8)
 		{
 			RX_isr[_index] = t - _start;
 			_index++;
@@ -137,37 +137,41 @@ ISR(PCINT1_vect)
 
 void rxInit(uint8_t mode)
 {
-	if (mode != RX_MODE_PWM)
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		// set pin direction
-		RX_AIL_DIR = INPUT;
+		if (mode != RX_MODE_PWM)
+		{
+			// set pin direction
+			RX_AIL_DIR = INPUT;
 
-		// enable interrupt INT1 for CPPM signal on PD3
-		EICRA  = /*_BV(ISC10) |*/ _BV(ISC11);	// rising edge on PD3 (INT1) 
-		EIFR   = _BV(INTF1);				// clear interrupt
-		EIMSK  = _BV(INT1);					// enable interrupt for INT1
-		PCICR  = 0;							// disable all PCIs
-	}
-	else
-	{
-		// set pins direction
-		RX_AIL_DIR = INPUT;
-		RX_ELE_DIR = INPUT;
-		RX_THR_DIR = INPUT;
-		RX_RUD_DIR = INPUT;
-		RX_AUX_DIR = INPUT;
+			// enable interrupt INT1 for CPPM signal on PD3
+			EICRA  = /*_BV(ISC10) |*/ _BV(ISC11);	// rising edge on PD3 (INT1) 
+			EIFR   = _BV(INTF0) | _BV(INTF1) | _BV(INTF2);	// clear interrupts
+			EIMSK  = _BV(INT1);					// enable interrupt for INT1
+			PCICR  = 0;							// disable all PCIs
+			PCIFR  = _BV(PCIF1) | _BV(PCIF3);	// clear interrupts
+		}
+		else
+		{
+			// set pins direction
+			RX_AIL_DIR = INPUT;
+			RX_ELE_DIR = INPUT;
+			RX_THR_DIR = INPUT;
+			RX_RUD_DIR = INPUT;
+			RX_AUX_DIR = INPUT;
 			
-		// enable interrupts
-		EICRA  = _BV(ISC00) | _BV(ISC10) | _BV(ISC20);	// any edge on INT0, INT1 and INT2
-		EIFR   = _BV(INTF0) | _BV(INTF1) | _BV(INTF2);	// clear interrupts
-		EIMSK  = _BV(INT0)  | _BV(INT1)  | _BV(INT2);	// enable interrupt for INT0, INT1 and INT2
-		PCMSK1 = _BV(PCINT8);							// enable PCINT8 (AUX) -> PCI1
-		PCMSK3 = _BV(PCINT24);							// enable PCINT24 (THR) -> PCI3
-		PCIFR  = _BV(PCIF1) | _BV(PCIF3);				// clear interrupts
-		PCICR |= _BV(PCIE1) | _BV(PCIE3);				// enable PCI1 and PCI3
-	}	
-	_mode = mode;	
-	RX_good = 0;
+			// enable interrupts
+			EICRA  = _BV(ISC00) | _BV(ISC10) | _BV(ISC20);	// any edge on INT0, INT1 and INT2
+			EIFR   = _BV(INTF0) | _BV(INTF1) | _BV(INTF2);	// clear interrupts
+			EIMSK  = _BV(INT0)  | _BV(INT1)  | _BV(INT2);	// enable interrupt for INT0, INT1 and INT2
+			PCMSK1 = _BV(PCINT8);							// enable PCINT8 (AUX) -> PCI1
+			PCMSK3 = _BV(PCINT24);							// enable PCINT24 (THR) -> PCI3
+			PCIFR  = _BV(PCIF1) | _BV(PCIF3);				// clear interrupts
+			PCICR |= _BV(PCIE1) | _BV(PCIE3);				// enable PCI1 and PCI3
+		}	
+		_mode = mode;	
+		RX_good = 0;
+	}
 }
 
 void rxRead()
@@ -183,26 +187,24 @@ void rxRead()
 	
 	for (uint8_t i = 0; i < RX_CHANNELS; i++)
 	{
-		ATOMIC_BLOCK(ATOMIC_FORCEON)
-			b = RX_isr[i];
-
-		b = TICKSTOMICRO(b);
-		
 		if (_mode == RX_MODE_PWM)
 			index = i;
 		else
-			index = Config.RX_chmap[i];
+			index = Config.RX_chmap[i] - 1;
+			
+		ATOMIC_BLOCK(ATOMIC_FORCEON)
+			b = RX_isr[index];
+
+		b = TICKSTOMICRO(b);
 		
 		if (b >= PWM_MIN && b <= PWM_MAX)
 		{
-			RX_raw[index] = b; 
-			RX[index] = (int16_t)(RX_raw[index] - Config.RX_zero[index]) >> 2;
+			RX_raw[i] = b; 
+			RX[i] = (int16_t)(RX_raw[i] - Config.RX_zero[i]) >> 2;
 		}
-		/*
-		else
-			RX_raw[index] = 0;
-			*/
 	}
+	
+	// divide throttle by 2
 	RX[THR]	>>= 1;
 }
 

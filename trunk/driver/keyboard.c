@@ -13,9 +13,14 @@
 #define ALLKEYS (KEY_1 | KEY_2 | KEY_3 | KEY_4)
 uint8_t lastKeys;
 
+uint8_t keyboardState()
+{
+	return ~KEYBOARD_PIN & ALLKEYS;
+}
+
 uint8_t keyboardRead()
 {
-	uint8_t keys = ~KEYBOARD_PIN & ALLKEYS;
+	uint8_t keys = keyboardState();
 	uint8_t newkeys = keys & ~lastKeys;
 	lastKeys = keys;
 	return newkeys;
@@ -29,8 +34,4 @@ void keyboardInit()
 	KEYBOARD_PORT |= ALLKEYS;
 }
 
-inline uint8_t keyboardState()
-{
-	return lastKeys;
-}
 	
