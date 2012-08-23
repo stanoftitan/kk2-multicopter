@@ -24,6 +24,8 @@
 #include "hardware.h"
 #include "config.h"
 
+#define THROTTLE_OFF	5
+
 typedef struct  
 {
 	uint8_t Armed;
@@ -37,6 +39,10 @@ typedef struct
 	#define ERR_NO_YAW			0x04
 	#define ERR_NO_THR			0x08
 	uint8_t Error;
+	
+	#define MODE_NORMAL			0
+	#define MODE_ESC_CAL		1
+	uint8_t Mode;
 } state_t;
 
 extern state_t State;

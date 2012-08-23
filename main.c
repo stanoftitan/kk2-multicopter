@@ -43,7 +43,7 @@ void init()
 {
 	configInit();
 	adcInit();
-	rxInit(Config.RX_mode);
+	rxInit(Config.ReceiverMode);
 	mixerInit();
 	pwmInit();
 	lcdInit();
@@ -53,7 +53,7 @@ void init()
 
 void CheckState()
 {
-	State.ThrottleOff = RX[THR] <= 5;
+	State.ThrottleOff = RX[THR] < THROTTLE_OFF;
 	State.Aux = RX[AUX] > 10;
 	
 	if (Config.SelfLevelMode)	// AUX
@@ -86,20 +86,39 @@ int main(void)
 	lcdWriteString_P(versionAuthor);
 	buzzerBuzzWait(500);
 	WAITMS(700);
+	
+	if (keyboardState() == (KEY_1 | KEY_4))
+	{
+		State.Mode = MODE_ESC_CAL;
+		lcdClear();
+		lcdSetPos(3, 18);
+		lcdWriteString_P(PSTR("Calibrating ESCs"));
+	}
 
 	while(1)
 	{
  		LED_TOGGLE;
 		rxRead();
 		
-		CheckState();
-		sensorsRead();
+		if (State.Mode == MODE_ESC_CAL)
+		{
+			if (keyboardState() != (KEY_1 | KEY_4))
+				State.Mode = MODE_NORMAL;
+				
+			for (uint8_t i = 0; i < RX_CHANNELS; i++)
+				pwmWrite(i, RX_raw[THR]);
+		}
+		else
+		{
+			CheckState();
+			sensorsRead();
 
-		for (uint8_t i = 0; i < 5; i++)
-			pwmWrite(i+1, RX_raw[i]);
+			for (uint8_t i = 0; i < 5; i++)
+				pwmWrite(i+1, RX_raw[i]);
 
-		EVERYMS(20)
-			menuShow();
+			EVERYMS(20)
+				menuShow();
+		}			
 
  		buzzerLoop();
 		 

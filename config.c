@@ -14,13 +14,12 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x5C
+#define SIGNATURE	0x5D
 
 static config_t defaultConfig PROGMEM = 
 {
 	.signature = SIGNATURE,
 	.MixerIndex = 0,
-	.RX_mode = RX_MODE_CPPM,
 	.RX_zero[AIL] = PWM_MID,
 	.RX_zero[ELE] = PWM_MID,
 	.RX_zero[RUD] = PWM_MID,
@@ -42,6 +41,7 @@ static config_t defaultConfig PROGMEM =
 	.PID[RUD] = { 50,  20, 50, 10},
 	.LinkRollPitch = ON,
 	.AutoDisarm = ON,
+	.ReceiverMode = RX_MODE_CPPM,
 	.StickScaling = { 30, 30, 50, 90},
 	.MinThrottle = 10,
 	.LCDContrast = 32,

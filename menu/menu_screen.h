@@ -90,12 +90,6 @@ P_STR scrSensorCal1[] =
 	"stationary, and try\n"
 	"again.";
 
-PROGMEM const prog_char* scrSensorCal[] = 
-	{
-		scrSensorCal0, 
-		scrSensorCal1
-	};
-
 P_STR scrESCCal0[] = 
 	"1 TAKE OFF THE\n"
 	"  PROPELLERS!!\n"
@@ -115,7 +109,7 @@ P_STR scrESCCal1[] =
 P_STR scrESCCal2[] = 
 	"6 Set the throttle to\n"
 	"  full.\n"
-	"7 Press down button\n"
+	"7 Press down buttons\n"
 	"  1 and 4 and keep\n"
 	"  them down until the\n"
 	"  last step.\n"
@@ -159,6 +153,14 @@ P_STR scrRadioCal0[] =
 	"\n"
 	"Press CONTINUE to\n"
 	"calibrate.";
+
+P_STR scrRadioCal1[] = 
+	"\n"
+	"Check the correct\n"
+	"signals from\n"
+	"receiver.\n"
+	"One or more signals\n"
+	"are missing.";
 
 P_STR scrMixerEditor[] = 
 	"Throttle:       Ch:\n"
