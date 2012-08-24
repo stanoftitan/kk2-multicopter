@@ -21,7 +21,9 @@
 
 uint8_t _mykey;
 #define KEY_INIT	1
+#define KEY_REFRESH	2
 #define KEYINIT		(_mykey & KEY_INIT)
+#define KEYREFRESH	(_mykey & KEY_REFRESH)
 #define KEY1		(_mykey & KEY_1)
 #define KEY2		(_mykey & KEY_2)
 #define KEY3		(_mykey & KEY_3)
@@ -29,13 +31,6 @@ uint8_t _mykey;
 #define ANYKEY		(_mykey)
 #define KEYPRESS	(_mykey & (KEY_1|KEY_2|KEY_3|KEY_4))
 #define NOKEYRETURN {if (!_mykey) return;}
-
-//typedef const prog_char screen_t[7][22];
-// typedef struct  
-// {
-// 	uint8_t posX, posY;
-// 	const prog_char *text;
-// } PROGMEM element_t;
 
 typedef struct
 {
@@ -79,13 +74,17 @@ static void _hStickCentering();
 static void _hStickScaling();
 static void _hShowModelLayout();
 static void _hLoadModelLayout();
-static void _hDebug();
 static void _hFactoryReset();
 static void _hPIEditor();
 static void _hMiscSettings();
 static void _hSelflevelSettings();
 static void _hCPPMSettings();
 static void _hModeSettings();
+static void _hMixerEditor();
+
+#ifdef DEBUG
+static void _hDebug();
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 // softkeys
@@ -114,11 +113,13 @@ static const page_t pages[] PROGMEM = {
 /* 10 */	{ _skCONTINUE, _hESCCalibration, scrESCCal0},
 /* 11 */	{ _skPAGE, _hCPPMSettings, scrCPPMSettings},
 /* 12 */	{ _skCONTINUE, _hStickCentering},
-/* 13 */	{ _skPAGE, NULL, scrMixerEditor},
+/* 13 */	{ _skPAGE, _hMixerEditor, scrMixerEditor},
 /* 14 */	{ _skBACKNEXT, _hShowModelLayout},
 /* 15 */	{ _skMENU, _hLoadModelLayout },
-/* 16 */	{ _skBACK, _hDebug },
 /* 16 */	{ _skCANCELYES, _hFactoryReset },
+#ifdef DEBUG
+/* 17 */	{ _skBACK, _hDebug },
+#endif
 };
 
 static const prog_char *lstMenu[] PROGMEM = {
@@ -136,8 +137,10 @@ static const prog_char *lstMenu[] PROGMEM = {
 	strMixerEditor,
 	strShowMotorLayout,
 	strLoadMotorLayout,
-	strDebug,
 	strFactoryReset,
+#ifdef DEBUG
+	strDebug,
+#endif
 };
 
 #define PAGE_START			0
@@ -147,14 +150,19 @@ static const prog_char *lstMenu[] PROGMEM = {
 static PGM_P tsmMain(uint8_t);
 static PGM_P tsmLoadModelLayout(uint8_t);
 
-static uint8_t page, subpage;
+static uint8_t page, subpage, subindex;
+static uint8_t oldPage;
 static uint16_t _tStart;
 static page_t currentPage;
 static menu_t mnuMain = {length(lstMenu), tsmMain};
 static menu_t mnuMLayout = {MIXER_TABLE_LEN, tsmLoadModelLayout};
 static int16_t editValue, editLoLimit, editHiLimit;
-static uint8_t editMode;
+static uint8_t editMode, editValueType;
 static void* editValuePtr;
+
+#define TYPE_UINT8		0
+#define TYPE_INT8		1
+#define TYPE_INT16		3
 
 static void writeSpace(uint8_t len)
 {
@@ -224,7 +232,7 @@ static void defaultHandler()
 		editModeHandler();
 	else
 	{
-		if (KEYINIT)
+		if (KEYINIT | KEYREFRESH)
 		{
 			lcdClear();
 			if (currentPage.screen)
@@ -243,9 +251,16 @@ static void editModeHandler()
 {
 	if (KEY4)	// DONE;
 	{
-		editMode = 0;
-		_mykey = KEY_INIT;
-		*(uint8_t*)editValuePtr = editValue;
+		editMode = OFF;
+		_mykey = KEY_REFRESH;
+		
+		if (editValueType == TYPE_UINT8)
+			*(uint8_t*)editValuePtr = editValue;
+		else if (editValueType == TYPE_INT8)
+			*(int8_t*)editValuePtr = editValue;
+		else if (editValueType == TYPE_INT16)
+			*(int16_t*)editValuePtr = editValue;
+		
 		configSave();
 		lcdSelectFont(NULL);
 		defaultHandler();
@@ -272,10 +287,19 @@ static void editModeHandler()
 
 static void startEditMode(void* valuePtr, int16_t loLimit, int16_t hiLimit, uint8_t valueType)
 {
-	editMode = 1;
+	editMode = ON;
 	_mykey = KEY_INIT;
 	editValuePtr = valuePtr;
-	editValue = *(uint8_t*)valuePtr;
+	editValueType = valueType;
+	
+	if (valueType == TYPE_UINT8)
+		editValue = *(uint8_t*)valuePtr;
+	else if (valueType == TYPE_INT8)
+		editValue = *(int8_t*)valuePtr;
+	else if (valueType == TYPE_INT16)
+		editValue = *(int16_t*)valuePtr;
+	
+	
 	editLoLimit = loLimit;
 	editHiLimit = hiLimit;
 	
@@ -382,7 +406,11 @@ static void showMotor(uint8_t motor, uint8_t withDir)
 	else if (withDir)
 	{
 		lcdSetPos(3, 64);
-		if (channel->flags == FLAG_NONE)
+		if (channel->Aileron == 0 &&
+			channel->Elevator == 0 &&
+			channel->Throttle == 0 &&
+			channel->Rudder == 0 &&
+			channel->Offset == 0)
 			lcdWriteString_P(strUnused);
 		else
 			lcdWriteString_P(strServo);
@@ -441,7 +469,7 @@ static void _hLoadModelLayout()
 static void _hStart()
 {
 	char s[7];
-	if (KEY4)	// MENU
+	if (KEY4 && !State.Armed)	// MENU
 	{
 		loadPage(PAGE_MENU);
 		return;
@@ -449,15 +477,26 @@ static void _hStart()
 	
 	if (KEYINIT)
 	{
-		lcdSetPos(0, 36);
-		lcdSelectFont(&font12x16);
-		lcdWriteString_P(strSAFE);
-		lcdSelectFont(NULL);
-		lcdSetPos(3, 0);
-		lcdWriteString_P(strSelflevel);
-		lcdWriteString_P(strSpIsSp);
-		lcdSetPos(5, 0);
-		lcdWriteString_P(strBattery);
+		if (State.Armed)
+		{
+			lcdSetPos(0, 16);
+			lcdSelectFont(&font12x16);
+			lcdWriteString_P(strARMED);
+			lcdSelectFont(NULL);
+			return;
+		}
+		else
+		{
+			lcdSetPos(0, 36);
+			lcdSelectFont(&font12x16);
+			lcdWriteString_P(strSAFE);
+			lcdSelectFont(NULL);
+			lcdSetPos(3, 0);
+			lcdWriteString_P(strSelflevel);
+			lcdWriteString_P(strSpIsSp);
+			lcdSetPos(5, 0);
+			lcdWriteString_P(strBattery);
+		}
 	}
 	
 	lcdSetPos(3, 84);
@@ -636,6 +675,7 @@ static void _hStickCentering()
 		loadPage(PAGE_MENU);
 }
 
+#ifdef DEBUG
 static void _hDebug()
 {
 	lcdSetPos(0, 0);
@@ -644,6 +684,7 @@ static void _hDebug()
 	utoa(Config.MixerIndex, s, 10);
 	lcdWriteString(s);
 }
+#endif
 
 static void _hFactoryReset()
 {
@@ -691,22 +732,20 @@ static void _hPIEditor()
 {
 	NOKEYRETURN;
 	
-	static uint8_t axis;
-	
 	pageKey(5);
 
 	if (KEY4) // CHANGE
 	{
 		if (subpage == 0)
-			axis = (axis + 1) % 3;
+			subindex = (subindex + 1) % 3;
 		else
 		{
 			switch (subpage)
 			{
-				case 1: startEditMode(&Config.PID[axis].PGain, 0, 200, 0); break;
-				case 2: startEditMode(&Config.PID[axis].PLimit, 0, 200, 0); break;
-				case 3: startEditMode(&Config.PID[axis].IGain, 0, 200, 0); break;
-				case 4: startEditMode(&Config.PID[axis].ILimit, 0, 200, 0); break;
+				case 1: startEditMode(&Config.PID[subindex].PGain, 0, 200, TYPE_UINT8); break;
+				case 2: startEditMode(&Config.PID[subindex].PLimit, 0, 200, TYPE_UINT8); break;
+				case 3: startEditMode(&Config.PID[subindex].IGain, 0, 200, TYPE_UINT8); break;
+				case 4: startEditMode(&Config.PID[subindex].ILimit, 0, 200, TYPE_UINT8); break;
 			}
 			return;
 		}
@@ -714,18 +753,53 @@ static void _hPIEditor()
 	
 	lcdSetPos(0, 30);
 	lcdReverse(subpage == 0);
-	switch (axis)
+	switch (subindex)
 	{
 		case 0: writePadded_P(strRollAil, 16); break;
 		case 1: writePadded_P(strPitchEle, 16); break;
 		default: writePadded_P(strYawRud, 16); break;
 	}
 	
-	writeValue(2, 60, Config.PID[axis].PGain, 5, 1);
-	writeValue(3, 60, Config.PID[axis].PLimit, 5, 2);
-	writeValue(4, 60, Config.PID[axis].IGain, 5, 3);
-	writeValue(5, 60, Config.PID[axis].ILimit, 5, 4);
+	writeValue(2, 60, Config.PID[subindex].PGain, 5, 1);
+	writeValue(3, 60, Config.PID[subindex].PLimit, 5, 2);
+	writeValue(4, 60, Config.PID[subindex].IGain, 5, 3);
+	writeValue(5, 60, Config.PID[subindex].ILimit, 5, 4);
 }
+
+static void _hMixerEditor()
+{
+	NOKEYRETURN;
+		
+	if (KEY4)	// CHANGE?
+	{
+		if (subpage == 0)
+			subindex = (subindex + 1) % length(Config.Mixer.Channel);
+		else
+		{
+			switch(subpage)
+			{
+				case 1: startEditMode(&Config.Mixer.Channel[subindex].Throttle, -127, 127, TYPE_INT8); return;
+				case 2: startEditMode(&Config.Mixer.Channel[subindex].Aileron, -127, 127, TYPE_INT8); return;
+				case 3: startEditMode(&Config.Mixer.Channel[subindex].Elevator, -127, 127, TYPE_INT8); return;
+				case 4: startEditMode(&Config.Mixer.Channel[subindex].Rudder, -127, 127, TYPE_INT8); return;
+				case 5: startEditMode(&Config.Mixer.Channel[subindex].Offset, -127, 127, TYPE_INT8); return;
+				case 6: Config.Mixer.Channel[subindex].flags ^= FLAG_ESC; break;
+				case 7: Config.Mixer.Channel[subindex].flags ^= FLAG_HIGH; break;
+			}
+		}
+	}
+	
+	pageKey(8);
+	writeValue(0, 120, subindex + 1, 1, 0);
+	writeValue(0, 60, Config.Mixer.Channel[subindex].Throttle, 4, 1);
+	writeValue(1, 60, Config.Mixer.Channel[subindex].Aileron, 4, 2);
+	writeValue(2, 60, Config.Mixer.Channel[subindex].Elevator, 4, 3);
+	writeValue(3, 60, Config.Mixer.Channel[subindex].Rudder, 4, 4);
+	writeValue(4, 60, Config.Mixer.Channel[subindex].Offset, 4, 5);
+	writeString_P(5, 36, Config.Mixer.Channel[subindex].flags & FLAG_ESC ? strESC : strServo, 5, 6);
+	writeString_P(5, 108, Config.Mixer.Channel[subindex].flags & FLAG_ESC ? strHigh : Config.Mixer.Channel[subindex].flags & FLAG_HIGH ? strHigh : strLow, 3, 7);
+}
+
 
 static void simplePageHandler(edit_element_t *elements, uint8_t len)
 {
@@ -735,7 +809,7 @@ static void simplePageHandler(edit_element_t *elements, uint8_t len)
 	if (KEY4)	// CHANGE?
 	{
 		memcpy_P(&element, &elements[subpage], sizeof(element));
-		startEditMode(element.valuePtr, element.loLimit, element.hiLimit, 0);
+		startEditMode(element.valuePtr, element.loLimit, element.hiLimit, TYPE_UINT8);
 		return;
 	}
 	for (uint8_t i = 0; i < len; i++)
@@ -793,7 +867,7 @@ static void _hCPPMSettings()
 
 void menuShow()
 {
-	static uint8_t oldPage = 0xFF;
+
 	
 	_mykey = keyboardRead();
 		
@@ -810,6 +884,7 @@ void menuShow()
 	{
 		_mykey = KEY_INIT;
 		subpage = 0;
+		subindex = 0;
 		oldPage = page;
 	}
 	defaultHandler();
@@ -821,6 +896,7 @@ void menuShow()
 
 void menuInit()
 {
+	oldPage = 0xFF;
 	loadPage(PAGE_START);
 }
 
