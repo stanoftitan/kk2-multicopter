@@ -15,6 +15,7 @@
 extern model_t mixerTable[] PROGMEM;
 
 uint16_t MIXER[8];
+extern int16_t CHANNELS[4];
 
 void mixerInit()
 {
@@ -27,15 +28,23 @@ void mixerLoadTable(uint8_t index)
 	Config.MixerIndex = index;
 }
 
-void mixerDoMixing()
+void mixerMixing()
 {
+	int32_t r;
+	
 	for (uint8_t i = 0; i < 8; i++)
 	{
 		if (Config.Mixer.Channel[i].flags == 0)
 			MIXER[i] = 0;
 		else
 		{
-			// @@@
+			r = 0;
+			r += CHANNELS[0] * Config.Mixer.Channel[i].Aileron;
+			r += CHANNELS[1] * Config.Mixer.Channel[i].Elevator;
+			r += CHANNELS[2] * Config.Mixer.Channel[i].Rudder;
+			r += CHANNELS[3] * Config.Mixer.Channel[i].Throttle;
+		
+			MIXER[i] = r >> 7;
 		}
 	}
 }

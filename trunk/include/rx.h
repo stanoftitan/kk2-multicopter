@@ -26,8 +26,6 @@ extern uint8_t RX_good;
 
 void rxInit(uint8_t mode);
 void rxRead();
-void rxCalibrate();
-
-
+uint8_t rxCalibrate();
 
 #endif /* RX_H_ */

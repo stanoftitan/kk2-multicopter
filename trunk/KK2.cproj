@@ -89,6 +89,9 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="calculator.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="config.c">
       <SubType>compile</SubType>
     </Compile>

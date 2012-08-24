@@ -14,7 +14,7 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x5D
+#define SIGNATURE	0x5E
 
 static config_t defaultConfig PROGMEM = 
 {
@@ -42,7 +42,8 @@ static config_t defaultConfig PROGMEM =
 	.LinkRollPitch = ON,
 	.AutoDisarm = ON,
 	.ReceiverMode = RX_MODE_CPPM,
-	.StickScaling = { 30, 30, 50, 90},
+	.StickScaling = { 200, 200, 200, 200},
+//	.StickScaling = { 30, 30, 50, 90},
 	.MinThrottle = 10,
 	.LCDContrast = 32,
 	.HeightDampening = 0,

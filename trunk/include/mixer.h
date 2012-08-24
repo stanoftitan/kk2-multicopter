@@ -38,5 +38,6 @@ extern model_t mixerTable[MIXER_TABLE_LEN];
 
 void mixerInit();
 void mixerLoadTable(uint8_t index);
+void mixerMixing();
 
 #endif /* MIXER_H_ */
