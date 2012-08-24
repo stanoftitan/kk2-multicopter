@@ -19,6 +19,8 @@
 #include <avr/wdt.h>
 #include <string.h>
 
+extern int16_t CHANNELS[4];
+
 uint8_t _mykey;
 #define KEY_INIT	1
 #define KEY_REFRESH	2
@@ -118,7 +120,7 @@ static const page_t pages[] PROGMEM = {
 /* 15 */	{ _skMENU, _hLoadModelLayout },
 /* 16 */	{ _skCANCELYES, _hFactoryReset },
 #ifdef DEBUG
-/* 17 */	{ _skBACK, _hDebug },
+/* 17 */	{ _skBACK, _hDebug, scrDebug },
 #endif
 };
 
@@ -258,8 +260,8 @@ static void editModeHandler()
 			*(uint8_t*)editValuePtr = editValue;
 		else if (editValueType == TYPE_INT8)
 			*(int8_t*)editValuePtr = editValue;
-		else if (editValueType == TYPE_INT16)
-			*(int16_t*)editValuePtr = editValue;
+// 		else if (editValueType == TYPE_INT16)
+// 			*(int16_t*)editValuePtr = editValue;
 		
 		configSave();
 		lcdSelectFont(NULL);
@@ -296,9 +298,8 @@ static void startEditMode(void* valuePtr, int16_t loLimit, int16_t hiLimit, uint
 		editValue = *(uint8_t*)valuePtr;
 	else if (valueType == TYPE_INT8)
 		editValue = *(int8_t*)valuePtr;
-	else if (valueType == TYPE_INT16)
-		editValue = *(int16_t*)valuePtr;
-	
+// 	else if (valueType == TYPE_INT16)
+// 		editValue = *(int16_t*)valuePtr;
 	
 	editLoLimit = loLimit;
 	editHiLimit = hiLimit;
@@ -662,11 +663,16 @@ static void _hStickCentering()
 	{
 		if (KEY4)
 		{
-			rxCalibrate();
-			configSave();
 			lcdClear();
-			lcdSetPos(3, 0);
-			lcdWriteString_P(strCalSucc);
+			if (rxCalibrate())
+			{
+				configSave();
+				lcdSetPos(3, 0);
+				lcdWriteString_P(strCalSucc);
+			}
+			else
+				lcdWriteString_P(scrRadioCal2);
+
 			writeSoftkeys(NULL);
 			subpage = 1;
 		}
@@ -678,11 +684,11 @@ static void _hStickCentering()
 #ifdef DEBUG
 static void _hDebug()
 {
-	lcdSetPos(0, 0);
-	lcdWriteString_P(PSTR("MixerIndex: "));
-	char s[7];
-	utoa(Config.MixerIndex, s, 10);
-	lcdWriteString(s);
+	writeValue(0, 66, Config.MixerIndex, 2, -1);
+	writeValue(1, 66, CHANNELS[0], 6, -1);
+	writeValue(2, 66, CHANNELS[1], 6, -1);
+	writeValue(3, 66, CHANNELS[2], 6, -1);
+	writeValue(4, 66, CHANNELS[3], 6, -1);
 }
 #endif
 

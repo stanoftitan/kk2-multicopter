@@ -45,7 +45,7 @@ void init()
 	adcInit();
 	rxInit(Config.ReceiverMode);
 	mixerInit();
-	pwmInit();
+	//pwmInit();
 	lcdInit();
 	keyboardInit();
 	menuInit();
@@ -112,6 +112,9 @@ int main(void)
 		{
 			CheckState();
 			sensorsRead();
+			
+			calc();
+			mixerMixing();
 
 			for (uint8_t i = 0; i < 5; i++)
 				pwmWrite(i+1, RX_raw[i]);

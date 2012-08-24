@@ -162,6 +162,13 @@ P_STR scrRadioCal1[] =
 	"One or more signals\n"
 	"are missing.";
 
+P_STR scrRadioCal2[] = 
+	"Calibration failed.\n"
+	"\n"
+	"Make sure the sticks\n"
+	"are released and\n"
+	"throttle is idle.";
+
 P_STR scrMixerEditor[] = 
 	"Throttle:       Ch:\n"
 	"Aileron:\n"
@@ -169,5 +176,13 @@ P_STR scrMixerEditor[] =
 	"Rudder:\n"
 	"Offset:\n"
 	"Type:       Rate:";
+
+P_STR scrDebug[] =
+	"MixerIndex:\n"
+	"Channel0:\n"
+	"Channel1:\n"
+	"Channel2:\n"
+	"Channel3:";
+
 
 #endif /* MENU_SCREEN_H_ */

@@ -208,8 +208,19 @@ void rxRead()
 	RX[THR]	>>= 1;
 }
 
-void rxCalibrate()
+uint8_t rxCalibrate()
 {
 	rxRead();
+	for (uint8_t i = 0; i < 5; i++)
+	{
+		if (i == THR)
+		{
+			if (RX_raw[THR] < PWM_LOW - 50 || RX_raw[THR] > PWM_LOW + 50)
+				return 0;
+		}
+		else if (RX_raw[i] < PWM_MID - 50 || RX_raw[i] > PWM_MID + 50)
+			return 0;
+	}
 	memcpy(&Config.RX_zero, &RX_raw, sizeof(Config.RX_zero));
+	return 1;
 }
