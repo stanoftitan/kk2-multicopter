@@ -10,9 +10,10 @@
 #include "fonts.h"
 #include <avr/pgmspace.h>
 
+/*
 const fontdescriptor_t *fonts[] PROGMEM = {
 	&font4x6,
 	&font6x8,
 	&font12x16,
 };
-
+*/
