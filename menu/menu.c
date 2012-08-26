@@ -18,8 +18,7 @@
 #include <stdlib.h>
 #include <avr/wdt.h>
 #include <string.h>
-
-extern int16_t CHANNELS[4];
+#include "controller.h"
 
 uint8_t _mykey;
 #define KEY_INIT	1
@@ -541,12 +540,12 @@ static void _hStart()
 
 static void _hSensorTest()
 {
-	writeValue(0, 48, GYRO_raw[AIL], 5, -1);
-	writeValue(1, 48, GYRO_raw[ELE], 5, -1);
-	writeValue(2, 48, GYRO_raw[RUD], 5, -1);
-	writeValue(3, 48, ACC_raw[AIL], 5, -1);
-	writeValue(4, 48, ACC_raw[ELE], 5, -1);
-	writeValue(5, 48, ACC_raw[RUD], 5, -1);
+	writeValue(0, 48, GYRO[AIL], 5, -1);
+	writeValue(1, 48, GYRO[ELE], 5, -1);
+	writeValue(2, 48, GYRO[RUD], 5, -1);
+	writeValue(3, 48, ACC[AIL], 5, -1);
+	writeValue(4, 48, ACC[ELE], 5, -1);
+	writeValue(5, 48, ACC[RUD], 5, -1);
 	writeValue(6, 48, BATT, 5, -1);
 }
 
@@ -685,10 +684,10 @@ static void _hStickCentering()
 static void _hDebug()
 {
 	writeValue(0, 66, Config.MixerIndex, 2, -1);
-	writeValue(1, 66, CHANNELS[0], 6, -1);
-	writeValue(2, 66, CHANNELS[1], 6, -1);
-	writeValue(3, 66, CHANNELS[2], 6, -1);
-	writeValue(4, 66, CHANNELS[3], 6, -1);
+	writeValue(1, 66, CONTROL[0], 6, -1);
+	writeValue(2, 66, CONTROL[1], 6, -1);
+	writeValue(3, 66, CONTROL[2], 6, -1);
+	writeValue(4, 66, CONTROL[3], 6, -1);
 }
 #endif
 
@@ -873,8 +872,6 @@ static void _hCPPMSettings()
 
 void menuShow()
 {
-
-	
 	_mykey = keyboardRead();
 		
 	if (KEY1 && !editMode)	// BACK
