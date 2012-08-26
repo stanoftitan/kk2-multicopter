@@ -17,6 +17,7 @@
 #include "keyboard.h"
 #include "menu.h"
 #include "buzzer.h"
+#include "controller.h"
 #include <util/delay.h>
 #include <avr/wdt.h>
 
@@ -113,7 +114,7 @@ int main(void)
 			CheckState();
 			sensorsRead();
 			
-			calc();
+			controller();
 			mixerMixing();
 
 			for (uint8_t i = 0; i < 5; i++)

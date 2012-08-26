@@ -9,6 +9,8 @@
 
 #include "global.h"
 #include "mixer.h"
+#include "rx.h"
+#include "controller.h"
 #include <string.h>
 #include <avr/pgmspace.h>
 
@@ -39,10 +41,10 @@ void mixerMixing()
 		else
 		{
 			r = 0;
-			r += CHANNELS[0] * Config.Mixer.Channel[i].Aileron;
-			r += CHANNELS[1] * Config.Mixer.Channel[i].Elevator;
-			r += CHANNELS[2] * Config.Mixer.Channel[i].Rudder;
-			r += CHANNELS[3] * Config.Mixer.Channel[i].Throttle;
+			r += CONTROL[AIL] * Config.Mixer.Channel[i].Aileron;
+			r += CONTROL[ELE] * Config.Mixer.Channel[i].Elevator;
+			r += CONTROL[RUD] * Config.Mixer.Channel[i].Rudder;
+			r += CONTROL[THR] * Config.Mixer.Channel[i].Throttle;
 		
 			MIXER[i] = r >> 7;
 		}
