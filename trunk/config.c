@@ -61,16 +61,11 @@ static void _initConfig()
 	mixerLoadTable(Config.MixerIndex);
 }
 
-static void _loadConfig()
+void configLoad()
 {
 	eeprom_read_block(&Config, &EEConfig, sizeof(Config));
 	if (Config.signature != SIGNATURE)
 		_initConfig();
-}
-
-void configLoad()
-{
-	_loadConfig();
 }
 
 void configInit()

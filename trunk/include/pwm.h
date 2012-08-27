@@ -13,6 +13,7 @@
 
 void pwmInit();
 void pwmWrite(uint8_t channel, uint16_t value);
-
+void pwmEnable();
+void pwmDisable();
 
 #endif /* PWM_H_ */

@@ -16,7 +16,7 @@
 #include "mixer.h"
 #include "keyboard.h"
 #include "menu.h"
-#include "buzzer.h"
+#include "digitals.h"
 #include "controller.h"
 #include <util/delay.h>
 #include <avr/wdt.h>
@@ -46,7 +46,7 @@ void init()
 	adcInit();
 	rxInit(Config.ReceiverMode);
 	mixerInit();
-	//pwmInit();
+	pwmInit();
 	lcdInit();
 	keyboardInit();
 	menuInit();
@@ -85,7 +85,7 @@ int main(void)
 	lcdWriteString_P(versionNum);
 	lcdSetPos(2, 0);
 	lcdWriteString_P(versionAuthor);
-	buzzerBuzzWait(500);
+	digitalsBuzzBlocking(500);
 	WAITMS(700);
 	
 	if (keyboardState() == (KEY_1 | KEY_4))
@@ -95,6 +95,7 @@ int main(void)
 		lcdSetPos(3, 18);
 		lcdWriteString_P(PSTR("Calibrating ESCs"));
 	}
+	pwmEnable();
 
 	while(1)
 	{
@@ -124,7 +125,6 @@ int main(void)
 				menuShow();
 		}			
 
- 		buzzerLoop();
-		 
+ 		digitalsLoop();
 	}
 }

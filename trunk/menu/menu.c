@@ -13,7 +13,7 @@
 #include "sensors.h"
 #include "rx.h"
 #include "mixer.h"
-#include "buzzer.h"
+#include "digitals.h"
 #include <avr/pgmspace.h>
 #include <stdlib.h>
 #include <avr/wdt.h>
@@ -894,7 +894,7 @@ void menuShow()
 	lcdEnable();
 
 	if (KEYPRESS)
-		buzzerBuzz(5);
+		digitalsBuzz(5);
 }
 
 void menuInit()
