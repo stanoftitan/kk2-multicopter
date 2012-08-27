@@ -98,7 +98,7 @@
     <Compile Include="driver\adc.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="driver\buzzer.c">
+    <Compile Include="driver\digitals.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="driver\keyboard.c">
@@ -137,7 +137,7 @@
     <Compile Include="include\adc.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="include\buzzer.h">
+    <Compile Include="include\digitals.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="include\config.h">
