@@ -26,8 +26,8 @@
 #include <string.h>
 
 state_t State;
-static const prog_char versionNum[] = "Version 0.2a";
-static const prog_char versionAuthor[] = "By Oliver Schulz";
+static const char versionNum[] PROGMEM = "Version 0.2a";
+static const char versionAuthor[] PROGMEM = "By Oliver Schulz";
 
 
 __attribute__((naked))

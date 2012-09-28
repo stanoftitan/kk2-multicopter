@@ -12,7 +12,7 @@
 #define MENU_SCREEN_H_
 
 #ifndef P_STR
-#define P_STR static const prog_char
+#define P_STR static const char PROGMEM
 #endif
 
 P_STR scrPIEditor[] = 
@@ -136,7 +136,7 @@ P_STR scrESCCal5[] =
 	"\n"
 	"  You are now done!";
 
-PROGMEM const prog_char* scrESCCal[] = 
+static const char* const scrESCCal[] PROGMEM = 
 	{
 		scrESCCal0,
 		scrESCCal1,

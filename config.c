@@ -16,7 +16,7 @@ noinit config_t Config;
 EEMEM config_t EEConfig;
 #define SIGNATURE	0x5E
 
-static config_t defaultConfig PROGMEM = 
+static const config_t defaultConfig PROGMEM = 
 {
 	.signature = SIGNATURE,
 	.MixerIndex = 0,

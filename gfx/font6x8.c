@@ -12,7 +12,7 @@
 
 #define BYTESPERCHAR	6UL
 
-static const prog_uchar _font6x8map[] = {
+static const uint8_t _font6x8map[] PROGMEM = {
 	/*
 	0x00,0x00,0x00,0x00,0x00,0x00,	// 0x00
 	0x00,0x3E,0x45,0x51,0x45,0x3E,	// 0x01
@@ -280,4 +280,4 @@ static PGM_P _font6x8selector(unsigned char c)
 	return (PGM_P) _font6x8map + (c - 0x20) * BYTESPERCHAR;
 }
 
-fontdescriptor_t font6x8 PROGMEM = { 6, 8, _font6x8selector };
+const fontdescriptor_t font6x8 PROGMEM = { 6, 8, _font6x8selector };

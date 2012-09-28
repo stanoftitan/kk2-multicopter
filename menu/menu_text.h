@@ -12,7 +12,7 @@
 #define MENU_TEXT_H_
 
 #ifndef P_STR
-#define P_STR static const prog_char
+#define P_STR static const char PROGMEM
 #endif
 
 P_STR strSAFE[] = "SAFE";
