@@ -94,8 +94,8 @@ int main(void)
 		lcdClear();
 		lcdSetPos(3, 18);
 		lcdWriteString_P(PSTR("Calibrating ESCs"));
+		pwmEnable();
 	}
-	pwmEnable();
 
 	while(1)
 	{
@@ -105,7 +105,10 @@ int main(void)
 		if (State.Mode == MODE_ESC_CAL)
 		{
 			if (keyboardState() != (KEY_1 | KEY_4))
+			{
 				State.Mode = MODE_NORMAL;
+				pwmDisable();
+			}
 				
 			for (uint8_t i = 0; i < RX_CHANNELS; i++)
 				pwmWrite(i, RX_raw[THR]);
