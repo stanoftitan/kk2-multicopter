@@ -10,6 +10,7 @@
 #include "global.h"
 #include "rx.h"
 #include "sensors.h"
+#include <string.h>
 
 int16_t CONTROL[4];
 

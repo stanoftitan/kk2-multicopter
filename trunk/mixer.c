@@ -14,7 +14,7 @@
 #include <string.h>
 #include <avr/pgmspace.h>
 
-extern model_t mixerTable[] PROGMEM;
+extern model_t const mixerTable[];
 
 uint16_t MIXER[8];
 extern int16_t CHANNELS[4];

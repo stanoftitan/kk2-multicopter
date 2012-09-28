@@ -21,9 +21,9 @@ typedef struct
 } fontdescriptor_t;
 
 
-extern fontdescriptor_t font4x6;
-extern fontdescriptor_t font6x8;
-extern fontdescriptor_t font12x16;
+extern const fontdescriptor_t font4x6;
+extern const fontdescriptor_t font6x8;
+extern const fontdescriptor_t font12x16;
 
 extern const fontdescriptor_t *fonts[];
 

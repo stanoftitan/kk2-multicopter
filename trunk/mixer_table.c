@@ -11,7 +11,7 @@
 #include "mixer.h"
 #include <avr/pgmspace.h>
 
-#define P_STR static const prog_char
+#define P_STR static const char PROGMEM
 
 P_STR strModel00[] = "SingleCopter 2M 2S";
 P_STR strModel01[] = "SingleCopter 1M 4S";
@@ -36,7 +36,7 @@ P_STR strModel19[] = "Flying Wing";
 P_STR strModel20[] = "Y4";
 P_STR strModel21[] = "V-Tail";
 
-PROGMEM model_t mixerTable[MIXER_TABLE_LEN] = {
+model_t const mixerTable[MIXER_TABLE_LEN] PROGMEM = {
 	// SingleCopter 2M 2S
 	{
 		strModel00,

@@ -16,7 +16,7 @@
 typedef struct
 {
 	uint8_t sizeX, sizeY;
-	prog_char glyph[];
+	char glyph[];
 } glyph_t;
 
 extern const glyph_t glyArrowDown;

@@ -14,7 +14,7 @@
 uint16_t PWM[8];
 static uint16_t _lastLoStart;
 
-prog_uchar masktable[] = {_BV(OUT1_BIT), _BV(OUT2_BIT), _BV(OUT3_BIT), _BV(OUT4_BIT), _BV(OUT5_BIT), _BV(OUT6_BIT), _BV(OUT7_BIT), _BV(OUT8_BIT)};
+const uint8_t masktable[] PROGMEM = {_BV(OUT1_BIT), _BV(OUT2_BIT), _BV(OUT3_BIT), _BV(OUT4_BIT), _BV(OUT5_BIT), _BV(OUT6_BIT), _BV(OUT7_BIT), _BV(OUT8_BIT)};
 
 __attribute__ ((section(".lowtext")))
 ISR(TIMER1_COMPA_vect)

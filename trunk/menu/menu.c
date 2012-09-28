@@ -60,7 +60,7 @@ typedef struct
 
 
 //////////////////////////////////////////////////////////////////////////
-#define P_STR static const prog_char
+#define P_STR static const char PROGMEM
 #include "menu_text.h"
 #include "menu_screen.h"
 
@@ -89,15 +89,15 @@ static void _hDebug();
 
 //////////////////////////////////////////////////////////////////////////
 // softkeys
-static const prog_char _skSTART[]     = "                 MENU";
-static const prog_char _skMENU[]      = "BACK  UP   DOWN ENTER";
-static const prog_char _skBACK[]      = "BACK";
-static const prog_char _skCONTINUE[]  = "BACK         CONTINUE";
-static const prog_char _skCANCELYES[] = "CANCEL            YES";
-static const prog_char _skPAGE[]      = "BACK PREV NEXT CHANGE";
-static const prog_char _skEDIT[]      = "CLR  DOWN   UP   DONE";
-static const prog_char _skBACKNEXT[]  = "BACK  NEXT";
-static const prog_char _skCANCEL[]    = "CANCEL";
+P_STR _skSTART[]     = "                 MENU";
+P_STR _skMENU[]      = "BACK  UP   DOWN ENTER";
+P_STR _skBACK[]      = "BACK";
+P_STR _skCONTINUE[]  = "BACK         CONTINUE";
+P_STR _skCANCELYES[] = "CANCEL            YES";
+P_STR _skPAGE[]      = "BACK PREV NEXT CHANGE";
+P_STR _skEDIT[]      = "CLR  DOWN   UP   DONE";
+P_STR _skBACKNEXT[]  = "BACK  NEXT";
+P_STR _skCANCEL[]    = "CANCEL";
 
 //////////////////////////////////////////////////////////////////////////
 static const page_t pages[] PROGMEM = {
@@ -123,7 +123,7 @@ static const page_t pages[] PROGMEM = {
 #endif
 };
 
-static const prog_char *lstMenu[] PROGMEM = {
+static const char* const lstMenu[] PROGMEM = {
 	strPIEditor,
 	strReceiverTest,
 	strModeSettings,
@@ -551,7 +551,7 @@ static void _hSensorTest()
 
 static void _hReceiverTest()
 {
-	static const prog_char* info[5][2] PROGMEM = {
+	static const char* const info[5][2] PROGMEM = {
 		{ strLeft, strRight },
 		{ strForward, strBack },
 		{ strRight, strLeft },
@@ -806,7 +806,7 @@ static void _hMixerEditor()
 }
 
 
-static void simplePageHandler(edit_element_t *elements, uint8_t len)
+static void simplePageHandler(const edit_element_t *elements, uint8_t len)
 {
 	NOKEYRETURN;
 	edit_element_t element;
@@ -826,7 +826,7 @@ static void simplePageHandler(edit_element_t *elements, uint8_t len)
 
 static void _hStickScaling()
 {
-	static edit_element_t elements[] PROGMEM = {
+	static edit_element_t const elements[] PROGMEM = {
 		{ 2, 78, &Config.StickScaling[AIL], 0, 200, 5 },
 		{ 3, 78, &Config.StickScaling[ELE], 0, 200, 5 },
 		{ 4, 78, &Config.StickScaling[RUD], 0, 200, 5 },
@@ -837,7 +837,7 @@ static void _hStickScaling()
 
 static void _hMiscSettings()
 {
-	static edit_element_t elements[] PROGMEM = {
+	static edit_element_t const elements[] PROGMEM = {
 		{ 0, 102, &Config.MinThrottle, 0, 20, 4 },
 		{ 1, 102, &Config.HeightDampening, 0, 250, 4 },
 		{ 2, 102, &Config.HeightDampeningLimit, 0, 30, 4 },
@@ -849,7 +849,7 @@ static void _hMiscSettings()
 
 static void _hSelflevelSettings()
 {
-	static edit_element_t elements[] PROGMEM = {
+	static edit_element_t const elements[] PROGMEM = {
 		{ 0, 54, &Config.PID_SelfLevel.PGain, 0, 250, 5 },
 		{ 1, 54, &Config.PID_SelfLevel.PLimit, 0, 250, 5 },
 		{ 3, 96, &Config.AccTrimRoll, -128, 127, 5 },
@@ -860,7 +860,7 @@ static void _hSelflevelSettings()
 
 static void _hCPPMSettings()
 {
-	static edit_element_t elements[] PROGMEM = {
+	static edit_element_t const elements[] PROGMEM = {
 		{ 0, 78, &Config.RX_chmap[AIL], 1, 8, 1 },
 		{ 1, 78, &Config.RX_chmap[ELE], 1, 8, 1 },
 		{ 2, 78, &Config.RX_chmap[RUD], 1, 8, 1 },

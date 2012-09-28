@@ -118,7 +118,7 @@ void lcdXY(uint8_t x, uint8_t y)
 
 void lcdSetPixel(uint8_t x, uint8_t y, uint8_t color)
 {
-	static const prog_char masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
+	static const char PROGMEM masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
 	uint8_t *scr = _screen + x + (y / 8 * LCDWIDTH); 
 	uint8_t mask = pgm_read_byte(&masks[y % 8]);
 	if ((_flags & REVERSED) ^ !color)
@@ -306,7 +306,7 @@ void lcdSelectFont(const fontdescriptor_t *font)
 	memcpy_P(&_font, font, sizeof(_font));
 }
 
-static const prog_uchar _initSeq[] = {
+static const unsigned char _initSeq[] PROGMEM = {
 	CMD_SET_BIAS_9,				// set bias to 1/9
 	CMD_SET_ADC_NORMAL,			// SEG output direction = normal
 	CMD_SET_COM_REVERSE,		// COM output direction = reversed

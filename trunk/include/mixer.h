@@ -33,7 +33,7 @@ typedef struct
 } model_t;
 
 #define MIXER_TABLE_LEN		22
-extern model_t mixerTable[MIXER_TABLE_LEN];
+extern const model_t mixerTable[MIXER_TABLE_LEN];
 
 
 void mixerInit();
