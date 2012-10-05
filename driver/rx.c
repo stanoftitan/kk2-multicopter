@@ -197,6 +197,10 @@ void rxRead()
 
 		b = TICKSTOMICRO(b);
 		
+		#ifdef SIMULATOR
+		b = PWM_MID;
+		#endif
+		
 		if (b >= PWM_MIN && b <= PWM_MAX)
 		{
 			RX_raw[i] = b; 

@@ -29,12 +29,13 @@ int16_t calcChannel(uint8_t index)
 	int32_t r;
 	
 	err = RX[index] * Config.StickScaling[index];
-	err -= GYRO[index] * 50;
+	err -= GYRO[index] * 100;
+	err >>= 7;
 	
 	r = err * Config.PID[index].PGain;
 	
-	//IntegralSum[index] += err;
-	//r += IntegralSum[index] * Config.PID[index].IGain;
+	IntegralSum[index] += err;
+	r += IntegralSum[index] * Config.PID[index].IGain;
 	
 	return r >> 6;
 }
@@ -43,7 +44,6 @@ uint16_t calcThrottle()
 {
 	int32_t r;
 	r = RX[THR] * Config.StickScaling[THR];
-	
 	return r;
 }
 

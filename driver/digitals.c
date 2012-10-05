@@ -55,7 +55,7 @@ void digitalsBuzz(uint16_t ms)
 {
 	digBUZZER.end = millis() + ms;
 	digBUZZER.interval = 0;
-	BUZZER_TOGGLE;
+	BUZZER = ON;
 }
 
 void digitalsBuzzInterval(uint16_t ms)
@@ -65,4 +65,20 @@ void digitalsBuzzInterval(uint16_t ms)
 	digBUZZER.interval = ms;
 	if (!ms)
 		BUZZER = OFF;
+}
+
+void digitalsLed(uint16_t ms)
+{
+	digLED.end = millis() + ms;
+	digLED.interval = 0;
+	LED = ON;
+}
+
+void digitalsLedInterval(uint16_t ms)
+{
+	if (!digLED.interval)
+		digLED.end = millis();
+	digLED.interval = ms;
+	if (!ms)
+		LED = OFF;
 }

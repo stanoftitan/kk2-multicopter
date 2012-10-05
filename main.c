@@ -32,7 +32,8 @@ static const char versionAuthor[] PROGMEM = "By Oliver Schulz";
 
 __attribute__((naked))
 __attribute__((section(".init3")))
-void stop_wdt()
+__attribute__((used))
+static void stop_wdt()
 {
 	// clear watchdog reset flag!!
 	MCUSR = 0;
@@ -40,7 +41,7 @@ void stop_wdt()
 	wdt_disable();
 }
 
-void init()
+static void init()
 {
 	configInit();
 	adcInit();
@@ -52,7 +53,7 @@ void init()
 	menuInit();
 }
 
-void CheckState()
+static void CheckState()
 {
 	State.ThrottleOff = RX[THR] < THROTTLE_OFF;
 	State.Aux = RX[AUX] > 10;
@@ -66,6 +67,28 @@ void CheckState()
 	e |= (~RX_good) & (ERR_NO_PITCH|ERR_NO_ROLL|ERR_NO_THR|ERR_NO_YAW);
 	
 	State.Error = e;
+}
+
+static void ESCCalibration()
+{
+	State.Mode = MODE_ESC_CAL;
+	lcdClear();
+	lcdSetPos(3, 18);
+	lcdWriteString_P(PSTR("Calibrating ESCs"));
+	pwmEnable();
+	while(1)
+	{
+		rxRead();
+		if (keyboardState() != (KEY_1 | KEY_4))
+		{
+			State.Mode = MODE_NORMAL;
+			pwmDisable();
+			break;
+		}
+			
+		for (uint8_t i = 0; i < RX_CHANNELS; i++)
+		pwmWrite(i, RX_raw[THR]);
+	}
 }
 
 int main(void)
@@ -88,36 +111,18 @@ int main(void)
 	digitalsBuzzBlocking(500);
 	WAITMS(700);
 	
-	if (keyboardState() == (KEY_1 | KEY_4))
-	{
-		State.Mode = MODE_ESC_CAL;
-		lcdClear();
-		lcdSetPos(3, 18);
-		lcdWriteString_P(PSTR("Calibrating ESCs"));
-		pwmEnable();
-	}
+	if (keyboardState() == (KEY_1 | KEY_4))		// enter ESC Calibration mode?
+		ESCCalibration();
 
 	while(1)
 	{
  		LED_TOGGLE;
-		rxRead();
 		
-		if (State.Mode == MODE_ESC_CAL)
+		FIXEDUS(2500)
 		{
-			if (keyboardState() != (KEY_1 | KEY_4))
-			{
-				State.Mode = MODE_NORMAL;
-				pwmDisable();
-			}
-				
-			for (uint8_t i = 0; i < RX_CHANNELS; i++)
-				pwmWrite(i, RX_raw[THR]);
-		}
-		else
-		{
+			rxRead();
 			CheckState();
 			sensorsRead();
-			
 			controller();
 			mixerMixing();
 
@@ -126,8 +131,8 @@ int main(void)
 
 			EVERYMS(20)
 				menuShow();
-		}			
-
- 		digitalsLoop();
+	
+	 		digitalsLoop();
+		}
 	}
 }

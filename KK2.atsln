@@ -9,10 +9,13 @@ Global
 		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Simulator|AVR = Debug Simulator|AVR
 		Debug|AVR = Debug|AVR
 		Release|AVR = Release|AVR
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8554D9A8-CFCD-4FE2-AC10-96ED9B7DD9CD}.Debug Simulator|AVR.ActiveCfg = Debug Simulator|AVR
+		{8554D9A8-CFCD-4FE2-AC10-96ED9B7DD9CD}.Debug Simulator|AVR.Build.0 = Debug Simulator|AVR
 		{8554D9A8-CFCD-4FE2-AC10-96ED9B7DD9CD}.Debug|AVR.ActiveCfg = Debug|AVR
 		{8554D9A8-CFCD-4FE2-AC10-96ED9B7DD9CD}.Debug|AVR.Build.0 = Debug|AVR
 		{8554D9A8-CFCD-4FE2-AC10-96ED9B7DD9CD}.Release|AVR.ActiveCfg = Release|AVR

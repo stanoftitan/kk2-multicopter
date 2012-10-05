@@ -38,7 +38,7 @@ uint16_t adcRead(uint8_t channel)
 	ADMUX = channel;		// set channel to read from
 	ADCSRA |= _BV(ADSC);	// start conversion
 	loop_until_bit_is_clear(ADCSRA, ADSC);	// wait to complete
-	ADCSRA = 0b11011111;
+	ADCSRA = 0b11011111;	// reenable interrupt
 	return ADC;
 }
 
