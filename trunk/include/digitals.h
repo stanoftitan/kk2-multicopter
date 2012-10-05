@@ -15,5 +15,8 @@ void digitalsBuzz(uint16_t ms);
 void digitalsBuzzBlocking(uint16_t ms);
 void digitalsLoop();
 void digitalsBuzzInterval(uint16_t ms);
+void digitalsLed(uint16_t ms);
+void digitalsLedInterval(uint16_t ms);
+
 
 #endif /* BUZZER_H_ */

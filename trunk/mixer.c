@@ -36,15 +36,15 @@ void mixerMixing()
 	
 	for (uint8_t i = 0; i < 8; i++)
 	{
-		if (Config.Mixer.Channel[i].flags == 0)
-			MIXER[i] = 0;
-		else
+// 		if (Config.Mixer.Channel[i].flags == FLAG_NONE)
+// 			MIXER[i] = 0;
+// 		else
 		{
 			r = 0;
-			r += CONTROL[AIL] * Config.Mixer.Channel[i].Aileron;
-			r += CONTROL[ELE] * Config.Mixer.Channel[i].Elevator;
-			r += CONTROL[RUD] * Config.Mixer.Channel[i].Rudder;
-			r += CONTROL[THR] * Config.Mixer.Channel[i].Throttle;
+			r += (int32_t) CONTROL[AIL] * Config.Mixer.Channel[i].Aileron;
+			r += (int32_t) CONTROL[ELE] * Config.Mixer.Channel[i].Elevator;
+			r += (int32_t) CONTROL[RUD] * Config.Mixer.Channel[i].Rudder;
+			r += (int32_t) CONTROL[THR] * Config.Mixer.Channel[i].Throttle;
 		
 			MIXER[i] = r >> 7;
 		}

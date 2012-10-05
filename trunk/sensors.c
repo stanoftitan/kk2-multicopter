@@ -32,6 +32,15 @@ void sensorsRead()
 	ACC[2] = (int16_t)(ACC_raw[2] - Config.ACC_zero[2]) >> 1;
 
 	BATT = adcGet(ADC_VBAT) * 100 / 376;
+	
+#ifdef SIMULATOR
+	GYRO[0] = 0;
+	GYRO[1] = 0;
+	GYRO[2] = 0;
+	ACC[0] = 0;
+	ACC[1] = 0;
+	ACC[2] = 0;
+#endif
 }
 
 void sensorsCalibate()
