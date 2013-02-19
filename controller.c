@@ -28,23 +28,26 @@ int16_t calcChannel(uint8_t index)
 	int16_t err;
 	int32_t r;
 	
+	// RX = -140..+140
+	// StickScaling = 0..+200
+	// ==> -28000..+28000 -> 16bit
 	err = RX[index] * Config.StickScaling[index];
-	err -= GYRO[index] * 100;
-	err >>= 7;
+	err >>= 6;
+	err -= GYRO[index] * 2;
 	
 	r = err * Config.PID[index].PGain;
 	
-	IntegralSum[index] += err;
-	r += IntegralSum[index] * Config.PID[index].IGain;
+	//IntegralSum[index] += err;
+	//r += IntegralSum[index] * Config.PID[index].IGain;
 	
-	return r >> 6;
+	return r >> 4;
 }
 
 uint16_t calcThrottle()
 {
 	int32_t r;
 	r = RX[THR] * Config.StickScaling[THR];
-	return r;
+	return r >> 4;
 }
 
 void controller()
