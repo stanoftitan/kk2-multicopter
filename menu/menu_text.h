@@ -27,6 +27,7 @@ P_STR strModeSettings[] = "Mode Settings";
 P_STR strStickScaling[] = "Stick Scaling";
 P_STR strMiscSettings[] = "Misc. Settings";
 P_STR strSelflevelSettings[] = "Self-level Settings";
+P_STR strCameraStabSerrings[] = "Camera Stab Settings";
 P_STR strSensorTest[] = "Sensor Test";
 P_STR strSensorCalibration[] = "Sensor Calibration";
 P_STR strCPPMSettings[] = "CPPM Settings";
@@ -38,10 +39,14 @@ P_STR strLoadMotorLayout[] = "Load Model Layout";
 P_STR strDebug[] = "Debug";
 P_STR strFactoryReset[] = "Factory Reset";
 
+// start screen
 P_STR strSelflevel[] = "Self-level";
 P_STR strIofPI[] = "I of PI";
 P_STR strSpIsSp[] = " is ";
+P_STR strRollAngle[] = "Roll angle:";
+P_STR strPitchAngle[] = "Pitch angle:";
 
+// menu settings
 P_STR strRollAil[] = "Roll (Aileron)";
 P_STR strPitchEle[] = "Pitch (Elevator)";
 P_STR strYawRud[] = "Yaw (Rudder)";

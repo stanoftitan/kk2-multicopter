@@ -17,6 +17,14 @@
 
 typedef struct  
 {
+	int8_t RollGain;
+	int8_t RollOffset;
+	int8_t PitchGain;
+	int8_t PitchOffset;
+} camera_t;
+
+typedef struct  
+{
 	uint8_t signature;
 	uint16_t RX_zero[RX_CHANNELS];
 	uint8_t RX_chmap[RX_CHANNELS];
@@ -41,6 +49,7 @@ typedef struct
 	int8_t AccTrimPitch;
 	int8_t AccTrimRoll;
 	model_t Mixer;
+	camera_t Camera;
 } config_t;
 
 extern config_t Config;
