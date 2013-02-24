@@ -19,6 +19,7 @@
 #include <avr/wdt.h>
 #include <string.h>
 #include "controller.h"
+#include "imu.h"
 
 uint8_t _mykey;
 #define KEY_INIT	1
@@ -79,6 +80,7 @@ static void _hFactoryReset();
 static void _hPIEditor();
 static void _hMiscSettings();
 static void _hSelflevelSettings();
+static void _hCameraStabSettings();
 static void _hCPPMSettings();
 static void _hModeSettings();
 static void _hMixerEditor();
@@ -109,17 +111,18 @@ static const page_t pages[] PROGMEM = {
 /*  5 */	{ _skPAGE, _hStickScaling, scrStickScaling},
 /*  6 */	{ _skPAGE, _hMiscSettings, scrMiscSettings},
 /*  7 */	{ _skPAGE, _hSelflevelSettings, scrSelflevelSettings},
-/*  8 */	{ _skBACK, _hSensorTest, scrSensorTest},
-/*  9 */	{ _skCONTINUE, _hSensorCalibration, scrSensorCal0},
-/* 10 */	{ _skCONTINUE, _hESCCalibration, scrESCCal0},
-/* 11 */	{ _skPAGE, _hCPPMSettings, scrCPPMSettings},
-/* 12 */	{ _skCONTINUE, _hStickCentering},
-/* 13 */	{ _skPAGE, _hMixerEditor, scrMixerEditor},
-/* 14 */	{ _skBACKNEXT, _hShowModelLayout},
-/* 15 */	{ _skMENU, _hLoadModelLayout },
-/* 16 */	{ _skCANCELYES, _hFactoryReset },
+/*  8 */    { _skPAGE, _hCameraStabSettings, scrCameraStabSettings},	
+/*  9 */	{ _skBACK, _hSensorTest, scrSensorTest},
+/* 10 */	{ _skCONTINUE, _hSensorCalibration, scrSensorCal0},
+/* 11 */	{ _skCONTINUE, _hESCCalibration, scrESCCal0},
+/* 12 */	{ _skPAGE, _hCPPMSettings, scrCPPMSettings},
+/* 13 */	{ _skCONTINUE, _hStickCentering},
+/* 14 */	{ _skPAGE, _hMixerEditor, scrMixerEditor},
+/* 15 */	{ _skBACKNEXT, _hShowModelLayout},
+/* 16 */	{ _skMENU, _hLoadModelLayout },
+/* 17 */	{ _skCANCELYES, _hFactoryReset },
 #ifdef DEBUG
-/* 17 */	{ _skBACK, _hDebug, scrDebug },
+/* 18 */	{ _skBACK, _hDebug, scrDebug },
 #endif
 };
 
@@ -130,6 +133,7 @@ static const char* const lstMenu[] PROGMEM = {
 	strStickScaling,
 	strMiscSettings,
 	strSelflevelSettings,
+	strCameraStabSerrings,
 	strSensorTest,
 	strSensorCalibration,
 	strESCCalibration,
@@ -146,7 +150,7 @@ static const char* const lstMenu[] PROGMEM = {
 
 #define PAGE_START			0
 #define PAGE_MENU			1
-#define PAGE_SHOW_LAYOUT	14
+#define PAGE_SHOW_LAYOUT	15
 
 static PGM_P tsmMain(uint8_t);
 static PGM_P tsmLoadModelLayout(uint8_t);
@@ -165,9 +169,9 @@ static void* editValuePtr;
 #define TYPE_INT8		1
 #define TYPE_INT16		3
 
-static void writeSpace(uint8_t len)
+static void writeSpace(int8_t len)
 {
-	for (uint8_t i = 0; i < len; i++)
+	for (int8_t i = 0; i < len; i++)
 		lcdWriteChar(32);
 }
 
@@ -333,12 +337,13 @@ static uint8_t doMenu(menu_t *menu)
 		menu->top = menu->marked;
 	else if (menu->marked - menu->top >= 5)
 		menu->top = menu->marked - 4;
-	
-	// text output
+
+	// upper arrow
 	lcdSetPos(0, 58);
-	if (menu->top > 0)
-		lcdWriteGlyph_P(&glyArrowUp, 0);
+	lcdReverse(menu->top == 0);
+	lcdWriteGlyph_P(&glyArrowUp, ROP_PAINT);
 		
+	// text output
 	for (uint8_t i = 0; i < 5 && i < menu->len; i++)
 	{
 		lcdSetPos(i + 1, 0);
@@ -347,10 +352,10 @@ static uint8_t doMenu(menu_t *menu)
 		writePadded_P(item, 21);
 	}
 
-	lcdReverse(0);
+	// lower arrow
 	lcdSetPos(6, 58);
-	if (menu->top < menu->len - 5)
-		lcdWriteGlyph_P(&glyArrowDown, 0);
+	lcdReverse(menu->top >= menu->len - 5);
+	lcdWriteGlyph_P(&glyArrowDown, ROP_PAINT);
 	
 	return 0;
 }
@@ -491,21 +496,18 @@ static void _hStart()
 			lcdSelectFont(&font12x16);
 			lcdWriteString_P(strSAFE);
 			lcdSelectFont(NULL);
-			lcdSetPos(3, 0);
-			lcdWriteString_P(strSelflevel);
-			lcdWriteString_P(strSpIsSp);
-			lcdSetPos(5, 0);
-			lcdWriteString_P(strBattery);
+			lcdSetPos(2, 0);
+			lcdWriteString_P(scrStart);
 		}
 	}
 	
-	lcdSetPos(3, 84);
+	lcdSetPos(2, 84);
 	if (State.SelfLevel)
 		lcdWriteString_P(strON);
 	else		
 		lcdWriteString_P(strOFF);
 	
-	lcdSetPos(4, 0);
+	lcdSetPos(3, 0);
 	if (State.Error)
 	{
 		lcdWriteString_P(strError);
@@ -529,23 +531,29 @@ static void _hStart()
 	else
 		lcdWriteString_P(PSTR("Ready for departure!"));
 	
-	lcdSetPos(5, 9*6);
+	// battery level
+	lcdSetPos(4, 13*6);
 	utoa(BATT / 10, s, 10);
 	lcdWriteString(s);
 	lcdWriteChar('.');
 	utoa(BATT % 10, s, 10);
-	lcdWriteString(s);
-	lcdWriteString_P(PSTR(" V "));
+	writePadded(s, 3);
+	
+	// roll angle
+	writeValue(5, 13*6, ANGLE[YAXIS], 7, -1);
+	
+	// pitch angle
+	writeValue(6, 13*6, ANGLE[XAXIS], 7, -1);
 }
 
 static void _hSensorTest()
 {
-	writeValue(0, 48, GYRO[AIL], 5, -1);
-	writeValue(1, 48, GYRO[ELE], 5, -1);
-	writeValue(2, 48, GYRO[RUD], 5, -1);
-	writeValue(3, 48, ACC[AIL], 5, -1);
-	writeValue(4, 48, ACC[ELE], 5, -1);
-	writeValue(5, 48, ACC[RUD], 5, -1);
+	writeValue(0, 48, GYRO[XAXIS], 5, -1);
+	writeValue(1, 48, GYRO[YAXIS], 5, -1);
+	writeValue(2, 48, GYRO[ZAXIS], 5, -1);
+	writeValue(3, 48, ACC[XAXIS], 5, -1);
+	writeValue(4, 48, ACC[YAXIS], 5, -1);
+	writeValue(5, 48, ACC[ZAXIS], 5, -1);
 	writeValue(6, 48, BATT, 5, -1);
 }
 
@@ -854,6 +862,17 @@ static void _hSelflevelSettings()
 		{ 1, 54, &Config.PID_SelfLevel.PLimit, 0, 250, 5 },
 		{ 3, 96, &Config.AccTrimRoll, -128, 127, 5 },
 		{ 4, 96, &Config.AccTrimPitch, -128, 127, 5 },
+	};
+	simplePageHandler(elements, length(elements));
+}
+
+static void _hCameraStabSettings()
+{
+	static edit_element_t const elements[] PROGMEM = {
+		{ 2, 96, &Config.Camera.RollGain, -128, 127, 5 },
+		{ 3, 96, &Config.Camera.RollOffset, -128, 127, 5 },
+		{ 4, 96, &Config.Camera.PitchGain, -128, 127, 5 },
+		{ 5, 96, &Config.Camera.PitchOffset, -128, 127, 5 },
 	};
 	simplePageHandler(elements, length(elements));
 }

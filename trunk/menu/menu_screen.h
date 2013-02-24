@@ -15,6 +15,13 @@
 #define P_STR static const char PROGMEM
 #endif
 
+P_STR scrStart[] =
+	"Self-level is\n"
+	"\n"
+	"Battery:\n"
+	"Roll angle:\n"
+	"Pitch angle:";
+	
 P_STR scrPIEditor[] = 
 	"Axis:\n"
 	"\n"
@@ -67,6 +74,14 @@ P_STR scrSelflevelSettings[] =
 	"\n"
 	"Acc Trim Roll:\n"
 	"Acc Trim Pitch:";
+
+P_STR scrCameraStabSettings[] =
+	"Camera Stab Setup\n"
+	"\n"
+	"Roll gain:\n"
+	"Roll offset:\n"
+	"Pitch gain:\n"
+	"Pitch offset:\n";
 
 P_STR scrCPPMSettings[] = 
 	"Roll (Ail):\n"

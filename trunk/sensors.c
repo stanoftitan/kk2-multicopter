@@ -17,19 +17,19 @@ uint8_t BATT;
 
 void sensorsRead()
 {
-	GYRO_raw[0] = adcGet(ADC_GYR_X);
-	GYRO[0] = (int16_t)(GYRO_raw[0] - Config.GYRO_zero[0]) >> 1;
-	GYRO_raw[1] = adcGet(ADC_GYR_Y);
-	GYRO[1] = (int16_t)(GYRO_raw[1] - Config.GYRO_zero[1]) >> 1;
-	GYRO_raw[2] = adcGet(ADC_GYR_Z);
-	GYRO[2] = (int16_t)(GYRO_raw[2] - Config.GYRO_zero[2]) >> 1;
+	GYRO_raw[XAXIS] = adcGet(ADC_GYR_X);
+	GYRO[XAXIS] = (int16_t)(GYRO_raw[XAXIS] - Config.GYRO_zero[XAXIS]) >> 1;
+	GYRO_raw[YAXIS] = adcGet(ADC_GYR_Y);
+	GYRO[YAXIS] = (int16_t)(GYRO_raw[YAXIS] - Config.GYRO_zero[YAXIS]) >> 1;
+	GYRO_raw[ZAXIS] = adcGet(ADC_GYR_Z);
+	GYRO[ZAXIS] = (int16_t)(GYRO_raw[ZAXIS] - Config.GYRO_zero[ZAXIS]) >> 1;
 	
-	ACC_raw[0] = adcGet(ADC_ACC_X);
-	ACC[0] = (int16_t)(ACC_raw[0] - Config.ACC_zero[0]) >> 1;
-	ACC_raw[1] = adcGet(ADC_ACC_Y);
-	ACC[1] = (int16_t)(ACC_raw[1] - Config.ACC_zero[1]) >> 1;
-	ACC_raw[2] = adcGet(ADC_ACC_Z);
-	ACC[2] = (int16_t)(ACC_raw[2] - Config.ACC_zero[2]) >> 1;
+	ACC_raw[XAXIS] = adcGet(ADC_ACC_X);
+	ACC[XAXIS] = (int16_t)(ACC_raw[XAXIS] - Config.ACC_zero[XAXIS]);
+	ACC_raw[YAXIS] = adcGet(ADC_ACC_Y);
+	ACC[YAXIS] = (int16_t)(ACC_raw[YAXIS] - Config.ACC_zero[YAXIS]);
+	ACC_raw[ZAXIS] = adcGet(ADC_ACC_Z);
+	ACC[ZAXIS] = (int16_t)(ACC_raw[ZAXIS] - Config.ACC_zero[ZAXIS]);
 
 	BATT = adcGet(ADC_VBAT) * 100 / 376;
 	
@@ -48,5 +48,6 @@ void sensorsCalibate()
 	sensorsRead();
 	memcpy(&Config.GYRO_zero, &GYRO_raw, sizeof(Config.GYRO_zero));
 	memcpy(&Config.ACC_zero, &ACC_raw, sizeof(Config.ACC_zero));
+	Config.ACC_zero[ZAXIS] -= 124;
 	Config.CalibrateFlags = 1;
 }

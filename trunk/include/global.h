@@ -16,6 +16,15 @@
 #define ON		1
 #define OFF		0
 
+#define XAXIS	0
+#define YAXIS	1
+#define ZAXIS	2
+
+#define ROL		0
+#define PIT		1
+#define RUD		2
+#define THR		3
+
 #define noinit __attribute__((section(".noinit")))
 #define length(array) (sizeof(array)/sizeof(*array))
 

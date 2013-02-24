@@ -18,6 +18,7 @@
 #include "menu.h"
 #include "digitals.h"
 #include "controller.h"
+#include "imu.h"
 #include <util/delay.h>
 #include <avr/wdt.h>
 
@@ -123,6 +124,7 @@ int main(void)
 			rxRead();
 			CheckState();
 			sensorsRead();
+			imuCalculate();
 			controller();
 			mixerMixing();
 

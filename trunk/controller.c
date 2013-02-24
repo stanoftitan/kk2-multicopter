@@ -33,7 +33,7 @@ int16_t calcChannel(uint8_t index)
 	// ==> -28000..+28000 -> 16bit
 	err = RX[index] * Config.StickScaling[index];
 	err >>= 6;
-	err -= GYRO[index] * 2;
+	err -= GYRO[index] << 1;
 	
 	r = err * Config.PID[index].PGain;
 	
@@ -52,8 +52,8 @@ uint16_t calcThrottle()
 
 void controller()
 {
-	CONTROL[AIL] = calcChannel(AIL);
-	CONTROL[ELE] = calcChannel(ELE);
+	CONTROL[ROL] = calcChannel(ROL);
+	CONTROL[PIT] = calcChannel(PIT);
 	CONTROL[RUD] = calcChannel(RUD);
 	CONTROL[THR] = calcThrottle();
 }

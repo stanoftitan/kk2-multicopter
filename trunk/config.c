@@ -14,7 +14,7 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x5E
+#define SIGNATURE	0x5F
 
 static const config_t defaultConfig PROGMEM = 
 {
@@ -30,29 +30,31 @@ static const config_t defaultConfig PROGMEM =
 	.RX_chmap[RUD] = 4,
 	.RX_chmap[THR] = 3,
 	.RX_chmap[AUX] = 5,
-	.GYRO_zero[AIL] = 536,
-	.GYRO_zero[ELE] = 548,
-	.GYRO_zero[RUD] = 565,
-	.ACC_zero[AIL]  = 621,
-	.ACC_zero[ELE]  = 611,
-	.ACC_zero[RUD]  = 766,
-	.PID[AIL] = { 50, 100, 25, 20},
-	.PID[ELE] = { 50, 100, 25, 20},
-	.PID[RUD] = { 50,  20, 50, 10},
+	.GYRO_zero[XAXIS] = 536,
+	.GYRO_zero[YAXIS] = 548,
+	.GYRO_zero[ZAXIS] = 565,
+	.ACC_zero[XAXIS]  = 621,
+	.ACC_zero[YAXIS]  = 611,
+	.ACC_zero[ZAXIS]  = 766,
+	.PID[XAXIS] = { 50, 100, 25, 20},
+	.PID[YAXIS] = { 50, 100, 25, 20},
+	.PID[ZAXIS] = { 50,  20, 50, 10},
 	.LinkRollPitch = ON,
 	.AutoDisarm = ON,
 	.ReceiverMode = RX_MODE_CPPM,
-	.StickScaling = { 200, 200, 200, 200},
-	//.StickScaling = { 30, 30, 50, 90},
+	//.StickScaling = { 200, 200, 200, 200},
+	.StickScaling = { 30, 30, 50, 90},
 	.MinThrottle = 10,
 	.LCDContrast = 32,
 	.HeightDampening = 0,
 	.HeightDampeningLimit = 30,
 	.LVA = 0,
-	.ServoFilter = 0,
-	.PID_SelfLevel = { 40, 20, 0, 0},
+	.ServoFilter = 50,
+	.PID_SelfLevel = { 100, 20, 0, 0},
 	.AccTrimPitch = 0,
 	.AccTrimRoll = 0,
+	.Camera = {0, 50, 0, 50},
+	
 };
 
 static void _initConfig()
