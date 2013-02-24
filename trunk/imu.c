@@ -70,10 +70,10 @@ static void calcComplementaryFilter()
 	uint16_t dt = ticks() - lastCall;
 	int32_t r;
 	
-	r = (MAXALPHA - ALPHA) * (ANGLE[XAXIS] + (int32_t)GYRO[XAXIS] * dt / 20000L) + ALPHA * ACC_ANGLE[XAXIS];
+	r = (MAXALPHA - ALPHA) * (ANGLE[XAXIS] + (int32_t)GYRO[XAXIS] * dt / 20000000L) + ALPHA * ACC_ANGLE[XAXIS];
 	ANGLE[XAXIS] = r >> 7;
 	
-	r = (MAXALPHA - ALPHA) * (ANGLE[YAXIS] + (int32_t)GYRO[YAXIS] * dt / 20000L) + ALPHA * ACC_ANGLE[YAXIS];
+	r = (MAXALPHA - ALPHA) * (ANGLE[YAXIS] + (int32_t)GYRO[YAXIS] * dt / 20000000L) + ALPHA * ACC_ANGLE[YAXIS];
 	ANGLE[YAXIS] = r >> 7;
 	
 	lastCall += dt;
