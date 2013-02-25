@@ -61,8 +61,8 @@ typedef struct
 #define LCD_SDA_DIR	_REG_BIT(LCD_DDR, LCD_SDA_BIT)
 
 /// ADC
-#define ADC_GYR_X	1
-#define ADC_GYR_Y	4
+#define ADC_GYR_X	4
+#define ADC_GYR_Y	1
 #define ADC_GYR_Z	2
 #define ADC_ACC_X	5
 #define ADC_ACC_Y	6

@@ -18,11 +18,11 @@ uint8_t BATT;
 void sensorsRead()
 {
 	GYRO_raw[XAXIS] = adcGet(ADC_GYR_X);
-	GYRO[XAXIS] = (int16_t)(GYRO_raw[XAXIS] - Config.GYRO_zero[XAXIS]) >> 1;
+	GYRO[XAXIS] = -(int16_t)(GYRO_raw[XAXIS] - Config.GYRO_zero[XAXIS]);
 	GYRO_raw[YAXIS] = adcGet(ADC_GYR_Y);
-	GYRO[YAXIS] = (int16_t)(GYRO_raw[YAXIS] - Config.GYRO_zero[YAXIS]) >> 1;
+	GYRO[YAXIS] = -(int16_t)(GYRO_raw[YAXIS] - Config.GYRO_zero[YAXIS]);
 	GYRO_raw[ZAXIS] = adcGet(ADC_GYR_Z);
-	GYRO[ZAXIS] = (int16_t)(GYRO_raw[ZAXIS] - Config.GYRO_zero[ZAXIS]) >> 1;
+	GYRO[ZAXIS] = (int16_t)(GYRO_raw[ZAXIS] - Config.GYRO_zero[ZAXIS]);
 	
 	ACC_raw[XAXIS] = adcGet(ADC_ACC_X);
 	ACC[XAXIS] = (int16_t)(ACC_raw[XAXIS] - Config.ACC_zero[XAXIS]);
