@@ -26,8 +26,9 @@
 #include <string.h>
 
 state_t State;
-static const char versionNum[] PROGMEM = "Version 0.2a";
-static const char versionAuthor[] PROGMEM = "By Oliver Schulz";
+static const char versionNum[] PROGMEM = "Version 0.2b";
+static const char versionAuthor[] PROGMEM = "by Oliver Schulz";
+#define CYCLE_TIME		2000	// us
 
 
 __attribute__((naked))
@@ -103,10 +104,13 @@ int main(void)
 	init();
 
 	lcdClear();
-	//lcdWriteGlyph_P(&glyLogo, ROP_COPY);
-	lcdSetPos(1, 0);
+	lcdSetPos(0, 0);
+	lcdSelectFont(&font12x16);
+	lcdWriteString_P(PSTR("KK2-Copter"));
+	lcdSelectFont(NULL);
+	lcdSetPos(3, 0);
 	lcdWriteString_P(versionNum);
-	lcdSetPos(2, 0);
+	lcdSetPos(4, 0);
 	lcdWriteString_P(versionAuthor);
 	digitalsBuzzBlocking(500);
 	WAITMS(700);
@@ -114,10 +118,10 @@ int main(void)
 	if (keyboardState() == (KEY_1 | KEY_4))		// enter ESC Calibration mode?
 		ESCCalibration();
 
-	LOOPUS(2500)
+	LOOPUS(CYCLE_TIME)
 	{
  		LED_TOGGLE;
-		rxRead();
+		rxRead();			// 
 		CheckState();
 		sensorsRead();
 		imuCalculate();
@@ -127,7 +131,7 @@ int main(void)
 		for (uint8_t i = 0; i < 5; i++)
 			pwmWrite(i+1, RX_raw[i]);
 
-		EVERYMS(20)
+		EVERYMS(25)
 			menuShow();
 	
 	 	digitalsLoop();

@@ -277,6 +277,9 @@ static const uint8_t _font12x16map[] PROGMEM = {
 
 static PGM_P _font12x16selector(unsigned char c)
 {
+	if (c >= 'a' && c <= 'z')
+		c -= 'a' - 'A';
+		
 	return (PGM_P) _font12x16map + (c - 0x20) * BYTESPERCHAR;
 }
 

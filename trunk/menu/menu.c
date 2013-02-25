@@ -501,49 +501,52 @@ static void _hStart()
 		}
 	}
 	
-	lcdSetPos(2, 84);
-	if (State.SelfLevel)
-		lcdWriteString_P(strON);
-	else		
-		lcdWriteString_P(strOFF);
-	
-	lcdSetPos(3, 0);
-	if (State.Error)
+	if (!State.Armed)
 	{
-		lcdWriteString_P(strError);
-		lcdWriteChar(32);
-		if (State.Error & ERR_NOT_CALIBRATED)
-			lcdWriteString_P(strSensorNotCal);
-		else 
+		lcdSetPos(2, 84);
+		if (State.SelfLevel)
+			lcdWriteString_P(strON);
+		else		
+			lcdWriteString_P(strOFF);
+	
+		lcdSetPos(3, 0);
+		if (State.Error)
 		{
-			lcdWriteString_P(PSTR("no "));
-			if (State.Error & ERR_NO_ROLL)
-				lcdWriteString_P(strRoll);
-			else if (State.Error & ERR_NO_PITCH)
-				lcdWriteString_P(strPitch);
-			else if (State.Error & ERR_NO_YAW)
-				lcdWriteString_P(strYaw);
+			lcdWriteString_P(strError);
+			lcdWriteChar(32);
+			if (State.Error & ERR_NOT_CALIBRATED)
+				lcdWriteString_P(strSensorNotCal);
 			else 
-				lcdWriteString_P(strThro);
-			lcdWriteString_P(PSTR(" input"));
-		}
+			{
+				lcdWriteString_P(PSTR("no "));
+				if (State.Error & ERR_NO_ROLL)
+					lcdWriteString_P(strRoll);
+				else if (State.Error & ERR_NO_PITCH)
+					lcdWriteString_P(strPitch);
+				else if (State.Error & ERR_NO_YAW)
+					lcdWriteString_P(strYaw);
+				else 
+					lcdWriteString_P(strThro);
+				lcdWriteString_P(PSTR(" input"));
+			}
+		}	
+		else
+			lcdWriteString_P(PSTR("Ready for departure!"));
+	
+		// battery level
+		lcdSetPos(4, 13*6);
+		utoa(BATT / 10, s, 10);
+		lcdWriteString(s);
+		lcdWriteChar('.');
+		utoa(BATT % 10, s, 10);
+		writePadded(s, 3);
+	
+		// roll angle
+		writeValue(5, 13*6, (int16_t)ANGLE[YAXIS], 7, -1);
+	
+		// pitch angle
+		writeValue(6, 13*6, (int16_t)ANGLE[XAXIS], 7, -1);
 	}	
-	else
-		lcdWriteString_P(PSTR("Ready for departure!"));
-	
-	// battery level
-	lcdSetPos(4, 13*6);
-	utoa(BATT / 10, s, 10);
-	lcdWriteString(s);
-	lcdWriteChar('.');
-	utoa(BATT % 10, s, 10);
-	writePadded(s, 3);
-	
-	// roll angle
-	writeValue(5, 13*6, (int16_t)ANGLE[YAXIS], 7, -1);
-	
-	// pitch angle
-	writeValue(6, 13*6, (int16_t)ANGLE[XAXIS], 7, -1);
 }
 
 static void _hSensorTest()

@@ -33,16 +33,6 @@ static int8_t GetConv(int16_t input)
 	return conv;
 }
 
-static void calcGyroAngles()
-{
-	static uint16_t lastCall;
-	uint16_t dt = ticks() - lastCall;
-	
-	GYR_ANGLE[XAXIS] += GYRO[XAXIS] * dt;
-	GYR_ANGLE[YAXIS] += GYRO[YAXIS] * dt;
-	GYR_ANGLE[ZAXIS] += GYRO[ZAXIS] * dt;
-}
-
 static void calcAccAngles()
 {
 	ACC_ANGLE[XAXIS] = GetConv(ACC[XAXIS]);
@@ -61,16 +51,16 @@ static void calcAccAngles()
 	}
 }
 
-#define ALPHA		0.02
-#define MAXALPHA	1.0
+#define ALPHA				0.02
+#define GYRO_SENSITIVITY	1.1
 
 static void calcComplementaryFilter()
 {
 	static uint16_t lastCall;
 	uint16_t dt = ticks() - lastCall;
 		
-	ANGLE[XAXIS] = (MAXALPHA - ALPHA) * ANGLE[XAXIS] + ALPHA * ACC_ANGLE[XAXIS];
-	ANGLE[YAXIS] = (MAXALPHA - ALPHA) * ANGLE[YAXIS] + ALPHA * ACC_ANGLE[YAXIS];
+	ANGLE[XAXIS] = (1.0 - ALPHA) * (ANGLE[XAXIS] + (float)GYRO[XAXIS] * dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO)) + ALPHA * ACC_ANGLE[XAXIS];
+	ANGLE[YAXIS] = (1.0 - ALPHA) * (ANGLE[YAXIS] + (float)GYRO[YAXIS] * dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO)) + ALPHA * ACC_ANGLE[YAXIS];
 	
 	lastCall += dt;
 }
@@ -78,6 +68,5 @@ static void calcComplementaryFilter()
 void imuCalculate()
 {
 	calcAccAngles();
-	//calcGyroAngles();
 	calcComplementaryFilter();
 }
