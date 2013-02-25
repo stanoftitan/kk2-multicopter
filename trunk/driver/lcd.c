@@ -8,7 +8,6 @@
 */ 
 
 #include "global.h"
-#include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <string.h>
 #include <stdlib.h>
@@ -250,7 +249,7 @@ void lcdWriteChar(char c)
 	}
 	else
 	{
-		lcdWriteSprite_P(_font.selector(c), _font.sizeX, _font.sizeY, 0);
+		lcdWriteSprite_P(_font.selector(c), _font.sizeX, _font.sizeY, ROP_COPY);
 		_curx += _font.sizeX;
 	}
 }
@@ -332,9 +331,9 @@ void lcdInit()
 
 	// init display
 	LCD_RST = 0;
-	_delay_ms(1);
+	WAITUS(1000);
 	LCD_RST = 1;
-	_delay_ms(1);
+	WAITUS(1000);
 	
 	const unsigned char* ptr = _initSeq;
 	uint8_t c;
