@@ -19,7 +19,6 @@
 #include "digitals.h"
 #include "controller.h"
 #include "imu.h"
-#include <util/delay.h>
 #include <avr/wdt.h>
 
 // for debugging
@@ -115,26 +114,22 @@ int main(void)
 	if (keyboardState() == (KEY_1 | KEY_4))		// enter ESC Calibration mode?
 		ESCCalibration();
 
-	while(1)
+	LOOPUS(2500)
 	{
  		LED_TOGGLE;
-		
-		FIXEDUS(2500)
-		{
-			rxRead();
-			CheckState();
-			sensorsRead();
-			imuCalculate();
-			controller();
-			mixerMixing();
+		rxRead();
+		CheckState();
+		sensorsRead();
+		imuCalculate();
+		controller();
+		mixerMixing();
 
-			for (uint8_t i = 0; i < 5; i++)
-				pwmWrite(i+1, RX_raw[i]);
+		for (uint8_t i = 0; i < 5; i++)
+			pwmWrite(i+1, RX_raw[i]);
 
-			EVERYMS(20)
-				menuShow();
+		EVERYMS(20)
+			menuShow();
 	
-	 		digitalsLoop();
-		}
+	 	digitalsLoop();
 	}
 }

@@ -23,14 +23,12 @@ uint32_t ticks();
 uint16_t millis();
 
 #ifdef SIMULATOR
-#define EVERYMS(ms)
 #define WAITMS(ms)
-#define FIXEDMS(ms)
-
-#define EVERYUS(ms)
 #define WAITUS(ms)
-#define FIXEDUS(ms) 
 #else /* SIMULATOR */
+#define WAITMS(ms) for(uint16_t _m = millis(); millis() - _m < ms;)
+#define WAITUS(us) for(uint32_t _m = ticks(); ticks() - _m < MICROTOTICKS(us);)
+#endif /* SIMULATOR */
 
 static __inline__ void __iWaitForMS(uint16_t __m, uint16_t ms)
 {
@@ -43,13 +41,9 @@ static __inline__ void __iWaitForTicks(uint32_t __m, uint32_t t)
 }
 
 #define EVERYMS(ms) static uint16_t __CONCAT(_t,__LINE__); for(uint16_t _m = millis(); _m - __CONCAT(_t,__LINE__) >= ms; __CONCAT(_t,__LINE__) = _m)
-#define WAITMS(ms) for(uint16_t _m = millis(); millis() - _m < ms;)
 #define FIXEDMS(ms) for(uint16_t __m = millis(); millis() - __m < ms; __iWaitForMS(__m, ms))
-
 #define EVERYUS(us) static uint32_t __CONCAT(_t,__LINE__); for(uint32_t _m = ticks(); _m - __CONCAT(_t,__LINE__) >= MICROTOTICKS(us); __CONCAT(_t,__LINE__) = _m)
-#define WAITUS(us) for(uint32_t _m = ticks(); ticks() - _m < MICROTOTICKS(us);)
 #define FIXEDUS(us) for(uint32_t __m = ticks(); ticks() - __m < MICROTOTICKS(us); __iWaitForTicks(__m, MICROTOTICKS(us)))
-
-#endif /* SIMULATOR */
+#define LOOPUS(us)  for(uint32_t __m = ticks(); 1; __iWaitForTicks(__m, MICROTOTICKS(us)), __m += MICROTOTICKS(us))
 
 #endif /* SYSTEM_H_ */

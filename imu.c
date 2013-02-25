@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <avr/pgmspace.h>
 
-int16_t ANGLE[3];
+float ANGLE[3];
 int16_t ACC_ANGLE[2];
 int16_t GYR_ANGLE[3];
 
@@ -61,20 +61,16 @@ static void calcAccAngles()
 	}
 }
 
-#define ALPHA		3L
-#define MAXALPHA	128L
+#define ALPHA		0.02
+#define MAXALPHA	1.0
 
 static void calcComplementaryFilter()
 {
 	static uint16_t lastCall;
 	uint16_t dt = ticks() - lastCall;
-	int32_t r;
-	
-	r = (MAXALPHA - ALPHA) * (ANGLE[XAXIS] + (int32_t)GYRO[XAXIS] * dt / 20000000L) + ALPHA * ACC_ANGLE[XAXIS];
-	ANGLE[XAXIS] = r >> 7;
-	
-	r = (MAXALPHA - ALPHA) * (ANGLE[YAXIS] + (int32_t)GYRO[YAXIS] * dt / 20000000L) + ALPHA * ACC_ANGLE[YAXIS];
-	ANGLE[YAXIS] = r >> 7;
+		
+	ANGLE[XAXIS] = (MAXALPHA - ALPHA) * ANGLE[XAXIS] + ALPHA * ACC_ANGLE[XAXIS];
+	ANGLE[YAXIS] = (MAXALPHA - ALPHA) * ANGLE[YAXIS] + ALPHA * ACC_ANGLE[YAXIS];
 	
 	lastCall += dt;
 }
