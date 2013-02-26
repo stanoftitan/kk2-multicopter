@@ -35,8 +35,8 @@ static int8_t GetConv(int16_t input)
 
 static void calcAccAngles()
 {
-	ACC_ANGLE[XAXIS] = GetConv(ACC[XAXIS]);
-	ACC_ANGLE[YAXIS] = GetConv(ACC[YAXIS]);
+	ACC_ANGLE[XAXIS] = GetConv(ACC[XAXIS]) + Config.AccTrim[XAXIS];
+	ACC_ANGLE[YAXIS] = GetConv(ACC[YAXIS]) + Config.AccTrim[YAXIS];
 	if (ACC[ZAXIS] < 0)
 	{
 		if (ACC_ANGLE[XAXIS] < 0)

@@ -505,9 +505,9 @@ static void _hStart()
 	{
 		lcdSetPos(2, 84);
 		if (State.SelfLevel)
-			lcdWriteString_P(strON);
+			writePadded_P(strON, 3);
 		else		
-			lcdWriteString_P(strOFF);
+			writePadded_P(strOFF, 3);
 	
 		lcdSetPos(3, 0);
 		if (State.Error)
@@ -519,14 +519,18 @@ static void _hStart()
 			else 
 			{
 				lcdWriteString_P(PSTR("no "));
-				if (State.Error & ERR_NO_ROLL)
-					lcdWriteString_P(strRoll);
+				const char* s;
+				if ((State.Error & ERR_NO_RX) == ERR_NO_RX)
+					s = PSTR("RX");
+				else if (State.Error & ERR_NO_ROLL)
+					s = strRoll;
 				else if (State.Error & ERR_NO_PITCH)
-					lcdWriteString_P(strPitch);
+					s = strPitch;
 				else if (State.Error & ERR_NO_YAW)
-					lcdWriteString_P(strYaw);
+					s = strYaw;
 				else 
-					lcdWriteString_P(strThro);
+					s = strThro;
+				lcdWriteString_P(s);
 				lcdWriteString_P(PSTR(" input"));
 			}
 		}	
@@ -727,17 +731,20 @@ static void _hModeSettings()
 	pageKey(5);
 	if (KEY4)	// CHANGE?
 	{
-		switch(subpage)
-		{
-			case 0: Config.SelfLevelMode = !Config.SelfLevelMode; break;
-			case 1: Config.ArmingMode = !Config.ArmingMode; break;
-			case 2: Config.LinkRollPitch = !Config.LinkRollPitch; break;
-			case 3: Config.AutoDisarm = !Config.AutoDisarm; break;
-			case 4: Config.ReceiverMode = !Config.ReceiverMode; rxInit(Config.ReceiverMode); break;
-		}
+		if (subpage == 0) Config.SelfLevelMode = (Config.SelfLevelMode + 1) % 3;
+		else if (subpage == 1) Config.ArmingMode = !Config.ArmingMode;
+		else if (subpage == 2) Config.LinkRollPitch = !Config.LinkRollPitch;
+		else if (subpage == 3) Config.AutoDisarm = !Config.AutoDisarm;
+		else Config.ReceiverMode = !Config.ReceiverMode; rxInit(Config.ReceiverMode);
 		configSave();
 	}
-	writeString_P(0, 84, Config.SelfLevelMode ? strAUX : strStick, 5, 0);
+	
+	const char* str;
+	if (Config.SelfLevelMode == SELFLEVEL_ON) str = strOn;
+	else if (Config.SelfLevelMode == SELFLEVEL_AUX) str = strAUX;
+	else str = strStick;
+	
+	writeString_P(0, 84, str, 5, 0);
 	writeString_P(1, 84, Config.ArmingMode ? strOn : strStick, 5, 1);
 	writeString_P(2, 102, Config.LinkRollPitch ? strYes : strNo, 3, 2);
 	writeString_P(3, 84, Config.AutoDisarm ? strYes : strNo, 3, 3);
@@ -750,18 +757,25 @@ static void _hPIEditor()
 	
 	pageKey(5);
 
+	uint8_t index = subindex;
+	if (Config.LinkRollPitch) index = subindex & 0xFE; 
+	
 	if (KEY4) // CHANGE
 	{
 		if (subpage == 0)
+		{
 			subindex = (subindex + 1) % 3;
+			index = subindex;
+			if (Config.LinkRollPitch) index = subindex & 0xFE;
+		}			
 		else
 		{
 			switch (subpage)
 			{
-				case 1: startEditMode(&Config.PID[subindex].PGain, 0, 200, TYPE_UINT8); break;
-				case 2: startEditMode(&Config.PID[subindex].PLimit, 0, 200, TYPE_UINT8); break;
-				case 3: startEditMode(&Config.PID[subindex].IGain, 0, 200, TYPE_UINT8); break;
-				case 4: startEditMode(&Config.PID[subindex].ILimit, 0, 200, TYPE_UINT8); break;
+				case 1: startEditMode(&Config.PID[index].PGain, 0, 200, TYPE_UINT8); break;
+				case 2: startEditMode(&Config.PID[index].PLimit, 0, 200, TYPE_UINT8); break;
+				case 3: startEditMode(&Config.PID[index].IGain, 0, 200, TYPE_UINT8); break;
+				case 4: startEditMode(&Config.PID[index].ILimit, 0, 200, TYPE_UINT8); break;
 			}
 			return;
 		}
@@ -776,10 +790,10 @@ static void _hPIEditor()
 		default: writePadded_P(strYawRud, 16); break;
 	}
 	
-	writeValue(2, 60, Config.PID[subindex].PGain, 5, 1);
-	writeValue(3, 60, Config.PID[subindex].PLimit, 5, 2);
-	writeValue(4, 60, Config.PID[subindex].IGain, 5, 3);
-	writeValue(5, 60, Config.PID[subindex].ILimit, 5, 4);
+	writeValue(2, 60, Config.PID[index].PGain, 5, 1);
+	writeValue(3, 60, Config.PID[index].PLimit, 5, 2);
+	writeValue(4, 60, Config.PID[index].IGain, 5, 3);
+	writeValue(5, 60, Config.PID[index].ILimit, 5, 4);
 }
 
 static void _hMixerEditor()
@@ -863,8 +877,8 @@ static void _hSelflevelSettings()
 	static edit_element_t const elements[] PROGMEM = {
 		{ 0, 54, &Config.PID_SelfLevel.PGain, 0, 250, 5 },
 		{ 1, 54, &Config.PID_SelfLevel.PLimit, 0, 250, 5 },
-		{ 3, 96, &Config.AccTrimRoll, -128, 127, 5 },
-		{ 4, 96, &Config.AccTrimPitch, -128, 127, 5 },
+		{ 3, 96, &Config.AccTrim[YAXIS], -45, 45, 5 },
+		{ 4, 96, &Config.AccTrim[XAXIS], -45, 45, 5 },
 	};
 	simplePageHandler(elements, length(elements));
 }

@@ -17,6 +17,7 @@
 
 #include "global.h"
 #include "rx.h"
+#include "serial.h"
 #include <string.h>
 #include <avr/pgmspace.h>
 
@@ -141,6 +142,7 @@ void rxInit(uint8_t mode)
 	{
 		if (mode != RX_MODE_PWM)
 		{
+			serialInit();
 			// set pin direction
 			RX_AIL_DIR = INPUT;
 
@@ -153,6 +155,7 @@ void rxInit(uint8_t mode)
 		}
 		else
 		{
+			serialTerminate();
 			// set pins direction
 			RX_AIL_DIR = INPUT;
 			RX_ELE_DIR = INPUT;

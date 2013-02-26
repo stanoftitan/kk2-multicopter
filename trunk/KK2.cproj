@@ -132,12 +132,6 @@
     <OutputPath>bin\Debug Simulator\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="controller.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="config.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="driver\adc.c">
       <SubType>compile</SubType>
     </Compile>
@@ -177,12 +171,39 @@
     <Compile Include="gfx\glyphs.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="include\msp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\config.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\controller.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\imu.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\math.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\mixer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\mixer_table.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\msp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\sensors.c">
+      <SubType>compile</SubType>
+    </Compile>
     <None Include="gfx\logo.c">
       <SubType>compile</SubType>
     </None>
-    <Compile Include="imu.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="include\adc.h">
       <SubType>compile</SubType>
     </Compile>
@@ -243,12 +264,6 @@
     <Compile Include="include\system.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="main.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <None Include="math.c">
-      <SubType>compile</SubType>
-    </None>
     <Compile Include="menu\menu.c">
       <SubType>compile</SubType>
     </Compile>
@@ -258,21 +273,13 @@
     <Compile Include="menu\menu_text.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="mixer.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="mixer_table.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="sensors.c">
-      <SubType>compile</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="include" />
     <Folder Include="driver" />
     <Folder Include="menu" />
     <Folder Include="gfx" />
+    <Folder Include="src" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
