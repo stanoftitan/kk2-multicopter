@@ -9,9 +9,9 @@
 
 /*
  * Receiver driver supports two modes:
- * 1. CPPM mode: CPPM signal on AIL pin (PB3/INT1)
+ * 1. CPPM mode: CPPM signal on RUD pin (PB2/INT2)
  * 2. PWM mode: 5 PWM inputs (AIL, ELE, THR, RUD, AUX) on 
- *				pins PB3/INT1, PD2/INT0, PD0, PB2/INT2, PB0
+ *				pins PD3/INT1, PD2/INT0, PD0, PB2/INT2, PB0
  *
  */
 
@@ -28,9 +28,43 @@ static uint8_t _mode;
 static uint8_t _RX_good;
 
 
-// ISR for vector INT1. Handles CPPM signal in CPPM mode, or PWM signal for AIL in PWM mode
+// ISR for vector INT1. Handles PWM signal for AIL in PWM mode
 __attribute__ ((section(".lowtext")))
 ISR(INT1_vect)
+{
+	static uint32_t _start;
+	uint32_t t = ticks();
+	sei();
+	
+	if (RX_AIL)
+		_start = t;
+	else
+	{
+		RX_isr[AIL] = t - _start;
+		_RX_good |= _BV(AIL);
+	}			
+}
+
+// ISR for vector INT0. Handles PWM signal for ELE in PWM mode
+__attribute__ ((section(".lowtext")))
+ISR(INT0_vect)
+{
+	static uint32_t _start;
+	uint32_t t = ticks();
+	sei();
+	
+	if (RX_ELE)
+	_start = t;
+	else
+	{
+		RX_isr[ELE] = t - _start;
+		_RX_good |= _BV(ELE);
+	}
+}
+
+// ISR for vector INT2. Handles CPPM signal in CPPM mode, or PWM signal for RUD in PWM mode
+__attribute__ ((section(".lowtext")))
+ISR(INT2_vect)
 {
 	static uint32_t _start;
 	static uint8_t _index;
@@ -45,60 +79,26 @@ ISR(INT1_vect)
 		{
 			_index = 0;
 			_mask = 1;
-		}			
+		}
 		else if (_index >= 0 && _index < 8)
 		{
 			RX_isr[_index] = t - _start;
 			_index++;
 			_RX_good |= _mask;
 			_mask <<= 1;
-		}			
+		}
 		_start = t;
 	}
 	else
 	{
-		if (RX_AIL)
+		if (RX_RUD)
 			_start = t;
 		else
 		{
-			RX_isr[AIL] = t - _start;
-			_RX_good |= _BV(AIL);
-		}			
-	}
-}
-
-// ISR for vector INT0. Handles PWM signal for ELE in PWM mode
-__attribute__ ((section(".lowtext")))
-ISR(INT0_vect)
-{
-	static uint16_t _start;
-	uint16_t t = ticks();
-	sei();
-	
-	if (RX_ELE)
-		_start = t;
-	else
-	{
-		RX_isr[ELE] = t - _start;
-		_RX_good |= _BV(ELE);
-	}		
-}
-
-// ISR for vector INT2. Handles PWM signal for RUD in PWM mode
-__attribute__ ((section(".lowtext")))
-ISR(INT2_vect)
-{
-	static uint16_t _start;
-	uint16_t t = ticks();
-	sei();
-	
-	if (RX_RUD)
-		_start = t;
-	else
-	{
-		RX_isr[RUD] = t - _start;
-		_RX_good |= _BV(RUD);
-	}		
+			RX_isr[RUD] = t - _start;
+			_RX_good |= _BV(RUD);
+		}
+	}	
 }
 
 // ISR for vector PCI3. Handles PWM signal for THR in PWM mode
@@ -144,10 +144,10 @@ void rxInit(uint8_t mode)
 			// set pin direction
 			RX_AIL_DIR = INPUT;
 
-			// enable interrupt INT1 for CPPM signal on PD3
-			EICRA  = /*_BV(ISC10) |*/ _BV(ISC11);	// rising edge on PD3 (INT1) 
+			// enable interrupt INT2 for CPPM signal on PB2
+			EICRA  = _BV(ISC21);				// falling edge on PB2 (INT2) 
 			EIFR   = _BV(INTF0) | _BV(INTF1) | _BV(INTF2);	// clear interrupts
-			EIMSK  = _BV(INT1);					// enable interrupt for INT1
+			EIMSK  = _BV(INT2);					// enable interrupt for INT2
 			PCICR  = 0;							// disable all PCIs
 			PCIFR  = _BV(PCIF1) | _BV(PCIF3);	// clear interrupts
 		}

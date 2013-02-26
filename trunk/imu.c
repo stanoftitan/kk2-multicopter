@@ -51,8 +51,8 @@ static void calcAccAngles()
 	}
 }
 
-#define ALPHA				0.02
-#define GYRO_SENSITIVITY	1.1
+#define ALPHA				0.005
+#define GYRO_SENSITIVITY	1.15
 
 static void calcComplementaryFilter()
 {

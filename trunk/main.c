@@ -19,6 +19,7 @@
 #include "digitals.h"
 #include "controller.h"
 #include "imu.h"
+#include "serial.h"
 #include <avr/wdt.h>
 
 // for debugging
@@ -52,6 +53,8 @@ static void init()
 	lcdInit();
 	keyboardInit();
 	menuInit();
+	if (Config.ReceiverMode == RX_MODE_CPPM)
+		serialInit();
 }
 
 static void CheckState()
@@ -90,6 +93,28 @@ static void ESCCalibration()
 		for (uint8_t i = 0; i < RX_CHANNELS; i++)
 		pwmWrite(i, RX_raw[THR]);
 	}
+}
+
+static void serialWriteInt16(int16_t value)
+{
+	serialWriteChar(value & 0xFF);
+	serialWriteChar(value >> 8);
+}
+
+static void debug_output()
+{
+	serialWriteChar(0x1F);
+	serialWriteChar(0x1E);
+	serialWriteChar(0x1C);
+	serialWriteInt16(GYRO[0]);
+	serialWriteInt16(GYRO[1]);
+	serialWriteInt16(GYRO[2]);
+	serialWriteInt16(ACC[0]);
+	serialWriteInt16(ACC[1]);
+	serialWriteInt16(ACC[2]);
+	serialWriteInt16(ANGLE[0]);
+	serialWriteInt16(ANGLE[1]);
+	serialWriteInt16(ANGLE[2]);
 }
 
 int main(void)
@@ -135,5 +160,10 @@ int main(void)
 			menuShow();
 	
 	 	digitalsLoop();
+		
+		#ifdef DEBUG
+		EVERYMS(10) 
+			debug_output();
+		#endif
 	}
 }
