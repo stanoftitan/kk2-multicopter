@@ -39,10 +39,10 @@ static const config_t defaultConfig PROGMEM =
 	.PID[XAXIS] = { 50, 100, 25, 20},
 	.PID[YAXIS] = { 50, 100, 25, 20},
 	.PID[ZAXIS] = { 50,  20, 50, 10},
+	.SelfLevelMode = SELFLEVEL_ON,
 	.LinkRollPitch = ON,
 	.AutoDisarm = ON,
 	.ReceiverMode = RX_MODE_CPPM,
-	//.StickScaling = { 200, 200, 200, 200},
 	.StickScaling = { 30, 30, 50, 90},
 	.MinThrottle = 10,
 	.LCDContrast = 32,
@@ -51,8 +51,7 @@ static const config_t defaultConfig PROGMEM =
 	.LVA = 0,
 	.ServoFilter = 50,
 	.PID_SelfLevel = { 100, 20, 0, 0},
-	.AccTrimPitch = 0,
-	.AccTrimRoll = 0,
+	.AccTrim = { 0, 0},
 	.Camera = {0, 50, 0, 50},
 	
 };

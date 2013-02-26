@@ -32,7 +32,12 @@ typedef struct
 	uint16_t ACC_zero[3];
 	uint8_t CalibrateFlags;
 	pid_param_t PID[3];
+	
+	#define SELFLEVEL_STICK		0
+	#define SELFLEVEL_AUX		1
+	#define SELFLEVEL_ON		2
 	uint8_t SelfLevelMode;
+	
 	uint8_t ArmingMode;
 	uint8_t AutoDisarm;
 	uint8_t LinkRollPitch;
@@ -46,8 +51,7 @@ typedef struct
 	uint8_t LVA;
 	uint8_t ServoFilter;
 	pid_param_t PID_SelfLevel;
-	int8_t AccTrimPitch;
-	int8_t AccTrimRoll;
+	int8_t AccTrim[2];
 	model_t Mixer;
 	camera_t Camera;
 } config_t;

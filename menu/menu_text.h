@@ -90,6 +90,6 @@ P_STR strCCW[] = "CCW";
 P_STR strALL[] = "ALL";
 P_STR strUnused[] = "Unused.";
 
-P_STR strSensorNotCal[] = "No calibration";
+P_STR strSensorNotCal[] = "no calibration";
 
 #endif /* MENU_TEXT_H_ */

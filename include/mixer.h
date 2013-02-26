@@ -34,7 +34,7 @@ typedef struct
 
 #define MIXER_TABLE_LEN		22
 extern const model_t mixerTable[MIXER_TABLE_LEN];
-
+extern uint16_t MIXER[8];
 
 void mixerInit();
 void mixerLoadTable(uint8_t index);

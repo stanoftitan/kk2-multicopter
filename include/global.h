@@ -47,6 +47,7 @@ typedef struct
 	#define ERR_NO_PITCH		0x02
 	#define ERR_NO_YAW			0x04
 	#define ERR_NO_THR			0x08
+	#define ERR_NO_RX			(ERR_NO_ROLL | ERR_NO_PITCH | ERR_NO_YAW | ERR_NO_THR)
 	uint8_t Error;
 	
 	#define MODE_NORMAL			0
