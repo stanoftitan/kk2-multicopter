@@ -43,7 +43,7 @@ void sensorsRead()
 #endif
 }
 
-void sensorsCalibate()
+void sensorsCalibrate()
 {
 	sensorsRead();
 	memcpy(&Config.GYRO_zero, &GYRO_raw, sizeof(Config.GYRO_zero));

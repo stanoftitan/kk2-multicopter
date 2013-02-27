@@ -14,7 +14,7 @@
 
 noinit config_t Config;
 EEMEM config_t EEConfig;
-#define SIGNATURE	0x5F
+#define SIGNATURE	0x60
 
 static const config_t defaultConfig PROGMEM = 
 {
@@ -24,21 +24,27 @@ static const config_t defaultConfig PROGMEM =
 	.RX_zero[ELE] = PWM_MID,
 	.RX_zero[RUD] = PWM_MID,
 	.RX_zero[THR] = PWM_LOW,
-	.RX_zero[AUX] = PWM_MID,
+	.RX_zero[AX1] = PWM_MID,
+	.RX_zero[AX2] = PWM_MID,
+	.RX_zero[AX3] = PWM_MID,
+	.RX_zero[AX4] = PWM_MID,
 	.RX_chmap[AIL] = 1,
 	.RX_chmap[ELE] = 2,
 	.RX_chmap[RUD] = 4,
 	.RX_chmap[THR] = 3,
-	.RX_chmap[AUX] = 5,
+	.RX_chmap[AX1] = 5,
+	.RX_chmap[AX2] = 6,
+	.RX_chmap[AX3] = 7,
+	.RX_chmap[AX4] = 8,
 	.GYRO_zero[XAXIS] = 536,
 	.GYRO_zero[YAXIS] = 548,
 	.GYRO_zero[ZAXIS] = 565,
 	.ACC_zero[XAXIS]  = 621,
 	.ACC_zero[YAXIS]  = 611,
 	.ACC_zero[ZAXIS]  = 766,
-	.PID[XAXIS] = { 50, 100, 25, 20},
-	.PID[YAXIS] = { 50, 100, 25, 20},
-	.PID[ZAXIS] = { 50,  20, 50, 10},
+	.PID[XAXIS] = {{ 50, 100, 25, 20}},
+	.PID[YAXIS] = {{ 50, 100, 25, 20}},
+	.PID[ZAXIS] = {{ 50,  20, 50, 10}},
 	.SelfLevelMode = SELFLEVEL_ON,
 	.LinkRollPitch = ON,
 	.AutoDisarm = ON,
@@ -50,7 +56,7 @@ static const config_t defaultConfig PROGMEM =
 	.HeightDampeningLimit = 30,
 	.LVA = 0,
 	.ServoFilter = 50,
-	.PID_SelfLevel = { 100, 20, 0, 0},
+	.PID_SelfLevel = {{ 100, 20, 0, 0}},
 	.AccTrim = { 0, 0},
 	.Camera = {0, 50, 0, 50},
 	
@@ -59,7 +65,7 @@ static const config_t defaultConfig PROGMEM =
 static void _initConfig()
 {
 	memcpy_P(&Config, &defaultConfig, sizeof(Config));
-	mixerLoadTable(Config.MixerIndex);
+	mixerLoadModel(Config.MixerIndex);
 }
 
 void configLoad()

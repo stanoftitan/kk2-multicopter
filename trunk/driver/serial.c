@@ -67,12 +67,13 @@ void serialInit()
 	// reset pointers
 	TX_Buf.WritePtr = 0;
 	TX_Buf.ReadPtr = 0;
-		
+	RX_Buf.ReadPtr = 0;
+	RX_Buf.WritePtr = 0;
 		
 	// using USART1 with TXD on PD3 and RXD on PD2. Running with 115.2 kbaud
 	UBRR1 = 10;
-	UCSR1A = _BV(RXC1);
-	UCSR1B = _BV(TXEN1) | _BV(RXEN1);
+	UCSR1A = 0;
+	UCSR1B = _BV(TXEN1) | _BV(RXEN1) | _BV(RXCIE1);
 	UCSR1C = _BV(UCSZ11) | _BV(UCSZ10);
 }
 

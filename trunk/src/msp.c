@@ -13,6 +13,7 @@
 #include "sensors.h"
 #include "mixer.h"
 #include "rx.h"
+#include "imu.h"
 
 /*
 #define INBUF_SIZE 64
@@ -141,7 +142,18 @@ static void evalutateCmd()
 		case MSP_RC:
 			writeResponseHeader(16);
 			for(uint8_t i = 0; i < 8; i++) 
-				write16(i < RX_CHANNELS ? RX[i] : 0);
+				write16(i < RX_CHANNELS ? RX_raw[i] : 0);
+			break;
+		case MSP_ATTITUDE:
+		   writeResponseHeader(8);
+		   write16(ANGLE[YAXIS] * 10);
+		   write16(ANGLE[XAXIS] * 10);
+		   write16(0);		// heading
+		   write16(0);		// headFreeModeHold
+		   break;
+		case MSP_ACC_CALIBRATION:
+			writeResponseHeader(0);
+			sensorsCalibrate();
 			break;
 		default:
 			writeErrorHeader();

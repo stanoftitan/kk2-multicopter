@@ -1,11 +1,11 @@
 /*
- * menu.c
- *
- * Created: 30.07.2012 18:52:51
- *  Author: OliverS
- *
- * $Id$
- */ 
+* menu.c
+*
+* Created: 30.07.2012 18:52:51
+*  Author: OliverS
+*
+* $Id$
+*/
 
 #include "global.h"
 #include "lcd.h"
@@ -115,7 +115,7 @@ static const page_t pages[] PROGMEM = {
 /*  9 */	{ _skBACK, _hSensorTest, scrSensorTest},
 /* 10 */	{ _skCONTINUE, _hSensorCalibration, scrSensorCal0},
 /* 11 */	{ _skCONTINUE, _hESCCalibration, scrESCCal0},
-/* 12 */	{ _skPAGE, _hCPPMSettings, scrCPPMSettings},
+/* 12 */	{ _skPAGE, _hCPPMSettings },
 /* 13 */	{ _skCONTINUE, _hStickCentering},
 /* 14 */	{ _skPAGE, _hMixerEditor, scrMixerEditor},
 /* 15 */	{ _skBACKNEXT, _hShowModelLayout},
@@ -155,13 +155,13 @@ static const char* const lstMenu[] PROGMEM = {
 static PGM_P tsmMain(uint8_t);
 static PGM_P tsmLoadModelLayout(uint8_t);
 
-static uint8_t page, subpage, subindex;
+static uint8_t page, elementIndex, subpage;
 static uint8_t oldPage;
 static uint16_t _tStart;
 static page_t currentPage;
 static menu_t mnuMain = {length(lstMenu), tsmMain};
-static menu_t mnuMLayout = {MIXER_TABLE_LEN, tsmLoadModelLayout};
-static int16_t editValue, editLoLimit, editHiLimit;
+static menu_t mnuMLayout = {MODEL_TABLE_LEN, tsmLoadModelLayout};
+static int16_t editValue, editLoLimit, editHiLimit, editInitialValue;
 static uint8_t editMode, editValueType;
 static void* editValuePtr;
 
@@ -200,7 +200,7 @@ static void writeSoftkeys(const char* sk)
 
 static void writeString_P(uint8_t x, uint8_t y, PGM_P str, uint8_t len, uint8_t index)
 {
-	lcdReverse(index == subpage);
+	lcdReverse(index == elementIndex);
 	lcdSetPos(x, y);
 	writePadded_P(str, len);
 	lcdReverse(0);
@@ -210,7 +210,7 @@ static void writeValue(uint8_t x, uint8_t y, int16_t value, uint8_t len, uint8_t
 {
 	char s[7];
 	itoa(value, s, 10);
-	lcdReverse(index == subpage);
+	lcdReverse(index == elementIndex);
 	lcdSetPos(x, y);
 	writePadded(s, len);
 	lcdReverse(0);
@@ -222,12 +222,12 @@ static void loadPage(uint8_t pageIndex)
 	page = pageIndex;
 }
 
-static void pageKey(uint8_t num)
+static void elementKey(uint8_t num)
 {
 	if (KEY2)	// PREV
-		subpage = subpage == 0 ? num - 1 : subpage - 1;
+		elementIndex = elementIndex == 0 ? num - 1 : elementIndex - 1;
 	else if (KEY3) // NEXT
-		subpage = (subpage + 1) % num;
+		elementIndex = (elementIndex + 1) % num;
 }
 
 static void editModeHandler();
@@ -242,7 +242,7 @@ static void defaultHandler()
 			lcdClear();
 			if (currentPage.screen)
 				lcdWriteString_P(currentPage.screen);
-			writeSoftkeys(currentPage.softkeys);
+			writeSoftkeys(NULL);
 			lcdSetPos(0, 0);
 		}
 		
@@ -257,7 +257,6 @@ static void editModeHandler()
 	if (KEY4)	// DONE;
 	{
 		editMode = OFF;
-		_mykey = KEY_REFRESH;
 		
 		if (editValueType == TYPE_UINT8)
 			*(uint8_t*)editValuePtr = editValue;
@@ -268,6 +267,8 @@ static void editModeHandler()
 		
 		configSave();
 		lcdSelectFont(NULL);
+		_mykey = KEY_REFRESH;
+		// call defaultHandler to refresh the screen
 		defaultHandler();
 		return;
 	}
@@ -284,7 +285,7 @@ static void editModeHandler()
 				editValue++;
 		}
 		else if (KEY1)	// CLR?
-			editValue = 0;
+			editValue = editInitialValue;
 			
 		writeValue(2, 34, editValue, 5, -1);
 	}
@@ -306,6 +307,7 @@ static void startEditMode(void* valuePtr, int16_t loLimit, int16_t hiLimit, uint
 	
 	editLoLimit = loLimit;
 	editHiLimit = hiLimit;
+	editInitialValue = editValue;
 	
 	lcdFillRectangle(30, 11, 98, 34, 0);
 	lcdRectangle(30, 11, 98, 34, 1);
@@ -372,7 +374,7 @@ void _hMenu()
 static void showMotor(uint8_t motor, uint8_t withDir)
 {
 	uint8_t x, y;
-	mixer_channel_t *channel = &Config.Mixer.Channel[motor];
+	mixer_channel_t *channel = &Config.Mixer[motor];
 	
 	if (channel->flags & FLAG_ESC)
 	{
@@ -427,12 +429,12 @@ static void _hShowModelLayout()
 	if (ANYKEY)
 	{
 		if (KEY2)	// NEXT
-			subpage = (subpage + 1) % 9;
+			elementIndex = (elementIndex + 1) % 9;
 		
 		lcdClear();
 		lcdWriteString_P(strOutput);
 		lcdWriteChar(32);
-		if (subpage == 0)
+		if (elementIndex == 0)
 		{
 			lcdWriteString_P(strALL);
 			for (uint8_t i = 0; i < 8; i++)
@@ -440,8 +442,8 @@ static void _hShowModelLayout()
 		}			
 		else
 		{
-			lcdWriteChar(subpage + '0');
-			showMotor(subpage - 1, 1);
+			lcdWriteChar(elementIndex + '0');
+			showMotor(elementIndex - 1, 1);
 		}
 		writeSoftkeys(NULL);
 	}
@@ -452,7 +454,7 @@ static void _hLoadModelLayout()
 	if (KEYINIT)
 		mnuMLayout.marked = Config.MixerIndex;
 
-	if (subpage == 0)
+	if (elementIndex == 0)
 	{
 		if (doMenu(&mnuMLayout))
 		{
@@ -460,12 +462,12 @@ static void _hLoadModelLayout()
 			lcdSetPos(3, 18);
 			lcdWriteString_P(strAreYouSure);
 			writeSoftkeys(_skCANCELYES);
-			subpage = 1;
+			elementIndex = 1;
 		}
 	}		
 	else if (KEY4)		// YES
 	{
-		mixerLoadTable(mnuMLayout.marked);
+		mixerLoadModel(mnuMLayout.marked);
 		configSave();
 		loadPage(PAGE_SHOW_LAYOUT);
 	}
@@ -555,26 +557,26 @@ static void _hStart()
 
 static void _hSensorTest()
 {
-	writeValue(0, 48, GYRO[XAXIS], 5, -1);
-	writeValue(1, 48, GYRO[YAXIS], 5, -1);
-	writeValue(2, 48, GYRO[ZAXIS], 5, -1);
-	writeValue(3, 48, ACC[XAXIS], 5, -1);
-	writeValue(4, 48, ACC[YAXIS], 5, -1);
-	writeValue(5, 48, ACC[ZAXIS], 5, -1);
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		writeValue(i, 48, GYRO[i], 5, -1);
+		writeValue(i + 3, 48, ACC[i], 5, -1);
+	}	
 	writeValue(6, 48, BATT, 5, -1);
 }
 
 static void _hReceiverTest()
 {
-	static const char* const info[5][2] PROGMEM = {
+	static const char* const info[6][2] PROGMEM = {
 		{ strLeft, strRight },
 		{ strForward, strBack },
 		{ strRight, strLeft },
 		{ strIdle, strFull },
 		{ strOff, strOn },
+		{ strOff, strOn },
 	};
 	
-	for (uint8_t i = 0; i < RX_CHANNELS; i++)
+	for (uint8_t i = 0; i < 6; i++)
 	{
 		if (RX_good & _BV(i))
 		{
@@ -607,11 +609,11 @@ static void _hReceiverTest()
 
 static void _hSensorCalibration()
 {
-	if (subpage == 0)
+	if (elementIndex == 0)
 	{
 		if (KEY4)
 		{
-			subpage = 1;
+			elementIndex = 1;
 			lcdClear();
 			lcdSetPos(3, 18);
 			lcdWriteString_P(strWait);
@@ -621,19 +623,19 @@ static void _hSensorCalibration()
 			_tStart = millis();
 		}			
 	}
-	else if (subpage == 1)
+	else if (elementIndex == 1)
 	{
 		lcdSetPos(3, 66);
 		uint8_t sec = (millis() - _tStart) / 1000;
 		lcdWriteChar((5-sec) + 48);
 		if (sec >= 5)
 		{
-			sensorsCalibate();
+			sensorsCalibrate();
 			configSave();
 			lcdSetPos(3, 0);
 			lcdWriteString_P(strCalSucc);
 			writeSoftkeys(NULL);
-			subpage = 2;
+			elementIndex = 2;
 		}
 	}
 	else if (KEY4)
@@ -644,36 +646,34 @@ static void _hESCCalibration()
 {
 	if (ANYKEY)
 	{
-		if (subpage >= length(scrESCCal))
+		if (elementIndex >= length(scrESCCal))
 			loadPage(PAGE_MENU);
 		else
 		{
 			lcdClear();
-			PGM_P s = (PGM_P)pgm_read_word(&scrESCCal[subpage]);
+			PGM_P s = (PGM_P)pgm_read_word(&scrESCCal[elementIndex]);
 			lcdWriteString_P(s);
 			writeSoftkeys(NULL);
-			subpage++;
+			elementIndex++;
 		}		
 	}
 }
 
 static void _hStickCentering()
 {
-	NOKEYRETURN;
-	
 	if (KEYINIT)
 	{
 		if ((RX_good & 0x0F) != 0x0F)
 		{
 			lcdWriteString_P(scrRadioCal1);
-			subpage = 1;
+			elementIndex = 1;
 			writeSoftkeys(_skBACK);
 		}
 		else
 			lcdWriteString_P(scrRadioCal0);
 	}
 	
-	if (subpage == 0)
+	if (elementIndex == 0)
 	{
 		if (KEY4)
 		{
@@ -688,7 +688,7 @@ static void _hStickCentering()
 				lcdWriteString_P(scrRadioCal2);
 
 			writeSoftkeys(NULL);
-			subpage = 1;
+			elementIndex = 1;
 		}
 	}
 	else if (KEY4)
@@ -728,13 +728,13 @@ static void _hFactoryReset()
 static void _hModeSettings()
 {
 	NOKEYRETURN;
-	pageKey(5);
+	elementKey(5);
 	if (KEY4)	// CHANGE?
 	{
-		if (subpage == 0) Config.SelfLevelMode = (Config.SelfLevelMode + 1) % 3;
-		else if (subpage == 1) Config.ArmingMode = !Config.ArmingMode;
-		else if (subpage == 2) Config.LinkRollPitch = !Config.LinkRollPitch;
-		else if (subpage == 3) Config.AutoDisarm = !Config.AutoDisarm;
+		if (elementIndex == 0) Config.SelfLevelMode = (Config.SelfLevelMode + 1) % 3;
+		else if (elementIndex == 1) Config.ArmingMode = !Config.ArmingMode;
+		else if (elementIndex == 2) Config.LinkRollPitch = !Config.LinkRollPitch;
+		else if (elementIndex == 3) Config.AutoDisarm = !Config.AutoDisarm;
 		else Config.ReceiverMode = !Config.ReceiverMode; rxInit(Config.ReceiverMode);
 		configSave();
 	}
@@ -755,45 +755,37 @@ static void _hPIEditor()
 {
 	NOKEYRETURN;
 	
-	pageKey(5);
+	elementKey(5);
 
-	uint8_t index = subindex;
-	if (Config.LinkRollPitch) index = subindex & 0xFE; 
+	uint8_t index = subpage;
+	if (Config.LinkRollPitch) index = subpage & 0xFE; 
 	
 	if (KEY4) // CHANGE
 	{
-		if (subpage == 0)
+		if (elementIndex == 0)
 		{
-			subindex = (subindex + 1) % 3;
-			index = subindex;
-			if (Config.LinkRollPitch) index = subindex & 0xFE;
+			subpage = (subpage + 1) % 3;
+			index = subpage;
+			if (Config.LinkRollPitch) index = subpage & 0xFE;
 		}			
 		else
 		{
-			switch (subpage)
-			{
-				case 1: startEditMode(&Config.PID[index].PGain, 0, 200, TYPE_UINT8); break;
-				case 2: startEditMode(&Config.PID[index].PLimit, 0, 200, TYPE_UINT8); break;
-				case 3: startEditMode(&Config.PID[index].IGain, 0, 200, TYPE_UINT8); break;
-				case 4: startEditMode(&Config.PID[index].ILimit, 0, 200, TYPE_UINT8); break;
-			}
+			startEditMode(&Config.PID[index].UI8[elementIndex - 1], 0, 200, TYPE_UINT8);
 			return;
 		}
 	}
 	
 	lcdSetPos(0, 30);
-	lcdReverse(subpage == 0);
-	switch (subindex)
+	lcdReverse(elementIndex == 0);
+	switch (subpage)
 	{
 		case 0: writePadded_P(strRollAil, 16); break;
 		case 1: writePadded_P(strPitchEle, 16); break;
 		default: writePadded_P(strYawRud, 16); break;
 	}
 	
-	writeValue(2, 60, Config.PID[index].PGain, 5, 1);
-	writeValue(3, 60, Config.PID[index].PLimit, 5, 2);
-	writeValue(4, 60, Config.PID[index].IGain, 5, 3);
-	writeValue(5, 60, Config.PID[index].ILimit, 5, 4);
+	for (uint8_t i = 0; i < 4; i++)
+		writeValue(i + 2, 60, Config.PID[index].UI8[i], 5, i + 1);
 }
 
 static void _hMixerEditor()
@@ -802,32 +794,25 @@ static void _hMixerEditor()
 		
 	if (KEY4)	// CHANGE?
 	{
-		if (subpage == 0)
-			subindex = (subindex + 1) % length(Config.Mixer.Channel);
-		else
+		if (elementIndex == 0)
+			subpage = (subpage + 1) % length(Config.Mixer);
+		else if (elementIndex <= 5)
 		{
-			switch(subpage)
-			{
-				case 1: startEditMode(&Config.Mixer.Channel[subindex].Throttle, -127, 127, TYPE_INT8); return;
-				case 2: startEditMode(&Config.Mixer.Channel[subindex].Aileron, -127, 127, TYPE_INT8); return;
-				case 3: startEditMode(&Config.Mixer.Channel[subindex].Elevator, -127, 127, TYPE_INT8); return;
-				case 4: startEditMode(&Config.Mixer.Channel[subindex].Rudder, -127, 127, TYPE_INT8); return;
-				case 5: startEditMode(&Config.Mixer.Channel[subindex].Offset, -127, 127, TYPE_INT8); return;
-				case 6: Config.Mixer.Channel[subindex].flags ^= FLAG_ESC; break;
-				case 7: Config.Mixer.Channel[subindex].flags ^= FLAG_HIGH; break;
-			}
-		}
+			startEditMode(&Config.Mixer[subpage].I8[elementIndex - 1], -127, 127, TYPE_INT8); 
+			return;
+		}						
+		else if (elementIndex == 6)
+			Config.Mixer[subpage].flags ^= FLAG_ESC;
+		else
+			Config.Mixer[subpage].flags ^= FLAG_HIGH;
 	}
 	
-	pageKey(8);
-	writeValue(0, 120, subindex + 1, 1, 0);
-	writeValue(0, 60, Config.Mixer.Channel[subindex].Throttle, 4, 1);
-	writeValue(1, 60, Config.Mixer.Channel[subindex].Aileron, 4, 2);
-	writeValue(2, 60, Config.Mixer.Channel[subindex].Elevator, 4, 3);
-	writeValue(3, 60, Config.Mixer.Channel[subindex].Rudder, 4, 4);
-	writeValue(4, 60, Config.Mixer.Channel[subindex].Offset, 4, 5);
-	writeString_P(5, 36, Config.Mixer.Channel[subindex].flags & FLAG_ESC ? strESC : strServo, 5, 6);
-	writeString_P(5, 108, Config.Mixer.Channel[subindex].flags & FLAG_ESC ? strHigh : Config.Mixer.Channel[subindex].flags & FLAG_HIGH ? strHigh : strLow, 3, 7);
+	elementKey(8);
+	writeValue(0, 120, subpage + 1, 1, 0);
+	for (uint8_t i = 0; i < 5; i++)
+		writeValue(i, 60, Config.Mixer[subpage].I8[i], 4, i + 1);
+	writeString_P(5, 36, Config.Mixer[subpage].flags & FLAG_ESC ? strESC : strServo, 5, 6);
+	writeString_P(5, 108, Config.Mixer[subpage].flags & FLAG_ESC ? strHigh : Config.Mixer[subpage].flags & FLAG_HIGH ? strHigh : strLow, 3, 7);
 }
 
 
@@ -835,10 +820,10 @@ static void simplePageHandler(const edit_element_t *elements, uint8_t len)
 {
 	NOKEYRETURN;
 	edit_element_t element;
-	pageKey(len);
+	elementKey(len);
 	if (KEY4)	// CHANGE?
 	{
-		memcpy_P(&element, &elements[subpage], sizeof(element));
+		memcpy_P(&element, &elements[elementIndex], sizeof(element));
 		startEditMode(element.valuePtr, element.loLimit, element.hiLimit, TYPE_UINT8);
 		return;
 	}
@@ -894,16 +879,38 @@ static void _hCameraStabSettings()
 	simplePageHandler(elements, length(elements));
 }
 
+static void writeCPPMScreen(uint8_t index)
+{
+	lcdClear();
+	lcdWriteString_P(strCPPMSettings);
+	lcdSetPos(2, 0);
+	if (index == 0)
+		lcdWriteString_P(scrCPPMSettings1);
+	else
+		lcdWriteString_P(scrCPPMSettings2);
+	writeSoftkeys(NULL);
+}
+
 static void _hCPPMSettings()
 {
-	static edit_element_t const elements[] PROGMEM = {
-		{ 0, 78, &Config.RX_chmap[AIL], 1, 8, 1 },
-		{ 1, 78, &Config.RX_chmap[ELE], 1, 8, 1 },
-		{ 2, 78, &Config.RX_chmap[RUD], 1, 8, 1 },
-		{ 3, 78, &Config.RX_chmap[THR], 1, 8, 1 },
-		{ 4, 78, &Config.RX_chmap[AUX], 1, 8, 1 },
-	};
-	simplePageHandler(elements, length(elements));
+	NOKEYRETURN;
+	uint8_t oldsubpage = elementIndex / 4;
+	elementKey(8);
+	uint8_t subpage = elementIndex / 4;
+	
+	if (KEYINIT || KEYREFRESH || oldsubpage != subpage)
+	{
+		writeCPPMScreen(subpage);
+	}
+	
+	if (KEY4)	// CHANGE?
+	{
+		startEditMode(&Config.RX_chmap[subpage * 4 + elementIndex - 1], 1, 8, TYPE_UINT8);
+		return;
+	}
+	
+	for (int i = 0; i < 4; i++)
+		writeValue(2 + i, 13*6, Config.RX_chmap[subpage * 4 + i], 1, i + subpage * 4);
 }
 
 void menuShow()
@@ -922,8 +929,8 @@ void menuShow()
 	if (oldPage != page)
 	{
 		_mykey = KEY_INIT;
+		elementIndex = 0;
 		subpage = 0;
-		subindex = 0;
 		oldPage = page;
 	}
 	defaultHandler();
@@ -946,5 +953,8 @@ static PGM_P tsmMain(uint8_t index)
 
 static PGM_P tsmLoadModelLayout(uint8_t index)
 {
-	return (PGM_P)pgm_read_word(&mixerTable[index].Name);
+	model_t model;
+	model_t* pmodel = (model_t*)pgm_read_word(&modelTable[index]);
+	memcpy_P(&model, pmodel, sizeof(model));
+	return (PGM_P)model.Name;
 }

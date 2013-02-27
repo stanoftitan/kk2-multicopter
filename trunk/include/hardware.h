@@ -101,7 +101,7 @@ typedef struct
 #define RX_AUX		_REG_BIT(RX_AUX_PIN, RX_AUX_BIT)
 #define RX_AUX_DIR	_REG_BIT(RX_AUX_DDR, RX_AUX_BIT)
 
-#define RX_CHANNELS			5
+#define RX_CHANNELS			8
 #define PWM_MIN				800		// was 922
 #define PWM_LOW				1120	// used if output = 0
 #define PWM_MID				1520

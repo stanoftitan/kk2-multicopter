@@ -26,6 +26,7 @@
 // for debugging
 #include <stdlib.h>
 #include <string.h>
+#include <stdfix.h>
 
 state_t State;
 static const char versionNum[] PROGMEM = "Version 0.2b";
@@ -62,14 +63,17 @@ static void init()
 static void CheckState()
 {
 	State.ThrottleOff = RX[THR] < THROTTLE_OFF;
-	State.Aux = RX[AUX] > 10;
+	State.Aux1 = RX[AX1] > 10;
+	State.Aux2 = RX[AX2] > 10;
+	State.Aux3 = RX[AX3] > 10;
+	State.Aux4 = RX[AX4] > 10;
 
 	if (Config.SelfLevelMode != SELFLEVEL_STICK)
 	{
 		if (Config.SelfLevelMode == SELFLEVEL_ON)
 			State.SelfLevel = ON;
 		else
-			State.SelfLevel = State.Aux;
+			State.SelfLevel = State.Aux1;
 	}		
 	
 	uint8_t e = 0;

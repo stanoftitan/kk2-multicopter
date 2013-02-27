@@ -119,7 +119,7 @@ ISR(PCINT3_vect)
 	}		
 }
 
-// ISR for vector PCI1. Handles PWM signal for AUX in PWM mode
+// ISR for vector PCI1. Handles PWM signal for AX1 in PWM mode
 __attribute__ ((section(".lowtext")))
 ISR(PCINT1_vect)
 {
@@ -131,8 +131,8 @@ ISR(PCINT1_vect)
 		_start = t;
 	else
 	{
-		RX_isr[AUX] = t - _start;	
-		_RX_good |= _BV(AUX);
+		RX_isr[AX1] = t - _start;	
+		_RX_good |= _BV(AX1);
 	}		
 }
 
@@ -218,14 +218,14 @@ void rxRead()
 uint8_t rxCalibrate()
 {
 	rxRead();
-	for (uint8_t i = 0; i < 5; i++)
+	for (uint8_t i = 0; i < RX_CHANNELS; i++)
 	{
 		if (i == THR)
 		{
 			if (RX_raw[THR] < PWM_LOW - 50 || RX_raw[THR] > PWM_LOW + 50)
 				return 0;
 		}
-		else if (RX_raw[i] < PWM_MID - 50 || RX_raw[i] > PWM_MID + 50)
+		else if ((RX_raw[i] != 0) && (RX_raw[i] < PWM_MID - 50 || RX_raw[i] > PWM_MID + 50))
 			return 0;
 	}
 	memcpy(&Config.RX_zero, &RX_raw, sizeof(Config.RX_zero));
