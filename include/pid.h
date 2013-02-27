@@ -9,12 +9,16 @@
 #ifndef PID_H_
 #define PID_H_
 
-typedef struct 
+typedef union 
 {
-	uint8_t PGain;
-	uint8_t PLimit;
-	uint8_t IGain;
-	uint8_t ILimit;
+	uint8_t UI8[4];
+	struct 
+	{
+		uint8_t PGain;
+		uint8_t PLimit;
+		uint8_t IGain;
+		uint8_t ILimit;
+	};		
 } pid_param_t;
 
 

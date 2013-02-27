@@ -35,7 +35,8 @@ P_STR scrReceiverTest[] =
 	"Elevator:\n"
 	"Rudder:\n"
 	"Throttle:\n"
-	"Auxiliary:";
+	"Aux1:\n"
+	"Aux2:";
 
 P_STR scrSensorTest[] = 
 	"Gyro X:\n"
@@ -83,12 +84,17 @@ P_STR scrCameraStabSettings[] =
 	"Pitch gain:\n"
 	"Pitch offset:\n";
 
-P_STR scrCPPMSettings[] = 
+P_STR scrCPPMSettings1[] = 
 	"Roll (Ail):\n"
 	"Pitch (Ele):\n"
 	"Yaw (Rud):\n"
-	"Throttle:\n"
-	"Aux:";
+	"Throttle:"; 
+
+P_STR scrCPPMSettings2[] =
+	"Aux1:\n"
+	"Aux2:\n"
+	"Aux3:\n"
+	"Aux4:";
 	
 P_STR scrSensorCal0[] = 
 	"Place the aircraft on\n"

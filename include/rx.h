@@ -22,7 +22,10 @@ extern uint8_t RX_good;
 #define ELE			1
 #define RUD			2
 #define THR			3
-#define AUX			4
+#define AX1			4
+#define AX2			5
+#define AX3			6
+#define AX4			7
 
 void rxInit(uint8_t mode);
 void rxRead();

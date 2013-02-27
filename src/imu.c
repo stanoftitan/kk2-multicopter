@@ -59,8 +59,8 @@ static void calcComplementaryFilter()
 	static uint16_t lastCall;
 	uint16_t dt = ticks() - lastCall;
 		
-	ANGLE[XAXIS] = (1.0 - ALPHA) * (ANGLE[XAXIS] + (float)GYRO[XAXIS] * dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO)) + ALPHA * ACC_ANGLE[XAXIS];
-	ANGLE[YAXIS] = (1.0 - ALPHA) * (ANGLE[YAXIS] + (float)GYRO[YAXIS] * dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO)) + ALPHA * ACC_ANGLE[YAXIS];
+	ANGLE[XAXIS] = (1.0 - ALPHA) * (ANGLE[XAXIS] + (float)GYRO[XAXIS] * dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO)) + ALPHA * (float)ACC_ANGLE[XAXIS];
+	ANGLE[YAXIS] = (1.0 - ALPHA) * (ANGLE[YAXIS] + (float)GYRO[YAXIS] * dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO)) + ALPHA * (float)ACC_ANGLE[YAXIS];
 	
 	lastCall += dt;
 }

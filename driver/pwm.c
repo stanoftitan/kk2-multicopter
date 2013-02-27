@@ -36,7 +36,7 @@ ISR(TIMER1_COMPA_vect)
 			loActive = OFF;
 	}
 	
-	if (PWM[_index] && ((Config.Mixer.Channel[_index].flags & (FLAG_HIGH | FLAG_ESC)) || loActive ))
+	if (PWM[_index] && ((Config.Mixer[_index].flags & (FLAG_HIGH | FLAG_ESC)) || loActive ))
 	{
 		OUT_PORT = pgm_read_byte(&masktable[_index]);
 		OCR1A = (uint16_t)(TCNT1 + (PWM[_index]));

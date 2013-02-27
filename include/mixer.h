@@ -16,28 +16,40 @@
 #define FLAG_ESC		2
 #define FLAG_HIGH		1
 
-typedef struct 
+
+typedef union
 {
-	int8_t Throttle;
-	int8_t Aileron;
-	int8_t Elevator;
-	int8_t Rudder;
-	int8_t Offset;
-	uint8_t flags;
+	int8_t I8[6];
+	struct
+	{
+		int8_t Throttle;
+		int8_t Aileron;
+		int8_t Elevator;
+		int8_t Rudder;
+		int8_t Offset;
+		uint8_t flags;
+	}; 
 } mixer_channel_t;
 
+//typedef int8_t mixer_channel_t[6];
+
+// type for storing the model parameters
 typedef struct  
 {
 	const char *Name;
-	mixer_channel_t Channel[8];
+	uint8_t Channels;
+	mixer_channel_t Channel[];
 } model_t;
 
-#define MIXER_TABLE_LEN		22
-extern const model_t mixerTable[MIXER_TABLE_LEN];
+// type for storing just mixer values
+typedef mixer_channel_t mixer_t[8];  
+
+#define MODEL_TABLE_LEN		22
+extern const model_t* const modelTable[MODEL_TABLE_LEN];
 extern uint16_t MIXER[8];
 
 void mixerInit();
-void mixerLoadTable(uint8_t index);
+void mixerLoadModel(uint8_t index);
 void mixerMixing();
 
 #endif /* MIXER_H_ */

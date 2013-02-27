@@ -52,7 +52,7 @@ typedef struct
 	uint8_t ServoFilter;
 	pid_param_t PID_SelfLevel;
 	int8_t AccTrim[2];
-	model_t Mixer;
+	mixer_t Mixer;
 	camera_t Camera;
 } config_t;
 

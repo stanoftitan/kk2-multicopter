@@ -40,7 +40,10 @@ typedef struct
 	uint8_t Armed;
 	uint8_t ThrottleOff;
 	uint8_t SelfLevel;
-	uint8_t Aux;
+	uint8_t Aux1;
+	uint8_t Aux2;
+	uint8_t Aux3;
+	uint8_t Aux4;
 	
 	#define ERR_NOT_CALIBRATED	0x80
 	#define ERR_NO_ROLL			0x01

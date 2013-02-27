@@ -18,6 +18,6 @@ extern uint16_t ACC_raw[3];
 extern uint8_t BATT;
 
 void sensorsRead();
-void sensorsCalibate();
+void sensorsCalibrate();
 
 #endif /* SENSORS_H_ */
