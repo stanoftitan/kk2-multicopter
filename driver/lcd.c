@@ -331,9 +331,9 @@ void lcdInit()
 
 	// init display
 	LCD_RST = 0;
-	WAITUS(1000);
+	WAITUS(2000);
 	LCD_RST = 1;
-	WAITUS(1000);
+	WAITUS(2000);
 	
 	const unsigned char* ptr = _initSeq;
 	uint8_t c;

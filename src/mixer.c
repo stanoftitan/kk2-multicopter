@@ -26,12 +26,12 @@ void mixerInit()
 
 void mixerLoadModel(uint8_t index)
 {
-	model_t model;
-	void* pmodel;
+	uint8_t channels;
+	model_t* pmodel;
 	pmodel = (void*)pgm_read_word(&modelTable[index]);
-	memcpy_P(&model, pmodel, sizeof(model));
+	channels = (uint8_t)pgm_read_byte(&pmodel->Channels);
 	memset(&Config.Mixer, 0, sizeof(Config.Mixer));
-	memcpy_P(&Config.Mixer, pmodel + sizeof(model), sizeof(model.Channel[0]) * model.Channels);
+	memcpy_P(&Config.Mixer, &pmodel->Channel, (uint8_t)(channels * sizeof(*pmodel->Channel)));
 	Config.MixerIndex = index;
 }
 

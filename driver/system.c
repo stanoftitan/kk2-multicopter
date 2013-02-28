@@ -26,26 +26,6 @@ ISR(TIMER1_OVF_vect)
 
 uint32_t ticks()
 {
-	/*
-	asm volatile(
-		"in	r20, __SREG__ \n\t"
-		"cli\n\t"
-		"lds	r24, %1\n\t"
-		"lds	r25, %1+1\n\t"
-		"lds	r22, %0\n\t"
-		"lds	r23, %0+1\n\t"
-		"sbis	%2, %3\n\t"
-		"rjmp	L1_%=\n\t"
-		"ldi	r21, 0xFF\n\t"
-		"cpi	r22, 0xFD\n\t"
-		"cpc	r23, r21\n\t"
-		"breq	L1_%=\n\t"
-		"subi	r24, 0xFF\n\t"
-		"sbci	r25, 0xFF\n"
-		"L1_%=:\n\t"
-		"out __SREG__, r20\n\t"
-		:: "i" (_SFR_MEM_ADDR(TCNT1)), "m" (t1_ovf), "i" (_SFR_IO_ADDR(TIFR1)), "i" (TOV1));
-	*/
 	uint16_t t1, t2;
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
@@ -60,6 +40,7 @@ uint32_t ticks()
 
 uint16_t micros()
 {
+/*
 	uint16_t t1, t2;
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
@@ -67,6 +48,8 @@ uint16_t micros()
 		t2 = t1_ovf;
 	}		
 	return  (t2 * 65536 + t1 * 2) / (2 * TICKSPERMICRO);
+*/
+	return TICKSTOMICRO(ticks());
 }
 
 // accuracy is 3ms
