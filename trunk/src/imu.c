@@ -18,25 +18,29 @@ int16_t GYR_ANGLE[3];
 
 static const uint8_t convtab[] PROGMEM =
 {
-	0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-	19, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35,
-	36, 37, 38, 39, 41, 42, 43, 44, 46, 47, 48, 50, 51, 53, 54, 56, 57,
-	59, 61, 63, 65, 67, 69, 72, 76, 80, 90,
+	0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
+	16, 17, 18, 19, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 
+	29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44, 
+	46, 47, 48, 50, 51, 53, 54, 56, 57, 59, 61, 63, 65, 67, 
+	69, 72, 76, 80, 90, 
 };
 
 static int8_t GetConv(int16_t input)
 {
 	uint8_t index = abs(input) >> 1;
-	uint8_t conv = pgm_read_byte(&convtab[index]);
-	if (input < 0)
-		conv = -conv;
+	if (index >= length(convtab))
+		index = length(convtab) - 1;
+	int8_t conv = pgm_read_byte(&convtab[index]);
+	//if (input & 1) conv++;
+	if (input < 0) conv = -conv;
+	//return conv << 7;
 	return conv;
 }
 
 static void calcAccAngles()
 {
-	ACC_ANGLE[XAXIS] = GetConv(ACC[XAXIS]) + Config.AccTrim[XAXIS];
-	ACC_ANGLE[YAXIS] = GetConv(ACC[YAXIS]) + Config.AccTrim[YAXIS];
+	ACC_ANGLE[XAXIS] = GetConv(ACC[XAXIS]) + (Config.AccTrim[XAXIS]);
+	ACC_ANGLE[YAXIS] = GetConv(ACC[YAXIS]) + (Config.AccTrim[YAXIS]);
 	if (ACC[ZAXIS] < 0)
 	{
 		if (ACC_ANGLE[XAXIS] < 0)
@@ -49,18 +53,28 @@ static void calcAccAngles()
 		else
 			ACC_ANGLE[YAXIS] = 180 - ACC_ANGLE[YAXIS];
 	}
+
+#ifdef SIMULATOR
+	ACC_ANGLE[XAXIS] = 5;
+	ACC_ANGLE[YAXIS] = -10;
+	GYRO[XAXIS] = 2;
+	GYRO[YAXIS] = -20;
+#endif
 }
 
+//#define ALPHA				2
+//#define MAXALPHA			256
 #define ALPHA				0.005
 #define GYRO_SENSITIVITY	1.15
 
 static void calcComplementaryFilter()
 {
-	static uint16_t lastCall;
+	static uint32_t lastCall;
 	uint16_t dt = ticks() - lastCall;
+	float gyromul = dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO);
 		
-	ANGLE[XAXIS] = (1.0 - ALPHA) * (ANGLE[XAXIS] + (float)GYRO[XAXIS] * dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO)) + ALPHA * (float)ACC_ANGLE[XAXIS];
-	ANGLE[YAXIS] = (1.0 - ALPHA) * (ANGLE[YAXIS] + (float)GYRO[YAXIS] * dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO)) + ALPHA * (float)ACC_ANGLE[YAXIS];
+	ANGLE[XAXIS] = (1.0 - ALPHA) * (ANGLE[XAXIS] + (float)GYRO[XAXIS] * gyromul) + ALPHA * (float)ACC_ANGLE[XAXIS];
+	ANGLE[YAXIS] = (1.0 - ALPHA) * (ANGLE[YAXIS] + (float)GYRO[YAXIS] * gyromul) + ALPHA * (float)ACC_ANGLE[YAXIS];
 	
 	lastCall += dt;
 }

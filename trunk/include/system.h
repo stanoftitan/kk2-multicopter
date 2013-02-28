@@ -19,7 +19,7 @@
 
 void setup();
 uint32_t ticks();
-//uint16_t micros();
+uint16_t micros();
 uint16_t millis();
 
 #ifdef SIMULATOR
@@ -37,7 +37,8 @@ static __inline__ void __iWaitForMS(uint16_t __m, uint16_t ms)
 
 static __inline__ void __iWaitForTicks(uint32_t __m, uint32_t t)
 {
-	while (ticks() - __m < t);
+	//uint32_t d = t + __m;
+	while (ticks() < t + __m);
 }
 
 #define EVERYMS(ms) static uint16_t __CONCAT(_t,__LINE__); for(uint16_t _m = millis(); _m - __CONCAT(_t,__LINE__) >= ms; __CONCAT(_t,__LINE__) = _m)
