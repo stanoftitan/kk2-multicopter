@@ -106,6 +106,28 @@ static void ESCCalibration()
 	}
 }
 
+static void write16(int16_t v)
+{
+	serialWriteChar(v & 0xFF);
+	serialWriteChar(v >> 8);
+}
+
+static void debug_output()
+{
+	serialWriteChar(0x1F);
+	serialWriteChar(0x1E);
+	serialWriteChar(0x1C);
+	write16(GYRO[0]);
+	write16(GYRO[1]);
+	write16(GYRO[2]);
+	write16(ACC[0]);
+	write16(ACC[1]);
+	write16(ACC[2]);
+	write16(ANGLE[0] >> 8);
+	write16(ANGLE[1] >> 8);
+	write16(0);
+}
+
 int main(void)
 {
 	// setup hardware w/o interrupts
@@ -149,6 +171,9 @@ int main(void)
 			menuShow();
 	
 	 	digitalsLoop();
-		mspLoop();
+		//mspLoop();
+		
+		//EVERYMS(3)
+			debug_output();
 	}
 }
