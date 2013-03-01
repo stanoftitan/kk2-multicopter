@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <avr/pgmspace.h>
 
-float ANGLE[3];
+int16_t ANGLE[3];
 int16_t ACC_ANGLE[2];
 int16_t GYR_ANGLE[3];
 
@@ -25,22 +25,21 @@ static const uint8_t convtab[] PROGMEM =
 	69, 72, 76, 80, 90, 
 };
 
-static int8_t GetConv(int16_t input)
+static int16_t GetConv(int16_t input)
 {
 	uint8_t index = abs(input) >> 1;
 	if (index >= length(convtab))
 		index = length(convtab) - 1;
-	int8_t conv = pgm_read_byte(&convtab[index]);
-	//if (input & 1) conv++;
+	int16_t conv = pgm_read_byte(&convtab[index]) * 2;
+	if (input & 1) conv++;
 	if (input < 0) conv = -conv;
-	//return conv << 7;
-	return conv;
+	return conv << 7;
 }
 
 static void calcAccAngles()
 {
-	ACC_ANGLE[XAXIS] = GetConv(ACC[XAXIS]) + (Config.AccTrim[XAXIS]);
-	ACC_ANGLE[YAXIS] = GetConv(ACC[YAXIS]) + (Config.AccTrim[YAXIS]);
+	ACC_ANGLE[XAXIS] = GetConv(ACC[XAXIS]) + (Config.AccTrim[XAXIS] << 8);
+	ACC_ANGLE[YAXIS] = GetConv(ACC[YAXIS]) + (Config.AccTrim[YAXIS] << 8);
 	if (ACC[ZAXIS] < 0)
 	{
 		if (ACC_ANGLE[XAXIS] < 0)
@@ -62,19 +61,27 @@ static void calcAccAngles()
 #endif
 }
 
-//#define ALPHA				2
-//#define MAXALPHA			256
-#define ALPHA				0.005
-#define GYRO_SENSITIVITY	1.15
+#define ALPHA				4
+#define MAXALPHA			256
+//#define ALPHA				0.005
+//#define GYRO_SENSITIVITY	1.15
 
 static void calcComplementaryFilter()
 {
 	static uint32_t lastCall;
 	uint16_t dt = ticks() - lastCall;
+
+	int32_t r;
+	r = ((int32_t) GYRO[XAXIS] * dt) >> 16;
+	r = (int32_t)(ANGLE[XAXIS] + r) * (MAXALPHA - ALPHA);
+	r += (int32_t)ACC_ANGLE[XAXIS] * ALPHA;
+	ANGLE[XAXIS] = r >> 8;
+/*
 	float gyromul = dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO);
 		
 	ANGLE[XAXIS] = (1.0 - ALPHA) * (ANGLE[XAXIS] + (float)GYRO[XAXIS] * gyromul) + ALPHA * (float)ACC_ANGLE[XAXIS];
 	ANGLE[YAXIS] = (1.0 - ALPHA) * (ANGLE[YAXIS] + (float)GYRO[YAXIS] * gyromul) + ALPHA * (float)ACC_ANGLE[YAXIS];
+*/
 	
 	lastCall += dt;
 }

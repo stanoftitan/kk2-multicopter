@@ -548,10 +548,10 @@ static void _hStart()
 		writePadded(s, 3);
 	
 		// roll angle
-		writeValue(5, 13*6, (int16_t)ANGLE[YAXIS], 7, -1);
+		writeValue(5, 13*6, (int16_t)ANGLE[YAXIS] >> 8, 7, -1);
 	
 		// pitch angle
-		writeValue(6, 13*6, (int16_t)ANGLE[XAXIS], 7, -1);
+		writeValue(6, 13*6, (int16_t)ANGLE[XAXIS] >> 8, 7, -1);
 	}	
 }
 

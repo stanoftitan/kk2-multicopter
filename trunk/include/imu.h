@@ -11,7 +11,7 @@
 #ifndef IMU_H_
 #define IMU_H_
 
-extern float ANGLE[3];
+extern int16_t ANGLE[3];
 
 void imuCalculate();
 

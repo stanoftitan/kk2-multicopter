@@ -32,12 +32,11 @@ uint16_t millis();
 
 static __inline__ void __iWaitForMS(uint16_t __m, uint16_t ms)
 {
-	while (millis() - __m < ms);
+	while (millis() < ms + __m);
 }
 
 static __inline__ void __iWaitForTicks(uint32_t __m, uint32_t t)
 {
-	//uint32_t d = t + __m;
 	while (ticks() < t + __m);
 }
 
