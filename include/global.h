@@ -56,6 +56,8 @@ typedef struct
 	#define MODE_NORMAL			0
 	#define MODE_ESC_CAL		1
 	uint8_t Mode;
+	
+	uint16_t CycleTime;
 } state_t;
 
 extern state_t State;

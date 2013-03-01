@@ -48,6 +48,6 @@ void sensorsCalibrate()
 	sensorsRead();
 	memcpy(&Config.GYRO_zero, &GYRO_raw, sizeof(Config.GYRO_zero));
 	memcpy(&Config.ACC_zero, &ACC_raw, sizeof(Config.ACC_zero));
-	Config.ACC_zero[ZAXIS] -= 124;
+	//Config.ACC_zero[ZAXIS] -= 124;
 	Config.CalibrateFlags = 1;
 }

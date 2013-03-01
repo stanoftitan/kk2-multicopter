@@ -13,8 +13,8 @@
 #include <avr/pgmspace.h>
 
 int16_t ANGLE[3];
-int16_t ACC_ANGLE[2];
-int16_t GYR_ANGLE[3];
+int16_t ACC_ANGLE[3];
+int16_t GYRO_RATE[3];
 
 static const uint8_t convtab[] PROGMEM =
 {
@@ -25,7 +25,7 @@ static const uint8_t convtab[] PROGMEM =
 	69, 72, 76, 80, 90, 
 };
 
-static int16_t GetConv(int16_t input)
+static int16_t getAccAngle(int16_t input)
 {
 	uint8_t index = abs(input) >> 1;
 	if (index >= length(convtab))
@@ -36,58 +36,46 @@ static int16_t GetConv(int16_t input)
 	return conv << 7;
 }
 
-static void calcAccAngles()
+static int16_t calcGyroRate(uint8_t axis, uint16_t dt)
 {
-	ACC_ANGLE[XAXIS] = GetConv(ACC[XAXIS]) + (Config.AccTrim[XAXIS] << 8);
-	ACC_ANGLE[YAXIS] = GetConv(ACC[YAXIS]) + (Config.AccTrim[YAXIS] << 8);
-	if (ACC[ZAXIS] < 0)
-	{
-		if (ACC_ANGLE[XAXIS] < 0)
-			ACC_ANGLE[XAXIS] = -180 - ACC_ANGLE[XAXIS];
-		else
-			ACC_ANGLE[XAXIS] = 180 - ACC_ANGLE[XAXIS];
-		
-		if (ACC_ANGLE[YAXIS] < 0)
-			ACC_ANGLE[YAXIS] = -180 - ACC_ANGLE[YAXIS];
-		else
-			ACC_ANGLE[YAXIS] = 180 - ACC_ANGLE[YAXIS];
-	}
-
-#ifdef SIMULATOR
-	ACC_ANGLE[XAXIS] = 5;
-	ACC_ANGLE[YAXIS] = -10;
-	GYRO[XAXIS] = 2;
-	GYRO[YAXIS] = -20;
-#endif
+	int32_t r = (int32_t)GYRO[axis] * dt >> 16;
+	if (r < 0) r++;	
+	return (int16_t)r;
 }
 
-#define ALPHA				4
+#define ALPHA				1
 #define MAXALPHA			256
-//#define ALPHA				0.005
-//#define GYRO_SENSITIVITY	1.15
+static int16_t calcComplementaryAngle(uint8_t axis)
+{
+	int32_t r;
+	r = (int32_t)(ANGLE[axis] + GYRO_RATE[axis]) * (MAXALPHA - ALPHA);
+	r += (int32_t)ACC_ANGLE[axis] * ALPHA;
+	r >>= 8;
+	if (r < 0) r++;
+	return r;
+}
 
-static void calcComplementaryFilter()
+static void imuComplementary()
 {
 	static uint32_t lastCall;
 	uint16_t dt = ticks() - lastCall;
-
-	int32_t r;
-	r = ((int32_t) GYRO[XAXIS] * dt) >> 16;
-	r = (int32_t)(ANGLE[XAXIS] + r) * (MAXALPHA - ALPHA);
-	r += (int32_t)ACC_ANGLE[XAXIS] * ALPHA;
-	ANGLE[XAXIS] = r >> 8;
-/*
-	float gyromul = dt / (1e6 * (2.0 - GYRO_SENSITIVITY) * TICKSPERMICRO);
 		
-	ANGLE[XAXIS] = (1.0 - ALPHA) * (ANGLE[XAXIS] + (float)GYRO[XAXIS] * gyromul) + ALPHA * (float)ACC_ANGLE[XAXIS];
-	ANGLE[YAXIS] = (1.0 - ALPHA) * (ANGLE[YAXIS] + (float)GYRO[YAXIS] * gyromul) + ALPHA * (float)ACC_ANGLE[YAXIS];
-*/
+	ACC_ANGLE[XAXIS] = getAccAngle(ACC[XAXIS]) + (Config.AccTrim[XAXIS] << 8);
+	ACC_ANGLE[YAXIS] = getAccAngle(ACC[YAXIS]) + (Config.AccTrim[YAXIS] << 8);
+	ACC_ANGLE[ZAXIS] = getAccAngle(ACC[ZAXIS]) + (90 << 8);
+
+	GYRO_RATE[XAXIS] = calcGyroRate(XAXIS, dt);
+	GYRO_RATE[YAXIS] = calcGyroRate(YAXIS, dt);
+	GYRO_RATE[ZAXIS] = calcGyroRate(ZAXIS, dt);
+	
+	ANGLE[XAXIS] = calcComplementaryAngle(XAXIS);
+	ANGLE[YAXIS] = calcComplementaryAngle(YAXIS);
+	ANGLE[ZAXIS] = ACC_ANGLE[ZAXIS];
 	
 	lastCall += dt;
 }
 
 void imuCalculate()
 {
-	calcAccAngles();
-	calcComplementaryFilter();
+	imuComplementary();
 }
