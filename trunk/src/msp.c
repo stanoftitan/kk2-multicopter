@@ -119,7 +119,7 @@ static void evalutateCmd()
 			break;
 		case MSP_STATUS:
 			writeResponseHeader(10);
-			write16(2000);		// cycle time
+			write16(State.CycleTime);		// cycle time
 			write16(0);			// i2c error count
 			write16(1);			// sensors bit field. 1 = ACC, 2 = BARO, 4 = MAG, 8 = GPS, 16 = SONAR
 			write32(0);			// don't know yet
@@ -146,8 +146,8 @@ static void evalutateCmd()
 			break;
 		case MSP_ATTITUDE:
 		   writeResponseHeader(8);
-		   write16(ANGLE[YAXIS] * 10);
-		   write16(ANGLE[XAXIS] * 10);
+		   write16((ANGLE[YAXIS] >> 8) * 10);
+		   write16((ANGLE[XAXIS] >> 8) * 10);
 		   write16(0);		// heading
 		   write16(0);		// headFreeModeHold
 		   break;

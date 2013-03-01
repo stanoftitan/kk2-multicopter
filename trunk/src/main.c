@@ -125,7 +125,7 @@ static void debug_output()
 	write16(ACC[2]);
 	write16(ANGLE[0] >> 8);
 	write16(ANGLE[1] >> 8);
-	write16(0);
+	write16(ANGLE[2] >> 8);
 }
 
 int main(void)
@@ -156,6 +156,10 @@ int main(void)
 
 	LOOPUS(CYCLE_TIME)
 	{
+		static uint32_t lastStart;
+		State.CycleTime = TICKSTOMICRO(_cycleStart - lastStart);
+		lastStart = _cycleStart;
+		
  		LED_TOGGLE;
 		rxRead();			// 
 		CheckState();
@@ -171,9 +175,11 @@ int main(void)
 			menuShow();
 	
 	 	digitalsLoop();
-		//mspLoop();
-		
-		//EVERYMS(3)
-			debug_output();
+
+#ifndef DEBUG
+		mspLoop();
+#else
+		debug_output();
+#endif
 	}
 }
