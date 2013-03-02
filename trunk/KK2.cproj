@@ -42,107 +42,107 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.directories.IncludePaths>
-    <ListValues>
-      <Value>../include</Value>
-    </ListValues>
-  </avrgcc.compiler.directories.IncludePaths>
-  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.OtherFlags>-ffast-math</avrgcc.compiler.optimization.OtherFlags>
-  <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.linker.libraries.Libraries>
-    <ListValues>
-      <Value>m</Value>
-    </ListValues>
-  </avrgcc.linker.libraries.Libraries>
-  <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
-</AvrGcc>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../include</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.OtherFlags>-ffast-math</avrgcc.compiler.optimization.OtherFlags>
+        <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>m</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
+      </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols>
-    <ListValues>
-      <Value>DEBUG</Value>
-    </ListValues>
-  </avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.directories.IncludePaths>
-    <ListValues>
-      <Value>../include</Value>
-    </ListValues>
-  </avrgcc.compiler.directories.IncludePaths>
-  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.OtherFlags>-ffast-math</avrgcc.compiler.optimization.OtherFlags>
-  <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fdiagnostics-show-option </avrgcc.compiler.miscellaneous.OtherFlags>
-  <avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>True</avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>
-  <avrgcc.linker.libraries.Libraries>
-    <ListValues>
-      <Value>m</Value>
-    </ListValues>
-  </avrgcc.linker.libraries.Libraries>
-  <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
-  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-</AvrGcc>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../include</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.OtherFlags>-ffast-math</avrgcc.compiler.optimization.OtherFlags>
+        <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fdiagnostics-show-option </avrgcc.compiler.miscellaneous.OtherFlags>
+        <avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>True</avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>m</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
+        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+      </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug Simulator' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols>
-    <ListValues>
-      <Value>DEBUG</Value>
-      <Value>SIMULATOR</Value>
-    </ListValues>
-  </avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.directories.IncludePaths>
-    <ListValues>
-      <Value>../include</Value>
-    </ListValues>
-  </avrgcc.compiler.directories.IncludePaths>
-  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.OtherFlags>-ffast-math</avrgcc.compiler.optimization.OtherFlags>
-  <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.optimization.DebugLevel>Maximum (-g3)</avrgcc.compiler.optimization.DebugLevel>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fdiagnostics-show-option </avrgcc.compiler.miscellaneous.OtherFlags>
-  <avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>True</avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>
-  <avrgcc.linker.libraries.Libraries>
-    <ListValues>
-      <Value>m</Value>
-    </ListValues>
-  </avrgcc.linker.libraries.Libraries>
-  <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
-  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-</AvrGcc>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG</Value>
+            <Value>SIMULATOR</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../include</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.OtherFlags>-ffast-math</avrgcc.compiler.optimization.OtherFlags>
+        <avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avrgcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Maximum (-g3)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -fdiagnostics-show-option </avrgcc.compiler.miscellaneous.OtherFlags>
+        <avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>True</avrgcc.compiler.miscellaneous.DoNotDeleteTemporaryFiles>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>m</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
+        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+      </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\Debug Simulator\</OutputPath>
   </PropertyGroup>
@@ -207,7 +207,7 @@
     <Compile Include="src\mixer.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\model_table.c">
+    <Compile Include="src\model_table.c.old">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\msp.c">
@@ -288,6 +288,13 @@
     <Compile Include="menu\menu_text.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\model_table.xml">
+      <SubType>compile</SubType>
+      <Generator>XSLT</Generator>
+    </Compile>
+    <None Include="src\model_table.xsl">
+      <SubType>compile</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="include" />

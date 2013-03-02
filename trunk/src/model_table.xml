@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml-stylesheet type="text/xsl" href="model_table.xsl"?>
+<modeltable>
+	<model name="SingleCopter 2M 2S">
+		<channel throttle="100" aileron="0" elevator="0" rudder="100" offset="0" type="motor" />
+		
+	</model>
+</modeltable>
