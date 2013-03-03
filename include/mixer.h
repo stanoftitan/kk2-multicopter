@@ -31,8 +31,6 @@ typedef union
 	}; 
 } mixer_channel_t;
 
-//typedef int8_t mixer_channel_t[6];
-
 // type for storing the model parameters
 typedef struct  
 {

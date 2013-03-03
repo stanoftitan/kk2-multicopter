@@ -207,7 +207,7 @@
     <Compile Include="src\mixer.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\model_table.c.old">
+    <Compile Include="src\model_table.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\msp.c">
@@ -288,10 +288,9 @@
     <Compile Include="menu\menu_text.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\model_table.xml">
+    <None Include="src\model_table.xml">
       <SubType>compile</SubType>
-      <Generator>XSLT</Generator>
-    </Compile>
+    </None>
     <None Include="src\model_table.xsl">
       <SubType>compile</SubType>
     </None>
