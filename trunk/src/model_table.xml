@@ -3,6 +3,169 @@
 <modeltable>
 	<model name="SingleCopter 2M 2S">
 		<channel throttle="100" aileron="0" elevator="0" rudder="100" offset="0" type="motor" />
-		
+		<channel throttle="100" aileron="0" elevator="0" rudder="-100" offset="0" type="motor" />
+		<channel throttle="0" aileron="100" elevator="0" rudder="0" offset="50" type="servo" />
+		<channel throttle="0" aileron="0" elevator="100" rudder="0" offset="50" type="servo" />
+	</model>
+	<model name="SingleCopter 1M 4S">
+		<channel throttle="100" aileron="0" elevator="0" rudder="0" offset="0" type="motor" />
+		<channel throttle="0" aileron="100" elevator="0" rudder="100" offset="50" type="servo" />
+		<channel throttle="0" aileron="0" elevator="100" rudder="100" offset="50" type="servo" />
+		<channel throttle="0" aileron="-100" elevator="0" rudder="100" offset="50" type="servo" />
+		<channel throttle="0" aileron="0" elevator="-100" rudder="100" offset="50" type="servo" />
+	</model>
+	<model name="DualCopter">
+		<channel throttle="100" aileron="100" elevator="0" rudder="0" offset="0" type="motor" />
+		<channel throttle="100" aileron="-100" elevator="0" rudder="0" offset="0" type="motor" />
+		<channel throttle="0" aileron="0" elevator="100" rudder="100" offset="50" type="servo" />
+		<channel throttle="0" aileron="0" elevator="-100" rudder="100" offset="50" type="servo" />
+	</model>
+	<model name="TriCopter">
+		<channel throttle="100" aileron="-87" elevator="50" rudder="0" offset="0" type="motor" />
+		<channel throttle="100" aileron="87" elevator="50" rudder="0" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="0" offset="0" type="motor" />
+		<channel throttle="0" aileron="0" elevator="0" rudder="100" offset="50" type="servo" />
+	</model>
+	<model name="Y6">
+		<channel throttle="100" aileron="-87" elevator="50" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-87" elevator="50" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="87" elevator="50" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="87" elevator="50" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="QuadroCopter +">
+		<channel throttle="100" aileron="0" elevator="100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="100" elevator="0" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-100" elevator="0" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="QuadroCopter x">
+		<channel throttle="100" aileron="-71" elevator="71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="-71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="-71" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="X8 +">
+		<channel throttle="100" aileron="0" elevator="100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="100" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="100" elevator="0" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="100" elevator="0" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-100" elevator="0" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-100" elevator="0" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="X8 x">
+		<channel throttle="100" aileron="-71" elevator="71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="-71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="-71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="-71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="-71" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="HexaCopter +">
+		<channel throttle="100" aileron="0" elevator="100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="87" elevator="50" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="87" elevator="-50" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-87" elevator="-50" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-87" elevator="50" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="HexaCopter x">
+		<channel throttle="100" aileron="50" elevator="87" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="100" elevator="0" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="50" elevator="-87" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-50" elevator="-87" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-100" elevator="0" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-50" elevator="87" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="OctoCopter +">
+		<channel throttle="100" aileron="0" elevator="100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="100" elevator="0" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="-71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="-71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-100" elevator="0" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="71" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="OctoCopter x">
+		<channel throttle="100" aileron="38" elevator="92" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="92" elevator="38" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="92" elevator="-38" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="38" elevator="-92" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-38" elevator="-92" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-92" elevator="-38" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-92" elevator="38" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-38" elevator="92" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="H6">
+		<channel throttle="100" aileron="71" elevator="71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="0" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="-71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="-71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="0" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="71" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="H8">
+		<channel throttle="100" aileron="71" elevator="71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="24" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="-24" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="-71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="-71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="-24" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="24" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="71" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="V6">
+		<channel throttle="100" aileron="100" elevator="71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="0" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="42" elevator="-71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-42" elevator="-71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-71" elevator="0" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-100" elevator="71" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="V8">
+		<channel throttle="100" aileron="100" elevator="71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="81" elevator="24" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="61" elevator="-24" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="42" elevator="-71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-42" elevator="-71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-61" elevator="-24" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-81" elevator="24" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="-100" elevator="71" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="Airplane 1S Ail">
+		<channel throttle="100" aileron="0" elevator="0" rudder="0" offset="0" type="motor" />
+		<channel throttle="0" aileron="100" elevator="0" rudder="0" offset="50" type="servo" />
+		<channel throttle="0" aileron="0" elevator="100" rudder="0" offset="50" type="servo" />
+		<channel throttle="0" aileron="0" elevator="0" rudder="100" offset="50" type="servo" />
+	</model>
+	<model name="Airplane 2S Ail">
+		<channel throttle="100" aileron="0" elevator="0" rudder="0" offset="0" type="motor" />
+		<channel throttle="0" aileron="100" elevator="0" rudder="0" offset="50" type="servo" />
+		<channel throttle="0" aileron="100" elevator="0" rudder="0" offset="50" type="servo" />
+		<channel throttle="0" aileron="0" elevator="100" rudder="0" offset="50" type="servo" />
+		<channel throttle="0" aileron="0" elevator="0" rudder="100" offset="50" type="servo" />
+	</model>
+	<model name="Flying Wing">
+		<channel throttle="100" aileron="0" elevator="0" rudder="0" offset="0" type="motor" />
+		<channel throttle="0" aileron="50" elevator="50" rudder="0" offset="50" type="servo" />
+		<channel throttle="0" aileron="50" elevator="-50" rudder="0" offset="50" type="servo" />
+	</model>
+	<model name="Y4">
+		<channel throttle="100" aileron="-71" elevator="71" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="71" rudder="-100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="100" offset="0" type="motor" />
+		<channel throttle="100" aileron="0" elevator="-100" rudder="-100" offset="0" type="motor" />
+	</model>
+	<model name="V-Tail">
+		<channel throttle="100" aileron="-71" elevator="71" rudder="0" offset="0" type="motor" />
+		<channel throttle="100" aileron="71" elevator="71" rudder="0" offset="0" type="motor" />
+		<channel throttle="120" aileron="0" elevator="-90" rudder="100" offset="0" type="motor" />
+		<channel throttle="120" aileron="0" elevator="-90" rudder="-100" offset="0" type="motor" />
 	</model>
 </modeltable>
