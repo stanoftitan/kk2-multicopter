@@ -10,11 +10,12 @@
 #include "global.h"
 #include "rx.h"
 #include "sensors.h"
+#include "imu.h"
 #include <string.h>
 
 int16_t CONTROL[4];
 
-static int16_t IntegralSum[4];
+static pid_state_t PID[3];
 
 static int16_t limit(int16_t value, int16_t low, int16_t high)
 {
@@ -32,13 +33,15 @@ int16_t calcChannel(uint8_t index)
 	// StickScaling = 0..+200
 	// ==> -28000..+28000 -> 16bit
 	err = RX[index] * Config.StickScaling[index];
-	err >>= 6;
-	err -= GYRO[index] << 1;
-	
+	err <<= 2;
+	err -= ANGLE[index] ;
+	err >>= 8;
+	if (err < 0) err++;
+
 	r = err * Config.PID[index].PGain;
 	
-	//IntegralSum[index] += err;
-	//r += IntegralSum[index] * Config.PID[index].IGain;
+	//PID[index].Integral += err;
+	//r += PID[index].Integral * Config.PID[index].IGain;
 	
 	return r >> 4;
 }
@@ -54,12 +57,12 @@ void controller()
 {
 	CONTROL[ROL] = calcChannel(ROL);
 	CONTROL[PIT] = calcChannel(PIT);
-	CONTROL[RUD] = calcChannel(RUD);
+	CONTROL[YAW] = calcChannel(YAW);
 	CONTROL[THR] = calcThrottle();
 }
 
 void controllerReset()
 {
-	// reset integral sums
-	memset (&IntegralSum, 0, sizeof(IntegralSum));
+	// reset PIDs
+	memset (&PID, 0, sizeof(PID));
 }

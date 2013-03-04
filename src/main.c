@@ -19,7 +19,7 @@
 #include "digitals.h"
 #include "controller.h"
 #include "imu.h"
-//#include "serial.h"
+#include "serial.h"
 #include "msp.h"
 #include <avr/wdt.h>
 
@@ -117,15 +117,16 @@ static void debug_output()
 	serialWriteChar(0x1F);
 	serialWriteChar(0x1E);
 	serialWriteChar(0x1C);
-	write16(GYRO[0]);
+	write16(GYRO[0]);	
 	write16(GYRO[1]);
 	write16(GYRO[2]);
-	write16(ACC[0]);
-	write16(ACC[1]);
-	write16(ACC[2]);
-	write16(ANGLE[0] >> 8);
-	write16(ANGLE[1] >> 8);
-	write16(ANGLE[2] >> 8);
+	write16(CONTROL[0]);
+	write16(CONTROL[1]);
+	write16(CONTROL[2]);
+	write16(CONTROL[3]);
+	//write16(ANGLE[0] >> 8);
+	//write16(ANGLE[1] >> 8);
+	//write16(ANGLE[2] >> 8);
 }
 
 int main(void)

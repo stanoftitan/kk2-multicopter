@@ -29,7 +29,7 @@ static const model_t model<xsl:number format='01'/> PROGMEM =
 {
     strModel<xsl:number format='01'/>, <xsl:value-of select='count(channel)'/>,
     {
-        //  thr   ail   ele   rud  offs  flags
+        //  thr   rol   pit   rud  offs  flags
 <xsl:for-each select ='channel'>        {{ <xsl:call-template name='lpad4'>
 <xsl:with-param name='value' select='@throttle'/></xsl:call-template>, <xsl:call-template name='lpad4'>
 <xsl:with-param name='value' select='@aileron'/></xsl:call-template>, <xsl:call-template name='lpad4'>

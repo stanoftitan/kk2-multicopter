@@ -11,7 +11,6 @@
 
 typedef union 
 {
-	uint8_t UI8[4];
 	struct 
 	{
 		uint8_t PGain;
@@ -19,7 +18,12 @@ typedef union
 		uint8_t IGain;
 		uint8_t ILimit;
 	};		
+	uint8_t UI8[4];
 } pid_param_t;
 
+typedef struct  
+{
+	int16_t Integral;
+} pid_state_t;
 
 #endif /* PID_H_ */
