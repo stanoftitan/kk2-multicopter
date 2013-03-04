@@ -35,23 +35,24 @@ void mixerLoadModel(uint8_t index)
 	Config.MixerIndex = index;
 }
 
-void mixerMixing()
+void mixerCalculate()
 {
 	int32_t r;
 	
 	for (uint8_t i = 0; i < 8; i++)
 	{
-// 		if (Config.Mixer.Channel[i].flags == FLAG_NONE)
-// 			MIXER[i] = 0;
-// 		else
+ 		if (Config.Mixer[i].flags == FLAG_NONE)
+ 			MIXER[i] = 0;
+ 		else
 		{
 			r = 0;
 			r += (int32_t) CONTROL[AIL] * Config.Mixer[i].Aileron;
 			r += (int32_t) CONTROL[ELE] * Config.Mixer[i].Elevator;
 			r += (int32_t) CONTROL[RUD] * Config.Mixer[i].Rudder;
 			r += (int32_t) CONTROL[THR] * Config.Mixer[i].Throttle;
+			r += (int32_t) 320 * Config.Mixer[i].Offset;
 		
-			MIXER[i] = r >> 7;
+			MIXER[i] = limit(PWM_LOW + (r >> 5), PWM_MIN, PWM_MAX);
 		}
 	}
 }

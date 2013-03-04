@@ -146,8 +146,8 @@ static void evalutateCmd()
 			break;
 		case MSP_ATTITUDE:
 		   writeResponseHeader(8);
-		   write16((ANGLE[YAXIS] >> 8) * 10);
-		   write16((ANGLE[XAXIS] >> 8) * 10);
+		   write16((ANGLE[ROL] >> 8) * 10);
+		   write16((ANGLE[PIT] >> 8) * 10);
 		   write16(0);		// heading
 		   write16(0);		// headFreeModeHold
 		   break;

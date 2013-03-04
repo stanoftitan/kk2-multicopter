@@ -60,7 +60,7 @@ static void init()
 	menuInit();
 }
 
-static void CheckState()
+static void checkState()
 {
 	State.ThrottleOff = RX[THR] < THROTTLE_OFF;
 	State.Aux1 = RX[AX1] > 10;
@@ -94,15 +94,13 @@ static void ESCCalibration()
 	while(1)
 	{
 		rxRead();
-		if (keyboardState() != (KEY_1 | KEY_4))
+		for (uint8_t i = 0; i < 8; i++)
 		{
-			State.Mode = MODE_NORMAL;
-			pwmDisable();
-			break;
-		}
-			
-		for (uint8_t i = 0; i < RX_CHANNELS; i++)
-		pwmWrite(i, RX_raw[THR]);
+			if (Config.Mixer[i].flags & FLAG_ESC)
+				pwmWrite(i, RX_raw[THR]);
+			else
+				pwmWrite(i, PWM_MID);
+		}				
 	}
 }
 
@@ -117,9 +115,9 @@ static void debug_output()
 	serialWriteChar(0x1F);
 	serialWriteChar(0x1E);
 	serialWriteChar(0x1C);
-	write16(GYRO[0]);	
-	write16(GYRO[1]);
-	write16(GYRO[2]);
+	//write16(GYRO[0]);	
+	//write16(GYRO[1]);
+	//write16(GYRO[2]);
 	write16(CONTROL[0]);
 	write16(CONTROL[1]);
 	write16(CONTROL[2]);
@@ -127,6 +125,11 @@ static void debug_output()
 	//write16(ANGLE[0] >> 8);
 	//write16(ANGLE[1] >> 8);
 	//write16(ANGLE[2] >> 8);
+	write16(MIXER[0]);
+	write16(MIXER[1]);
+	write16(MIXER[2]);
+	write16(MIXER[3]);
+	write16(State.CalculationTime);
 }
 
 int main(void)
@@ -152,9 +155,11 @@ int main(void)
 	digitalsBuzzBlocking(500);
 	WAITMS(700);
 	
-	if (keyboardState() == (KEY_1 | KEY_4))		// enter ESC Calibration mode?
+	rxRead();
+	if (RX[THR] >= 90 || keyboardState() == (KEY_1 | KEY_4))		// enter ESC Calibration mode?
 		ESCCalibration();
 
+	pwmEnable();
 	LOOPUS(CYCLE_TIME)
 	{
 		static uint32_t lastStart;
@@ -162,19 +167,22 @@ int main(void)
 		lastStart = _cycleStart;
 		
  		LED_TOGGLE;
-		rxRead();			// 
-		CheckState();
+		rxRead();
+		checkState();
 		sensorsRead();
 		imuCalculate();
-		controller();
-		mixerMixing();
+		controllerCalculate();
+		mixerCalculate();
 
-		for (uint8_t i = 0; i < 5; i++)
-			pwmWrite(i+1, RX_raw[i]);
+		for (uint8_t i = 0; i < 8; i++)
+			pwmWrite(i, MIXER[i]);
+		
+		State.CalculationTime = TICKSTOMICRO(ticks() - _cycleStart);
 
 		EVERYMS(25)
 			menuShow();
 	
+		lvaLoop();
 	 	digitalsLoop();
 
 #ifndef DEBUG

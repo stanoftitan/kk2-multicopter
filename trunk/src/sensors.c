@@ -10,26 +10,40 @@
 #include "global.h"
 #include "adc.h"
 #include <string.h>
+#include <stdlib.h>
 
 uint16_t GYRO_raw[3], ACC_raw[3];
 int16_t GYRO[3], ACC[3];
 uint8_t BATT;
 
+#define GYRO_DEADBAND	2
+
 void sensorsRead()
 {
-	GYRO_raw[XAXIS] = adcGet(ADC_GYR_X);
-	GYRO[XAXIS] = -(int16_t)(GYRO_raw[XAXIS] - Config.GYRO_zero[XAXIS]);
-	GYRO_raw[YAXIS] = adcGet(ADC_GYR_Y);
-	GYRO[YAXIS] = -(int16_t)(GYRO_raw[YAXIS] - Config.GYRO_zero[YAXIS]);
-	GYRO_raw[ZAXIS] = adcGet(ADC_GYR_Z);
-	GYRO[ZAXIS] = (int16_t)(GYRO_raw[ZAXIS] - Config.GYRO_zero[ZAXIS]);
+	GYRO_raw[PIT] = adcGet(ADC_GYR_X);
+	GYRO[PIT] = -(int16_t)(GYRO_raw[PIT] - Config.GYRO_zero[PIT]);
+#if GYRO_DEADBAND > 0
+	if (abs(GYRO[PIT]) <= GYRO_DEADBAND) GYRO[PIT] = 0;
+#endif
+
+	GYRO_raw[ROL] = adcGet(ADC_GYR_Y);
+	GYRO[ROL] = -(int16_t)(GYRO_raw[ROL] - Config.GYRO_zero[ROL]);
+#if GYRO_DEADBAND > 0
+	if (abs(GYRO[ROL]) <= GYRO_DEADBAND) GYRO[ROL] = 0;
+#endif
+
+	GYRO_raw[YAW] = adcGet(ADC_GYR_Z);
+	GYRO[YAW] = (int16_t)(GYRO_raw[YAW] - Config.GYRO_zero[YAW]);
+#if GYRO_DEADBAND > 0
+	if (abs(GYRO[YAW]) <= GYRO_DEADBAND) GYRO[YAW] = 0;
+#endif
 	
-	ACC_raw[XAXIS] = adcGet(ADC_ACC_X);
-	ACC[XAXIS] = (int16_t)(ACC_raw[XAXIS] - Config.ACC_zero[XAXIS]);
-	ACC_raw[YAXIS] = adcGet(ADC_ACC_Y);
-	ACC[YAXIS] = (int16_t)(ACC_raw[YAXIS] - Config.ACC_zero[YAXIS]);
-	ACC_raw[ZAXIS] = adcGet(ADC_ACC_Z);
-	ACC[ZAXIS] = (int16_t)(ACC_raw[ZAXIS] - Config.ACC_zero[ZAXIS]);
+	ACC_raw[PIT] = adcGet(ADC_ACC_X);
+	ACC[PIT] = (int16_t)(ACC_raw[PIT] - Config.ACC_zero[PIT]);
+	ACC_raw[ROL] = adcGet(ADC_ACC_Y);
+	ACC[ROL] = (int16_t)(ACC_raw[ROL] - Config.ACC_zero[ROL]);
+	ACC_raw[YAW] = adcGet(ADC_ACC_Z);
+	ACC[YAW] = (int16_t)(ACC_raw[YAW] - Config.ACC_zero[YAW]);
 
 	BATT = adcGet(ADC_VBAT) * 100 / 376;
 	

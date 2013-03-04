@@ -48,6 +48,6 @@ extern uint16_t MIXER[8];
 
 void mixerInit();
 void mixerLoadModel(uint8_t index);
-void mixerMixing();
+void mixerCalculate();
 
 #endif /* MIXER_H_ */

@@ -103,7 +103,7 @@ typedef struct
 
 #define RX_CHANNELS			8
 #define PWM_MIN				800		// was 922
-#define PWM_LOW				1120	// used if output = 0
+#define PWM_LOW				1100	// used if output = 0
 #define PWM_MID				1520
 #define PWM_MAX				2200	// was 2118
 #define PWM_CAL_RANGE		100

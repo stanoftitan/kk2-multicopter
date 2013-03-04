@@ -16,9 +16,11 @@
 #define ON		1
 #define OFF		0
 
+/*
 #define XAXIS	0
 #define YAXIS	1
 #define ZAXIS	2
+*/
 
 #define ROL		0
 #define PIT		1
@@ -58,6 +60,7 @@ typedef struct
 	uint8_t Mode;
 	
 	uint16_t CycleTime;
+	uint16_t CalculationTime;
 } state_t;
 
 extern state_t State;

@@ -12,21 +12,21 @@
 #include <avr/pgmspace.h>
 
 uint16_t PWM[8];
-static uint16_t _lastLoStart;
 
-const uint8_t masktable[] PROGMEM = {_BV(OUT1_BIT), _BV(OUT2_BIT), _BV(OUT3_BIT), _BV(OUT4_BIT), _BV(OUT5_BIT), _BV(OUT6_BIT), _BV(OUT7_BIT), _BV(OUT8_BIT)};
+static const uint8_t masktable[] PROGMEM = {_BV(OUT1_BIT), _BV(OUT2_BIT), _BV(OUT3_BIT), _BV(OUT4_BIT), _BV(OUT5_BIT), _BV(OUT6_BIT), _BV(OUT7_BIT), _BV(OUT8_BIT)};
 
 __attribute__ ((section(".lowtext")))
 ISR(TIMER1_COMPA_vect)
 {
-	static int8_t _index;
-	uint16_t t2 = millis();
-	static uint8_t loActive = OFF;
+	static uint8_t _index;
+	static uint8_t loActive;
+	static uint16_t _lastLoStart;
 	
 	OUT_PORT = 0;
 	
 	if (_index == 0)
 	{
+		uint16_t t2 = millis();		
 		if (t2 - _lastLoStart > 20)
 		{
 			_lastLoStart = t2;
@@ -42,9 +42,9 @@ ISR(TIMER1_COMPA_vect)
 		OCR1A = (uint16_t)(TCNT1 + (PWM[_index]));
 	}
 	else
-		OCR1A = (uint16_t)(TCNT1 + MICROTOTICKS(100));
+		OCR1A = (uint16_t)(TCNT1 + MICROTOTICKS(50));
 		
-	_index = (_index + 1) & 0x07;
+	_index = (_index + 1) % 8;
 
 }
 
@@ -57,7 +57,7 @@ void pwmInit()
 void pwmWrite(uint8_t channel, uint16_t value)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
-		PWM[channel] = value * TICKSPERMICRO;
+		PWM[channel] = (uint16_t) MICROTOTICKS(value);
 }
 
 void pwmEnable()

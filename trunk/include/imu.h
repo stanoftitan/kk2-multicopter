@@ -12,6 +12,7 @@
 #define IMU_H_
 
 extern int16_t ANGLE[3];
+extern int16_t GYRO_RATE[3];
 
 void imuCalculate();
 

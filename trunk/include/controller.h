@@ -12,8 +12,8 @@
 extern int16_t CONTROL[4];
 
 void controllerReset();
-void controller();
-
+void controllerCalculate();
+int16_t limit(int16_t value, int16_t low, int16_t high);
 
 
 
