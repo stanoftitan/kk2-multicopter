@@ -22,7 +22,7 @@
 
 #define ROL		0
 #define PIT		1
-#define RUD		2
+#define YAW		2
 #define THR		3
 
 #define noinit __attribute__((section(".noinit")))

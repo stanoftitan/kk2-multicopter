@@ -55,6 +55,13 @@ static int16_t calcComplementaryAngle(uint8_t axis)
 	return r;
 }
 
+static int16_t calcYawAngle()
+{
+	//int32_t r;
+	return ANGLE[ZAXIS] + GYRO_RATE[ZAXIS];
+
+}
+
 static void imuComplementary()
 {
 	static uint32_t lastCall;
@@ -70,7 +77,7 @@ static void imuComplementary()
 	
 	ANGLE[XAXIS] = calcComplementaryAngle(XAXIS);
 	ANGLE[YAXIS] = calcComplementaryAngle(YAXIS);
-	ANGLE[ZAXIS] = ACC_ANGLE[ZAXIS];
+	ANGLE[ZAXIS] = calcYawAngle();
 	
 	lastCall += dt;
 }
