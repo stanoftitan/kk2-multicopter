@@ -54,7 +54,6 @@ void digitalsLoop()
 void digitalsBuzz(uint16_t ms)
 {
 	digBUZZER.end = millis() + ms;
-	digBUZZER.interval = 0;
 	BUZZER = ON;
 }
 

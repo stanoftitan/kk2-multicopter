@@ -63,6 +63,10 @@ uint16_t millis()
 
 void setup()
 {
+	//disable JTAG port
+	MCUCR |= _BV(JTD);
+	MCUCR |= _BV(JTD);
+	
 	LED_DIR = OUTPUT;
 	
 	// Timer1 @20MHz with overflow interrupt

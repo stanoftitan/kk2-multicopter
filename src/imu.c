@@ -58,8 +58,7 @@ static int16_t calcComplementaryAngle(uint8_t axis)
 static int16_t calcYawAngle()
 {
 	//int32_t r;
-	return ANGLE[ZAXIS] + GYRO_RATE[ZAXIS];
-
+	return ANGLE[YAW] + GYRO_RATE[YAW];
 }
 
 static void imuComplementary()
@@ -67,17 +66,17 @@ static void imuComplementary()
 	static uint32_t lastCall;
 	uint16_t dt = ticks() - lastCall;
 		
-	ACC_ANGLE[XAXIS] = getAccAngle(ACC[XAXIS]) + (Config.AccTrim[XAXIS] << 8);
-	ACC_ANGLE[YAXIS] = getAccAngle(ACC[YAXIS]) + (Config.AccTrim[YAXIS] << 8);
-	ACC_ANGLE[ZAXIS] = getAccAngle(ACC[ZAXIS]) + (90 << 8);
+	ACC_ANGLE[ROL] = getAccAngle(ACC[ROL]) + (Config.AccTrim[ROL] << 8);
+	ACC_ANGLE[PIT] = getAccAngle(ACC[PIT]) + (Config.AccTrim[PIT] << 8);
+	ACC_ANGLE[YAW] = getAccAngle(ACC[YAW]) + (90 << 8);
 
-	GYRO_RATE[XAXIS] = calcGyroRate(XAXIS, dt);
-	GYRO_RATE[YAXIS] = calcGyroRate(YAXIS, dt);
-	GYRO_RATE[ZAXIS] = calcGyroRate(ZAXIS, dt);
+	GYRO_RATE[ROL] = calcGyroRate(ROL, dt);
+	GYRO_RATE[PIT] = calcGyroRate(PIT, dt);
+	GYRO_RATE[YAW] = calcGyroRate(YAW, dt);
 	
-	ANGLE[XAXIS] = calcComplementaryAngle(XAXIS);
-	ANGLE[YAXIS] = calcComplementaryAngle(YAXIS);
-	ANGLE[ZAXIS] = calcYawAngle();
+	ANGLE[ROL] = calcComplementaryAngle(ROL);
+	ANGLE[PIT] = calcComplementaryAngle(PIT);
+	ANGLE[YAW] = calcYawAngle();
 	
 	lastCall += dt;
 }

@@ -198,10 +198,10 @@
     <Compile Include="src\imu.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\main.c">
+    <Compile Include="src\lva.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\math.c">
+    <Compile Include="src\main.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\mixer.c">

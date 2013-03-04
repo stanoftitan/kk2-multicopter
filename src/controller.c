@@ -17,7 +17,7 @@ int16_t CONTROL[4];
 
 static pid_state_t PID[3];
 
-static int16_t limit(int16_t value, int16_t low, int16_t high)
+int16_t limit(int16_t value, int16_t low, int16_t high)
 {
 	if (value < low) return low;
 	else if (value > high) return high;
@@ -32,32 +32,38 @@ int16_t calcChannel(uint8_t index)
 	// RX = -140..+140
 	// StickScaling = 0..+200
 	// ==> -28000..+28000 -> 16bit
-	err = RX[index] * Config.StickScaling[index];
-	err <<= 2;
-	err -= ANGLE[index] ;
-	err >>= 8;
+	err = RX[index] * Config.StickScaling[index] * 2;
+	
+	if (index == YAW)
+		err += GYRO_RATE[YAW];
+	else
+		err += ANGLE[index];
+		
+	//err >>= 8;
 	if (err < 0) err++;
 
-	r = err * Config.PID[index].PGain;
+	r = (int32_t)err * Config.PID[index].PGain;
 	
 	//PID[index].Integral += err;
 	//r += PID[index].Integral * Config.PID[index].IGain;
 	
-	return r >> 4;
+	r >>= 12;
+	if (r < 0) r++;
+	return r;
 }
 
 uint16_t calcThrottle()
 {
 	int32_t r;
 	r = RX[THR] * Config.StickScaling[THR];
-	return r >> 4;
+	return r >> 5;
 }
 
-void controller()
+void controllerCalculate()
 {
-	CONTROL[ROL] = calcChannel(ROL);
+	CONTROL[ROL] = -calcChannel(ROL);
 	CONTROL[PIT] = calcChannel(PIT);
-	CONTROL[YAW] = calcChannel(YAW);
+	CONTROL[YAW] = -calcChannel(YAW);
 	CONTROL[THR] = calcThrottle();
 }
 

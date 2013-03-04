@@ -548,10 +548,10 @@ static void _hStart()
 		writePadded(s, 3);
 	
 		// roll angle
-		writeValue(5, 13*6, (int16_t)ANGLE[YAXIS] >> 8, 7, -1);
+		writeValue(5, 13*6, (int16_t)ANGLE[ROL] >> 8, 7, -1);
 	
 		// pitch angle
-		writeValue(6, 13*6, (int16_t)ANGLE[XAXIS] >> 8, 7, -1);
+		writeValue(6, 13*6, (int16_t)ANGLE[PIT] >> 8, 7, -1);
 	}	
 }
 
@@ -862,8 +862,8 @@ static void _hSelflevelSettings()
 	static edit_element_t const elements[] PROGMEM = {
 		{ 0, 54, &Config.PID_SelfLevel.PGain, 0, 250, 5 },
 		{ 1, 54, &Config.PID_SelfLevel.PLimit, 0, 250, 5 },
-		{ 3, 96, &Config.AccTrim[YAXIS], -45, 45, 5 },
-		{ 4, 96, &Config.AccTrim[XAXIS], -45, 45, 5 },
+		{ 3, 96, &Config.AccTrim[ROL], -45, 45, 5 },
+		{ 4, 96, &Config.AccTrim[PIT], -45, 45, 5 },
 	};
 	simplePageHandler(elements, length(elements));
 }
@@ -936,8 +936,6 @@ void menuShow()
 	defaultHandler();
 	lcdEnable();
 
-	if (KEYPRESS)
-		digitalsBuzz(5);
 }
 
 void menuInit()
