@@ -55,9 +55,12 @@ static void init()
 	
 	mixerInit();
 	pwmInit();
-	lcdInit();
 	keyboardInit();
+
+#ifndef NO_LCD
+	lcdInit();
 	menuInit();
+#endif
 }
 
 static void checkState()
@@ -87,9 +90,11 @@ static void checkState()
 static void ESCCalibration()
 {
 	State.Mode = MODE_ESC_CAL;
+#ifndef NO_LCD
 	lcdClear();
 	lcdSetPos(3, 18);
 	lcdWriteString_P(PSTR("Calibrating ESCs"));
+#endif
 	pwmEnable();
 	while(1)
 	{
@@ -143,6 +148,7 @@ int main(void)
 	// init hardware
 	init();
 
+#ifndef NO_LCD
 	lcdClear();
 	lcdSetPos(0, 0);
 	lcdSelectFont(&font12x16);
@@ -152,6 +158,7 @@ int main(void)
 	lcdWriteString_P(versionNum);
 	lcdSetPos(4, 0);
 	lcdWriteString_P(versionAuthor);
+#endif
 	digitalsBuzzBlocking(500);
 	WAITMS(700);
 	
@@ -179,8 +186,10 @@ int main(void)
 		
 		State.CalculationTime = TICKSTOMICRO(ticks() - _cycleStart);
 
+#ifndef NO_LCD
 		EVERYMS(25)
 			menuShow();
+#endif
 	
 		lvaLoop();
 	 	digitalsLoop();

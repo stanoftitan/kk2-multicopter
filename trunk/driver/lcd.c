@@ -7,6 +7,8 @@
  * $Id$
 */ 
 
+#ifndef NO_LCD
+
 #include "global.h"
 #include <avr/pgmspace.h>
 #include <string.h>
@@ -264,6 +266,7 @@ void lcdWriteString(char *s)
 void lcdWriteString_P(PGM_P s)
 {
 	char c;
+	if (s == NULL) return;
 	while ((c = pgm_read_byte(s++)))
 		lcdWriteChar(c);
 }
@@ -349,3 +352,4 @@ void lcdInit()
 	lcdEnable();
 }
 
+#endif /* NO_LCD */

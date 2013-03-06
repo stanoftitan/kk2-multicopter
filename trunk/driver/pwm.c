@@ -11,42 +11,73 @@
 #include "rx.h"
 #include <avr/pgmspace.h>
 
-uint16_t PWM[8];
-
+static uint16_t PWM[8];
 static const uint8_t masktable[] PROGMEM = {_BV(OUT1_BIT), _BV(OUT2_BIT), _BV(OUT3_BIT), _BV(OUT4_BIT), _BV(OUT5_BIT), _BV(OUT6_BIT), _BV(OUT7_BIT), _BV(OUT8_BIT)};
 
+#define USE_2_OC
+
+static uint8_t checkLoRate(uint16_t* lastStart)
+{
+	uint16_t t = millis();
+	if (t - *lastStart >= 20)
+	{
+		*lastStart = t;
+		return ON;
+	}
+	else
+		return OFF;
+}
+
+static uint16_t doOutput(uint8_t index, uint8_t loActive)
+{
+	if (PWM[index] && (Config.Mixer[index].flags & FLAG_TYPE) && (loActive || (Config.Mixer[index].flags & FLAG_HIGH)))
+	{
+		cli();
+		OUT_PORT |= pgm_read_byte(&masktable[index]);
+		return (uint16_t)(TCNT1 + (PWM[index]));
+	}
+	else
+		return (uint16_t)(TCNT1 + MICROTOTICKS(100));	
+}
+
+// for odd output numbers
 __attribute__ ((section(".lowtext")))
 ISR(TIMER1_COMPA_vect)
 {
-	static uint8_t _index;
+	static uint8_t index;
 	static uint8_t loActive;
-	static uint16_t _lastLoStart;
+	static uint16_t lastLoStart;
 	
-	OUT_PORT = 0;
+	OUT_PORT &= ~(_BV(OUT1_BIT) | _BV(OUT3_BIT) | _BV(OUT5_BIT) | _BV(OUT7_BIT));
+	sei();
 	
-	if (_index == 0)
-	{
-		uint16_t t2 = millis();		
-		if (t2 - _lastLoStart > 20)
-		{
-			_lastLoStart = t2;
-			loActive = ON;
-		}
-		else
-			loActive = OFF;
-	}
-	
-	if (PWM[_index] && ((Config.Mixer[_index].flags & (FLAG_HIGH | FLAG_ESC)) || loActive ))
-	{
-		OUT_PORT = pgm_read_byte(&masktable[_index]);
-		OCR1A = (uint16_t)(TCNT1 + (PWM[_index]));
-	}
-	else
-		OCR1A = (uint16_t)(TCNT1 + MICROTOTICKS(50));
-		
-	_index = (_index + 1) % 8;
+	if (index == 0)
+		loActive = checkLoRate(&lastLoStart);
 
+	OCR1A = doOutput(index * 2, loActive);
+	sei();
+	index = (index + 1) % 4;
 }
+
+// for even output numbers
+__attribute__ ((section(".lowtext")))
+ISR(TIMER1_COMPB_vect)
+{
+	static uint8_t index;
+	static uint8_t loActive;
+	static uint16_t lastLoStart;
+	
+	OUT_PORT &= ~(_BV(OUT2_BIT) | _BV(OUT4_BIT) | _BV(OUT6_BIT) | _BV(OUT8_BIT));
+	sei();
+	
+	if (index == 0)
+		loActive = checkLoRate(&lastLoStart);
+	
+	OCR1B = doOutput(index * 2 + 1, loActive);
+	sei();
+	index = (index + 1) % 4;
+}
+
 
 void pwmInit()
 {
@@ -63,16 +94,17 @@ void pwmWrite(uint8_t channel, uint16_t value)
 void pwmEnable()
 {
 	OCR1A = TCNT1;
-	TIFR1 |= _BV(OCF1A);	// clear OCA interrupt
-	TIMSK1 |= _BV(OCIE1A);	// enable OCA interrupt on timer1
+	OCR1B = TCNT1;
+	TIFR1 |= _BV(OCF1A) | _BV(OCF1B);		// clear OCA and OCB interrupt
+	TIMSK1 |= _BV(OCIE1A) | _BV(OCIE1B);	// enable OCA and OCB interrupt on timer1
 }
 
 void pwmDisable()
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		TIMSK1 &= ~_BV(OCIE1A);	// disable OCA interrupt on timer1
-		TIFR1 |= _BV(OCF1A);	// clear OCA interrupt
+		TIMSK1 &= ~(_BV(OCIE1A) | _BV(OCIE1B));	// disable OCA and OCB interrupt on timer1
+		TIFR1 |= _BV(OCF1A) | _BV(OCF1B);		// clear OCA and OCB interrupt
 	}
 	OUT_PORT = 0x00;		// all OFF
 }
