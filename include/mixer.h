@@ -12,9 +12,10 @@
 #define MIXER_H_
 
 #define FLAG_NONE		0
-#define FLAG_SERVO		0
+#define FLAG_SERVO		1
 #define FLAG_ESC		2
-#define FLAG_HIGH		1
+#define FLAG_HIGH		4
+#define FLAG_TYPE		3
 
 
 typedef union

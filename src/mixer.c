@@ -41,7 +41,7 @@ void mixerCalculate()
 	
 	for (uint8_t i = 0; i < 8; i++)
 	{
- 		if (Config.Mixer[i].flags == FLAG_NONE)
+ 		if (!(Config.Mixer[i].flags & FLAG_TYPE))
  			MIXER[i] = 0;
  		else
 		{
@@ -50,7 +50,7 @@ void mixerCalculate()
 			r += (int32_t) CONTROL[ELE] * Config.Mixer[i].Elevator;
 			r += (int32_t) CONTROL[RUD] * Config.Mixer[i].Rudder;
 			r += (int32_t) CONTROL[THR] * Config.Mixer[i].Throttle;
-			r += (int32_t) 320 * Config.Mixer[i].Offset;
+			r += (int32_t) ((PWM_MID - PWM_LOW) * 32 / 50) * Config.Mixer[i].Offset;
 		
 			MIXER[i] = limit(PWM_LOW + (r >> 5), PWM_MIN, PWM_MAX);
 		}

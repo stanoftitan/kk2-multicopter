@@ -7,6 +7,8 @@
 * $Id$
 */
 
+#ifndef NO_LCD
+
 #include "global.h"
 #include "lcd.h"
 #include "keyboard.h"
@@ -262,10 +264,8 @@ static void editModeHandler()
 			*(uint8_t*)editValuePtr = editValue;
 		else if (editValueType == TYPE_INT8)
 			*(int8_t*)editValuePtr = editValue;
-// 		else if (editValueType == TYPE_INT16)
-// 			*(int16_t*)editValuePtr = editValue;
 		
-		configSave();
+		//configSave();
 		lcdSelectFont(NULL);
 		_mykey = KEY_REFRESH;
 		// call defaultHandler to refresh the screen
@@ -378,8 +378,8 @@ static void showMotor(uint8_t motor, uint8_t withDir)
 	
 	if (channel->flags & FLAG_ESC)
 	{
-		x = CENTER_X + (channel->Aileron >> 2);
-		y = CENTER_Y - (channel->Elevator >> 2);
+		x = CENTER_X + (channel->Aileron / 4);
+		y = CENTER_Y - (channel->Elevator / 4);
 	
 		lcdLine(x, y, CENTER_X, CENTER_Y);
 		lcdXY(CENTER_X - 2, CENTER_Y - 2);
@@ -432,6 +432,8 @@ static void _hShowModelLayout()
 			elementIndex = (elementIndex + 1) % 9;
 		
 		lcdClear();
+		writeSoftkeys(NULL);
+		lcdSetPos(0, 0);
 		lcdWriteString_P(strOutput);
 		lcdWriteChar(32);
 		if (elementIndex == 0)
@@ -445,7 +447,6 @@ static void _hShowModelLayout()
 			lcdWriteChar(elementIndex + '0');
 			showMotor(elementIndex - 1, 1);
 		}
-		writeSoftkeys(NULL);
 	}
 }
 
@@ -468,7 +469,7 @@ static void _hLoadModelLayout()
 	else if (KEY4)		// YES
 	{
 		mixerLoadModel(mnuMLayout.marked);
-		configSave();
+		//configSave();
 		loadPage(PAGE_SHOW_LAYOUT);
 	}
 }
@@ -736,7 +737,7 @@ static void _hModeSettings()
 		else if (elementIndex == 2) Config.LinkRollPitch = !Config.LinkRollPitch;
 		else if (elementIndex == 3) Config.AutoDisarm = !Config.AutoDisarm;
 		else Config.ReceiverMode = !Config.ReceiverMode; rxInit(Config.ReceiverMode);
-		configSave();
+		//configSave();
 	}
 	
 	const char* str;
@@ -801,8 +802,8 @@ static void _hMixerEditor()
 			startEditMode(&Config.Mixer[subpage].I8[elementIndex - 1], -127, 127, TYPE_INT8); 
 			return;
 		}						
-		else if (elementIndex == 6)
-			Config.Mixer[subpage].flags ^= FLAG_ESC;
+		else if (elementIndex == 6)		// type
+			Config.Mixer[subpage].flags = (((Config.Mixer[subpage].flags & FLAG_TYPE) + 1) & FLAG_TYPE) | (Config.Mixer[subpage].flags & ~FLAG_TYPE);
 		else
 			Config.Mixer[subpage].flags ^= FLAG_HIGH;
 	}
@@ -811,7 +812,15 @@ static void _hMixerEditor()
 	writeValue(0, 120, subpage + 1, 1, 0);
 	for (uint8_t i = 0; i < 5; i++)
 		writeValue(i, 60, Config.Mixer[subpage].I8[i], 4, i + 1);
-	writeString_P(5, 36, Config.Mixer[subpage].flags & FLAG_ESC ? strESC : strServo, 5, 6);
+	char *s;
+	if (Config.Mixer[subpage].flags & FLAG_ESC)
+		s = strESC;
+	else if (Config.Mixer[subpage].flags & FLAG_SERVO)
+		s = strServo;
+	else
+		s = strOff;
+		
+	writeString_P(5, 36, s, 5, 6);
 	writeString_P(5, 108, Config.Mixer[subpage].flags & FLAG_ESC ? strHigh : Config.Mixer[subpage].flags & FLAG_HIGH ? strHigh : strLow, 3, 7);
 }
 
@@ -871,10 +880,10 @@ static void _hSelflevelSettings()
 static void _hCameraStabSettings()
 {
 	static edit_element_t const elements[] PROGMEM = {
-		{ 2, 96, &Config.Camera.RollGain, -128, 127, 5 },
-		{ 3, 96, &Config.Camera.RollOffset, -128, 127, 5 },
-		{ 4, 96, &Config.Camera.PitchGain, -128, 127, 5 },
-		{ 5, 96, &Config.Camera.PitchOffset, -128, 127, 5 },
+		{ 2, 84, &Config.Camera.RollGain, -128, 127, 5 },
+		{ 3, 84, &Config.Camera.RollOffset, -128, 127, 5 },
+		{ 4, 84, &Config.Camera.PitchGain, -128, 127, 5 },
+		{ 5, 84, &Config.Camera.PitchOffset, -128, 127, 5 },
 	};
 	simplePageHandler(elements, length(elements));
 }
@@ -922,7 +931,10 @@ void menuShow()
 		if (page > PAGE_MENU)
 			loadPage(PAGE_MENU);
 		else if (page == PAGE_MENU)
+		{
+			configSave();
 			loadPage(PAGE_START);
+		}			
 	}
 	
 	lcdDisable();
@@ -956,3 +968,5 @@ static PGM_P tsmLoadModelLayout(uint8_t index)
 	memcpy_P(&model, pmodel, sizeof(model));
 	return (PGM_P)model.Name;
 }
+
+#endif /* NO_LCD */
