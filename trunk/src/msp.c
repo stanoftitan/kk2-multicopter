@@ -113,7 +113,7 @@ static void evalutateCmd()
 		case MSP_IDENT:
 			writeResponseHeader(7);
 			write8(210);		// version 210
-			write8(2);			// 2 = QUADX
+			write8(2);			// 2 = QUADP
 			write8(MSP_VERSION);
 			write32(0);
 			break;

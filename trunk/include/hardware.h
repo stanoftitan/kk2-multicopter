@@ -108,8 +108,13 @@ typedef struct
 #define PWM_MAX				2100	// was 2118
 #define PWM_CAL_RANGE		100
 #define PPM_SYNC_LENGTH		3000
+#define LO_RATE_CYCLE		20		// cycle time for lo-rate servos in ms
+#define RX_THRESHOLD		75	
+#define ARM_DELAY			2000	// in ms
+#define DISARM_DELAY		60000	// in ms
 
 /// Outputs
+#define OUTPUTS		8
 #define OUT_PORT	PORTC
 #define OUT_DDR		DDRC
 #define OUT1_BIT	6
@@ -147,5 +152,11 @@ typedef struct
 #define BUZZER_DIR		_REG_BIT(BUZZER_DDR, BUZZER_BIT)
 #define BUZZER			_REG_BIT(BUZZER_PORT, BUZZER_BIT)
 #define BUZZER_TOGGLE	(_REG_BIT(BUZZER_PIN, BUZZER_BIT) = 1)
+
+#ifndef PRR1
+#define PRR1 _SFR_MEM8(0x65)
+#define PRTIM3 0
+#endif
+
 
 #endif /* HARDWARE_H_ */

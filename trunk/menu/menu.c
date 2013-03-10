@@ -23,18 +23,20 @@
 #include "controller.h"
 #include "imu.h"
 
-uint8_t _mykey;
+static uint8_t keys;
 #define KEY_INIT	1
 #define KEY_REFRESH	2
-#define KEYINIT		(_mykey & KEY_INIT)
-#define KEYREFRESH	(_mykey & KEY_REFRESH)
-#define KEY1		(_mykey & KEY_1)
-#define KEY2		(_mykey & KEY_2)
-#define KEY3		(_mykey & KEY_3)
-#define KEY4		(_mykey & KEY_4)
-#define ANYKEY		(_mykey)
-#define KEYPRESS	(_mykey & (KEY_1|KEY_2|KEY_3|KEY_4))
-#define NOKEYRETURN {if (!_mykey) return;}
+#define KEY_MENU	4
+#define KEYINIT		(keys & KEY_INIT)
+#define KEYREFRESH	(keys & KEY_REFRESH)
+#define KEYMENU		(keys & KEY_MENU)
+#define KEY1		(keys & KEY_1)
+#define KEY2		(keys & KEY_2)
+#define KEY3		(keys & KEY_3)
+#define KEY4		(keys & KEY_4)
+#define ANYKEY		(keys)
+#define KEYPRESS	(keys & (KEY_1|KEY_2|KEY_3|KEY_4))
+#define NOKEYRETURN {if (!keys) return;}
 
 typedef struct
 {
@@ -157,8 +159,8 @@ static const char* const lstMenu[] PROGMEM = {
 static PGM_P tsmMain(uint8_t);
 static PGM_P tsmLoadModelLayout(uint8_t);
 
-static uint8_t page, elementIndex, subpage;
-static uint8_t oldPage;
+uint8_t menuPage;
+static uint8_t elementIndex, subpage;
 static uint16_t _tStart;
 static page_t currentPage;
 static menu_t mnuMain = {length(lstMenu), tsmMain};
@@ -221,7 +223,10 @@ static void writeValue(uint8_t x, uint8_t y, int16_t value, uint8_t len, uint8_t
 static void loadPage(uint8_t pageIndex)
 {
 	memcpy_P(&currentPage, &pages[pageIndex], sizeof(currentPage));
-	page = pageIndex;
+	menuPage = pageIndex;
+	keys = KEY_MENU;
+	elementIndex = 0;
+	subpage = 0;
 }
 
 static void elementKey(uint8_t num)
@@ -267,7 +272,7 @@ static void editModeHandler()
 		
 		//configSave();
 		lcdSelectFont(NULL);
-		_mykey = KEY_REFRESH;
+		keys = KEY_REFRESH;
 		// call defaultHandler to refresh the screen
 		defaultHandler();
 		return;
@@ -294,7 +299,7 @@ static void editModeHandler()
 static void startEditMode(void* valuePtr, int16_t loLimit, int16_t hiLimit, uint8_t valueType)
 {
 	editMode = ON;
-	_mykey = KEY_INIT;
+	keys = KEY_INIT;
 	editValuePtr = valuePtr;
 	editValueType = valueType;
 	
@@ -319,7 +324,7 @@ static void startEditMode(void* valuePtr, int16_t loLimit, int16_t hiLimit, uint
 
 static uint8_t doMenu(menu_t *menu)
 {
-	if (!_mykey) return 0;
+	if (!keys) return 0;
 	
 	// key handling
 	if (KEY2)		// UP
@@ -376,7 +381,7 @@ static void showMotor(uint8_t motor, uint8_t withDir)
 	uint8_t x, y;
 	mixer_channel_t *channel = &Config.Mixer[motor];
 	
-	if (channel->flags & FLAG_ESC)
+	if (channel->IsMotor)
 	{
 		x = CENTER_X + (channel->Aileron / 4);
 		y = CENTER_Y - (channel->Elevator / 4);
@@ -413,14 +418,10 @@ static void showMotor(uint8_t motor, uint8_t withDir)
 	else if (withDir)
 	{
 		lcdSetPos(3, 64);
-		if (channel->Aileron == 0 &&
-			channel->Elevator == 0 &&
-			channel->Throttle == 0 &&
-			channel->Rudder == 0 &&
-			channel->Offset == 0)
-			lcdWriteString_P(strUnused);
-		else
+		if (channel->IsServo)
 			lcdWriteString_P(strServo);
+		else
+			lcdWriteString_P(strUnused);
 	}
 }
 
@@ -483,11 +484,12 @@ static void _hStart()
 		return;
 	}
 	
-	if (KEYINIT)
+	if (KEYINIT || KEYREFRESH)
 	{
 		if (State.Armed)
 		{
-			lcdSetPos(0, 16);
+			lcdClear();
+			lcdSetPos(3, 36);
 			lcdSelectFont(&font12x16);
 			lcdWriteString_P(strARMED);
 			lcdSelectFont(NULL);
@@ -587,14 +589,14 @@ static void _hReceiverTest()
 			{
 				if (State.ThrottleOff)
 					writePadded_P(strIdle, 5);
-				else if (RX[THR] >= 90)
+				else if (RX[THR] >= RX_THRESHOLD)
 					writePadded_P(strFull, 5);
 				else
 					writeSpace(5);
 			}
 			else
 			{
-				if (abs(RX[i]) > 10)
+				if (abs(RX[i]) > (RX_THRESHOLD / 2))
 					writePadded_P((PGM_P)pgm_read_word(&info[i][RX[i] > 0]), 5);
 				else
 					writeSpace(5);
@@ -803,27 +805,34 @@ static void _hMixerEditor()
 			return;
 		}						
 		else if (elementIndex == 6)		// type
-			Config.Mixer[subpage].flags = (((Config.Mixer[subpage].flags & FLAG_TYPE) + 1) & FLAG_TYPE) | (Config.Mixer[subpage].flags & ~FLAG_TYPE);
+		{
+			if (Config.Mixer[subpage].Flags == 0)
+				Config.Mixer[subpage].Flags = FLAG_ESC | FLAG_HIGH;
+			else if (Config.Mixer[subpage].IsMotor)
+				Config.Mixer[subpage].Flags = FLAG_SERVO;
+			else 
+				Config.Mixer[subpage].Flags = FLAG_NONE;
+		}		
 		else
-			Config.Mixer[subpage].flags ^= FLAG_HIGH;
+			Config.Mixer[subpage].Flags ^= FLAG_HIGH;
 	}
 	
 	elementKey(8);
 	writeValue(0, 120, subpage + 1, 1, 0);
 	for (uint8_t i = 0; i < 5; i++)
 		writeValue(i, 60, Config.Mixer[subpage].I8[i], 4, i + 1);
-	char *s;
-	if (Config.Mixer[subpage].flags & FLAG_ESC)
+	const char *s;
+	
+	if (Config.Mixer[subpage].IsMotor)
 		s = strESC;
-	else if (Config.Mixer[subpage].flags & FLAG_SERVO)
+	else if (Config.Mixer[subpage].IsServo)
 		s = strServo;
 	else
 		s = strOff;
 		
 	writeString_P(5, 36, s, 5, 6);
-	writeString_P(5, 108, Config.Mixer[subpage].flags & FLAG_ESC ? strHigh : Config.Mixer[subpage].flags & FLAG_HIGH ? strHigh : strLow, 3, 7);
+	writeString_P(5, 108, Config.Mixer[subpage].IsMotor || Config.Mixer[subpage].IsHiRate ? strHigh : strLow, 3, 7);
 }
-
 
 static void simplePageHandler(const edit_element_t *elements, uint8_t len)
 {
@@ -908,9 +917,7 @@ static void _hCPPMSettings()
 	uint8_t subpage = elementIndex / 4;
 	
 	if (KEYINIT || KEYREFRESH || oldsubpage != subpage)
-	{
 		writeCPPMScreen(subpage);
-	}
 	
 	if (KEY4)	// CHANGE?
 	{
@@ -922,38 +929,37 @@ static void _hCPPMSettings()
 		writeValue(2 + i, 13*6, Config.RX_chmap[subpage * 4 + i], 1, i + subpage * 4);
 }
 
-void menuShow()
+void menuLoop()
 {
-	_mykey = keyboardRead();
+	if (keys == 0)
+		keys = keyboardRead();
 		
 	if (KEY1 && !editMode)	// BACK
 	{
-		if (page > PAGE_MENU)
+		if (menuPage > PAGE_MENU)
 			loadPage(PAGE_MENU);
-		else if (page == PAGE_MENU)
+		else if (menuPage == PAGE_MENU)
 		{
 			configSave();
 			loadPage(PAGE_START);
 		}			
 	}
 	
-	lcdDisable();
-	if (oldPage != page)
-	{
-		_mykey = KEY_INIT;
-		elementIndex = 0;
-		subpage = 0;
-		oldPage = page;
-	}
+	if (KEYMENU)
+		keys = KEY_INIT;
 	defaultHandler();
-	lcdEnable();
-
+	keys &= KEY_MENU;
 }
 
 void menuInit()
 {
-	oldPage = 0xFF;
 	loadPage(PAGE_START);
+}
+
+void menuRefresh()
+{
+	keys |= KEY_REFRESH;
+	menuLoop();
 }
 
 static PGM_P tsmMain(uint8_t index)

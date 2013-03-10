@@ -64,6 +64,9 @@ ISR(USART1_RX_vect)
 
 void serialInit()
 {
+	// enable hardware
+	PRR0 |= PRUSART1;
+	
 	// reset pointers
 	TX_Buf.WritePtr = 0;
 	TX_Buf.ReadPtr = 0;

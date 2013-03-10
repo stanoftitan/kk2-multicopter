@@ -63,9 +63,13 @@ uint16_t millis()
 
 void setup()
 {
-	//disable JTAG port
+	// disable JTAG port
 	MCUCR |= _BV(JTD);
 	MCUCR |= _BV(JTD);
+	
+	// disable all hardware but Timer1
+	//PRR0 = 0xFF & ~PRTIM1;
+	//PRR1 = 0xFF;
 	
 	LED_DIR = OUTPUT;
 	

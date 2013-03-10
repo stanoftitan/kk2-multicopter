@@ -22,6 +22,7 @@
 #include "serial.h"
 #include "msp.h"
 #include <avr/wdt.h>
+#include <avr/sleep.h>
 
 // for debugging
 #include <stdlib.h>
@@ -101,7 +102,7 @@ static void ESCCalibration()
 		rxRead();
 		for (uint8_t i = 0; i < 8; i++)
 		{
-			if (Config.Mixer[i].flags & FLAG_ESC)
+			if (Config.Mixer[i].IsMotor)
 				pwmWrite(i, RX_raw[THR]);
 			else
 				pwmWrite(i, PWM_MID);
@@ -109,6 +110,90 @@ static void ESCCalibration()
 	}
 }
 
+static void arm(uint8_t value)
+{
+	if (value && !State.Armed)
+	{
+		State.Armed = ON;
+		LED = ON;
+		menuRefresh();
+		lcdDisable();
+	}
+	else if (!value && State.Armed)
+	{
+		State.Armed = OFF;
+		LED = OFF;
+		menuRefresh();
+		lcdEnable();
+	}
+}
+
+static void armingLoop()
+{
+	static uint16_t startArm;
+	static uint16_t startOff;
+	uint16_t t = millis();
+	
+	if (menuPage != 0) return;
+	if (State.Error != 0) return;
+	
+	if (startArm == 0)
+	{
+		if (State.ThrottleOff && abs(RX[YAW]) > RX_THRESHOLD)
+			startArm = t;
+	}
+	else if (!State.ThrottleOff || abs(RX[YAW]) < RX_THRESHOLD)
+		startArm = 0;
+	else if (t - startArm >= ARM_DELAY)
+	{
+		if (RX[YAW] > RX_THRESHOLD)
+			arm(ON);
+		else
+			arm(OFF);
+		startArm = 0;
+	}				
+	
+	if (Config.AutoDisarm)
+	{
+		if (startOff == 0)
+		{
+			if (State.ThrottleOff)
+				startOff = t;
+		}
+		else if (!State.ThrottleOff)
+		{
+			startOff = 0;
+		}
+		else if (t - startOff >= DISARM_DELAY)
+		{
+			arm(OFF);
+			startOff = 0;
+		}
+	}	
+}
+
+static void startup()
+{
+#ifndef NO_LCD
+	lcdClear();
+	lcdSetPos(0, 0);
+	lcdSelectFont(&font12x16);
+	lcdWriteString_P(PSTR("KK2-Copter"));
+	lcdSelectFont(NULL);
+	lcdSetPos(3, 0);
+	lcdWriteString_P(versionNum);
+	lcdSetPos(4, 0);
+	lcdWriteString_P(versionAuthor);
+#endif
+	digitalsBuzzBlocking(500);
+	WAITMS(700);	
+
+	rxRead();
+	if (RX[THR] >= 90 || keyboardState() == (KEY_1 | KEY_4))		// enter ESC Calibration mode?
+		ESCCalibration();
+}
+
+#ifdef DEBUG
 static void write16(int16_t v)
 {
 	serialWriteChar(v & 0xFF);
@@ -136,6 +221,7 @@ static void debug_output()
 	write16(MIXER[3]);
 	write16(State.CalculationTime);
 }
+#endif
 
 int main(void)
 {
@@ -148,24 +234,8 @@ int main(void)
 	// init hardware
 	init();
 
-#ifndef NO_LCD
-	lcdClear();
-	lcdSetPos(0, 0);
-	lcdSelectFont(&font12x16);
-	lcdWriteString_P(PSTR("KK2-Copter"));
-	lcdSelectFont(NULL);
-	lcdSetPos(3, 0);
-	lcdWriteString_P(versionNum);
-	lcdSetPos(4, 0);
-	lcdWriteString_P(versionAuthor);
-#endif
-	digitalsBuzzBlocking(500);
-	WAITMS(700);
+	startup();
 	
-	rxRead();
-	if (RX[THR] >= 90 || keyboardState() == (KEY_1 | KEY_4))		// enter ESC Calibration mode?
-		ESCCalibration();
-
 	pwmEnable();
 	LOOPUS(CYCLE_TIME)
 	{
@@ -173,22 +243,19 @@ int main(void)
 		State.CycleTime = TICKSTOMICRO(_cycleStart - lastStart);
 		lastStart = _cycleStart;
 		
- 		LED_TOGGLE;
 		rxRead();
 		checkState();
+		armingLoop();
 		sensorsRead();
 		imuCalculate();
 		controllerCalculate();
 		mixerCalculate();
 
-		for (uint8_t i = 0; i < 8; i++)
-			pwmWrite(i, MIXER[i]);
-		
 		State.CalculationTime = TICKSTOMICRO(ticks() - _cycleStart);
 
 #ifndef NO_LCD
 		EVERYMS(25)
-			menuShow();
+			menuLoop();
 #endif
 	
 		lvaLoop();

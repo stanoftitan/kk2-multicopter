@@ -9,9 +9,11 @@
 #ifndef MENU_H_
 #define MENU_H_
 
-void menuInit();
-void menuShow();
+uint8_t menuPage;
 
+void menuInit();
+void menuLoop();
+void menuRefresh();
 
 
 #endif /* MENU_H_ */

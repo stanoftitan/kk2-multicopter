@@ -40,11 +40,11 @@
 #define CMD_SET_CONTRAST			0x81
 #define CMD_SET_STATIC_OFF			0xAC
 #define CMD_SET_STATIC_ON			0xAD
-#define CMD_SET_STATIC_REG			0x0
+#define CMD_SET_STATIC_REG			0x00
 #define CMD_SET_BOOSTER_FIRST		0xF8
-#define CMD_SET_BOOSTER_234			0
-#define CMD_SET_BOOSTER_5			1
-#define CMD_SET_BOOSTER_6			3
+#define CMD_SET_BOOSTER_234			0x00
+#define CMD_SET_BOOSTER_5			0x01
+#define CMD_SET_BOOSTER_6			0x03
 
 #define REVERSED	1
 static uint8_t _flags = 0;
@@ -298,6 +298,7 @@ void lcdEnable()
 
 void lcdDisable()
 {
+	WAITMS(110);
 	TIMSK0 &= ~_BV(TOIE0);	// disable overflow interrupt
 }
 
@@ -348,6 +349,7 @@ void lcdInit()
 	// use timer0 with clk/8 and overflow
 	// at 256 as interrupt based output of data bytes
 	// ie every 1024us one byte is send to display. whole screen takes about 105ms
+	PRR0 |= PRTIM0;			// enable hardware
 	TCCR0B = _BV(CS01);		// clk/8
 	lcdEnable();
 }
