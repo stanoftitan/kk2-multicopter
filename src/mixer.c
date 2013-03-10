@@ -12,11 +12,12 @@
 #include "rx.h"
 #include "controller.h"
 #include "mixer.h"
+#include "pwm.h"
 #include <string.h>
 #include <avr/pgmspace.h>
 
 
-uint16_t MIXER[8];
+uint16_t MIXER[OUTPUTS];
 extern int16_t CHANNELS[4];
 
 void mixerInit()
@@ -39,9 +40,9 @@ void mixerCalculate()
 {
 	int32_t r;
 	
-	for (uint8_t i = 0; i < 8; i++)
+	for (uint8_t i = 0; i < OUTPUTS; i++)
 	{
- 		if (!(Config.Mixer[i].flags & FLAG_TYPE))
+ 		if (Config.Mixer[i].Flags == FLAG_NONE)
  			MIXER[i] = 0;
  		else
 		{
@@ -51,9 +52,18 @@ void mixerCalculate()
 			r += (int32_t) CONTROL[RUD] * Config.Mixer[i].Rudder;
 			r += (int32_t) CONTROL[THR] * Config.Mixer[i].Throttle;
 			r += (int32_t) ((PWM_MID - PWM_LOW) * 32 / 50) * Config.Mixer[i].Offset;
-		
 			MIXER[i] = limit(PWM_LOW + (r >> 5), PWM_MIN, PWM_MAX);
 		}
 	}
 }
 
+void mixerOutput()
+{
+	for (uint8_t i = 0; i < OUTPUTS; i++)
+	{
+		if ((Config.Mixer[i].IsMotor && State.Armed) || Config.Mixer[i].IsServo)
+			pwmWrite(i, MIXER[i]);
+		else
+			pwmWrite(i, PWM_MIN);
+	}			
+}

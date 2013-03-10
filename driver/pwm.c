@@ -11,7 +11,7 @@
 #include "rx.h"
 #include <avr/pgmspace.h>
 
-static uint16_t PWM[8];
+static uint16_t PWM[OUTPUTS];
 static const uint8_t masktable[] PROGMEM = {_BV(OUT1_BIT), _BV(OUT2_BIT), _BV(OUT3_BIT), _BV(OUT4_BIT), _BV(OUT5_BIT), _BV(OUT6_BIT), _BV(OUT7_BIT), _BV(OUT8_BIT)};
 
 #define USE_2_OC
@@ -19,7 +19,7 @@ static const uint8_t masktable[] PROGMEM = {_BV(OUT1_BIT), _BV(OUT2_BIT), _BV(OU
 static uint8_t checkLoRate(uint16_t* lastStart)
 {
 	uint16_t t = millis();
-	if (t - *lastStart >= 20)
+	if (t - *lastStart >= LO_RATE_CYCLE)
 	{
 		*lastStart = t;
 		return ON;
@@ -30,7 +30,7 @@ static uint8_t checkLoRate(uint16_t* lastStart)
 
 static uint16_t doOutput(uint8_t index, uint8_t loActive)
 {
-	if (PWM[index] && (Config.Mixer[index].flags & FLAG_TYPE) && (loActive || (Config.Mixer[index].flags & FLAG_HIGH)))
+	if (PWM[index] && Config.Mixer[index].Flags && (Config.Mixer[index].IsMotor || loActive || Config.Mixer[index].IsHiRate))
 	{
 		cli();
 		OUT_PORT |= pgm_read_byte(&masktable[index]);

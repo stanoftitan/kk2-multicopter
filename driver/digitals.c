@@ -40,7 +40,7 @@ void digitalsBuzzBlocking(uint16_t ms)
 			a.end = m + a.interval;	\
 		}							\
 	}								\
-	else if (state)					\
+	else if (a.end && state)		\
 		if (m >= a.end)				\
 			toggle;
 
