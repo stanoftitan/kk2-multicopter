@@ -478,17 +478,20 @@ static void _hLoadModelLayout()
 static void _hStart()
 {
 	char s[7];
-	if (KEY4 && !State.Armed)	// MENU
+	if (KEY4)	// MENU
 	{
+		arm(OFF);
 		loadPage(PAGE_MENU);
 		return;
 	}
 	
 	if (KEYINIT || KEYREFRESH)
 	{
+		if (Config.ArmingMode)
+			arm(ON);
+		
 		if (State.Armed)
 		{
-			lcdClear();
 			lcdSetPos(3, 36);
 			lcdSelectFont(&font12x16);
 			lcdWriteString_P(strARMED);

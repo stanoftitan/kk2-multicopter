@@ -16,12 +16,6 @@
 #define ON		1
 #define OFF		0
 
-/*
-#define XAXIS	0
-#define YAXIS	1
-#define ZAXIS	2
-*/
-
 #define ROL		0
 #define PIT		1
 #define YAW		2
@@ -65,5 +59,6 @@ typedef struct
 } state_t;
 
 extern state_t State;
+void arm(uint8_t);
 
 #endif /* GLOBAL_H_ */

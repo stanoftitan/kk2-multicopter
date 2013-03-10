@@ -24,6 +24,8 @@
 #include <avr/wdt.h>
 #include <avr/sleep.h>
 
+void lvaLoop();
+
 // for debugging
 #include <stdlib.h>
 #include <string.h>
@@ -96,6 +98,7 @@ static void ESCCalibration()
 	lcdSetPos(3, 18);
 	lcdWriteString_P(PSTR("Calibrating ESCs"));
 #endif
+	State.Armed = ON;
 	pwmEnable();
 	while(1)
 	{
@@ -110,7 +113,7 @@ static void ESCCalibration()
 	}
 }
 
-static void arm(uint8_t value)
+void arm(uint8_t value)
 {
 	if (value && !State.Armed)
 	{
@@ -118,6 +121,7 @@ static void arm(uint8_t value)
 		LED = ON;
 		menuRefresh();
 		lcdDisable();
+		controllerReset();
 	}
 	else if (!value && State.Armed)
 	{
@@ -153,14 +157,14 @@ static void armingLoop()
 		startArm = 0;
 	}				
 	
-	if (Config.AutoDisarm)
+	if (Config.AutoDisarm && !Config.ArmingMode)
 	{
 		if (startOff == 0)
 		{
-			if (State.ThrottleOff)
+			if (State.ThrottleOff && State.Armed)
 				startOff = t;
 		}
-		else if (!State.ThrottleOff)
+		else if (!State.ThrottleOff || !State.Armed)
 		{
 			startOff = 0;
 		}
@@ -215,10 +219,10 @@ static void debug_output()
 	//write16(ANGLE[0] >> 8);
 	//write16(ANGLE[1] >> 8);
 	//write16(ANGLE[2] >> 8);
-	write16(MIXER[0]);
-	write16(MIXER[1]);
-	write16(MIXER[2]);
-	write16(MIXER[3]);
+	//write16(MIXER[0]);
+	//write16(MIXER[1]);
+	//write16(MIXER[2]);
+	//write16(MIXER[3]);
 	write16(State.CalculationTime);
 }
 #endif
@@ -250,6 +254,7 @@ int main(void)
 		imuCalculate();
 		controllerCalculate();
 		mixerCalculate();
+		mixerOutput();
 
 		State.CalculationTime = TICKSTOMICRO(ticks() - _cycleStart);
 
