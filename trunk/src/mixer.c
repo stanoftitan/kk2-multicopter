@@ -16,6 +16,8 @@
 #include <string.h>
 #include <avr/pgmspace.h>
 
+#define max(a,b) ((a)>(b)?(a):(b))
+
 
 uint16_t MIXER[OUTPUTS];
 extern int16_t CHANNELS[4];
@@ -46,10 +48,14 @@ void mixerCalculate()
  			MIXER[i] = 0;
  		else
 		{
-			r = 0;
-			r += (int32_t) CONTROL[AIL] * Config.Mixer[i].Aileron;
-			r += (int32_t) CONTROL[ELE] * Config.Mixer[i].Elevator;
-			r += (int32_t) CONTROL[RUD] * Config.Mixer[i].Rudder;
+			if (Config.Mixer[i].IsServo)
+				r = PWM_MID - PWM_LOW;
+			else
+				r = 0;
+				
+			r += (int32_t) CONTROL[ROL] * Config.Mixer[i].Aileron;
+			r += (int32_t) CONTROL[PIT] * Config.Mixer[i].Elevator;
+			r += (int32_t) CONTROL[YAW] * Config.Mixer[i].Rudder;
 			r += (int32_t) CONTROL[THR] * Config.Mixer[i].Throttle;
 			r += (int32_t) ((PWM_MID - PWM_LOW) * 32 / 50) * Config.Mixer[i].Offset;
 			MIXER[i] = limit(PWM_LOW + (r >> 5), PWM_MIN, PWM_MAX);
@@ -61,9 +67,16 @@ void mixerOutput()
 {
 	for (uint8_t i = 0; i < OUTPUTS; i++)
 	{
-		if ((Config.Mixer[i].IsMotor && State.Armed) || Config.Mixer[i].IsServo)
+		if (Config.Mixer[i].IsServo)
 			pwmWrite(i, MIXER[i]);
+		else if (Config.Mixer[i].IsMotor)
+		{
+			if (State.Armed && !State.ThrottleOff)
+				pwmWrite(i, max(MIXER[i], PWM_LOW + Config.MinThrottle * 10));
+			else
+				pwmWrite(i, PWM_LOW);
+		}
 		else
-			pwmWrite(i, PWM_MIN);
+			pwmWrite(i, 0);
 	}			
 }

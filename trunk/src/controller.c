@@ -32,20 +32,20 @@ int16_t calcChannel(uint8_t index)
 	// RX = -140..+140
 	// StickScaling = 0..+200
 	// ==> -28000..+28000 -> 16bit
-	err = RX[index] * Config.StickScaling[index] * 2;
+	err = RX[index] * Config.StickScaling[index];
 	
 	if (index == YAW)
 		err += GYRO_RATE[YAW];
 	else
 		err += ANGLE[index];
 		
-	//err >>= 8;
-	if (err < 0) err++;
-
 	r = (int32_t)err * Config.PID[index].PGain;
 	
-	//PID[index].Integral += err;
+	PID[index].Integral += err >> 8;
 	//r += PID[index].Integral * Config.PID[index].IGain;
+	
+	//r += (PID[index].Error - err) * Config.PID[index].DGain;
+	//PID[index].Error = err;
 	
 	r >>= 12;
 	if (r < 0) r++;

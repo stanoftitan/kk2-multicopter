@@ -24,6 +24,7 @@ typedef union
 typedef struct  
 {
 	int16_t Integral;
+	int16_t Error;
 } pid_state_t;
 
 #endif /* PID_H_ */

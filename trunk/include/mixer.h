@@ -15,7 +15,6 @@
 #define FLAG_SERVO		2
 #define FLAG_ESC		1
 #define FLAG_HIGH		4
-#define FLAG_TYPE		3
 
 typedef union
 {

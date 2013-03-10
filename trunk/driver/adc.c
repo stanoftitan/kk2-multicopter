@@ -24,7 +24,7 @@ ISR(ADC_vect, ISR_NOBLOCK)
 void adcInit()
 {
 	// enable hardware
-	PRR0 |= PRADC;
+	//PRR0 |= PRADC;
 	
 	DIDR0 = 0xFF;			// disable all digital inputs on Port A
 	ADMUX = 0;
