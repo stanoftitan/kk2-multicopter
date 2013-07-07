@@ -16,7 +16,9 @@
 #include "mixer.h"
 #include <avr/pgmspace.h>
 
+#ifndef P_STR
 #define P_STR static const char PROGMEM
+#endif
 
 // ------------ model names
 P_STR strModel01[] = "SingleCopter 2M 2S";

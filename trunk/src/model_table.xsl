@@ -20,7 +20,9 @@
 #include "mixer.h"
 #include &lt;avr/pgmspace.h&gt;
 
+#ifndef P_STR
 #define P_STR static const char PROGMEM
+#endif
 
 // ------------ model names
 <xsl:for-each select='//model'>P_STR strModel<xsl:number format='01'/>[] = "<xsl:value-of select='@name'/>";
